@@ -1,0 +1,6 @@
+Changes from Sprint 1 to Sprint 2
+---------------------------------
+1. Added slippery runway and mechinical problem features both to the specification and the UI.
+2. Added the menu panel (in terms of buttons and appreance) .
+3. Improve the simulation appreance( fine tunning).
+

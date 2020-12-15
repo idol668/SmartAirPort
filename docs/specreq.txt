@@ -1,0 +1,25 @@
+Assumptions
+-----------
+
+1. Whenever aircraft are coming they have to stay in the waiting area until they are allowed to land or departure
+2.  Conistent mechinical problem - whenver there is a mechinical problem that is still not handled, the plane will remain in the same state, hence it will still have a mechinical problem.
+3.  Conistent slippery runway - whenver there is a slippery runway that is still not handled, the runway will remain in the same state, hence it will still remain slippery .
+4. If repair truck arrives when there is a mechinical problem in the next state the mechinical problem is fixed.
+5. If clean truck arrives when there is a slippery runway in the next state the slippery runway is fixed.
+6. There are no adjcent runways that are dirty at the same time.
+
+Guarantees
+----------
+
+1. In case an aircraft is waiting for landing or departure it will evenutally get the permmision to land or take off.
+2. In each runway we allow only for one way traffic, hence each runway will allow only a plane landing or takingoff at the same time.
+3. A repair truck will be sent only if aircraft exists.
+4. If there is no mechinical problem the system won't send a repair truck.
+5. In case there is a mechnical problem eventually a repair truck will be sent to handle the issue.
+6. If a plane has a mechinical problem, it's not allowed to execute a takeoff.
+7. If there is no slippery runway the system won't send a clean truck.
+8. In case there is a slippery runway eventually a clean truck will be sent to handle the issue
+9. If the runway[i] is slippery takeoffs and landings on this runway won't be allowed (until the issue if fixed).
+
+
+

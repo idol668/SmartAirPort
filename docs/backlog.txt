@@ -1,0 +1,25 @@
+Project Tasks
+-------------
+
+T5. UI simulation:
+	1. Create an Intercative manual mode
+	2. Create Scenarios simulation
+	3. Handle the different gurantees from the spectra specifcation for the emergancy landing
+	4. .Fine tune  the animations.
+
+T6. Add missing guarantees about:
+	1. Emergancy landings
+	2. How to handle differently the planes according to their types in emergancy landings
+
+
+
+
+
+Delivered in Sprint 2
+---------------------
+
+T1. Safety guarantees and assumptions about the slippery runway and mechinical problem features
+T2. We added a response pattern gurantees to say that whenver a slippery runway or mechinical problem occures it will remain in this state until cleaning/repair truck comes to fix it.
+T3. Simulation running (but still not interctive, the menu panel is set but still not interactive 
+T4. In the simulation the slippery runway and mechinical problem features are already working.
+T5. Improved the appreance of the simulation (minor deatails).

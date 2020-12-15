@@ -1,0 +1,15 @@
+spec Utils
+
+type Aircraft = {NONE, COMMERCIAL, PRIVATE, CARGO};
+
+predicate consistentAssertion(Aircraft aircraft, boolean crossAllowed1 ,boolean crossAllowed2 ):
+	(aircraft != NONE & !crossAllowed1 & !crossAllowed2) -> next(aircraft) = aircraft;
+
+predicate consistentAssertionStillDirty(boolean slippryRunway, boolean isCleaningCar ):
+	(slippryRunway & !isCleaningCar) -> next(slippryRunway);
+
+predicate consistentAssertionStillNotRepaired(Aircraft aircraft, boolean mechinicalProblem, boolean isRepairTrack):
+	(aircraft != NONE & mechinicalProblem & !isRepairTrack) -> (next(aircraft) = aircraft & next(mechinicalProblem) = mechinicalProblem);
+
+predicate consistentEmegencyLanding( boolean EmegencyLanding, boolean isRescueTeamArrives):
+	( EmegencyLanding & !isRescueTeamArrives) -> ( next(EmegencyLanding));

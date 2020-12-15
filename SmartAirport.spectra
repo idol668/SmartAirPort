@@ -1,0 +1,258 @@
+import "./imports/DwyerPatterns.spectra"
+import "./imports/Utils.spectra"
+
+spec SmartAirport			
+			
+define N := 2 ; // can be 1 OR 2
+define doubleN := 4 ; // can be 2 OR 4
+
+type Aircraft = {NONE, COMMERCIAL, PRIVATE, CARGO};
+
+// ****************************************************************************************
+// ***  ***
+// ****************************************************************************************
+env Aircraft[N] landingAircrafts;
+env Aircraft[N] takeoffAircrafts;
+
+env boolean[N] emergencyLanding;
+env boolean[N] mechanicalProblem;
+env boolean[doubleN] slipperyRunway;
+
+
+sys boolean[doubleN] landingAllowed;
+sys boolean[doubleN] takeoffAllowed;
+
+sys boolean[N] repairTruck;
+
+sys boolean[doubleN] cleanTruck;
+
+sys boolean[N] rescueTeam;
+
+//sys boolean[N] ambulance;
+
+
+// ********************************************************************************************
+// *** Whenever aircrafts are coming, they have to stay there until they are allowed to cross ***
+// ********************************************************************************************
+
+asm consistentAssertionlanding{Int(0..(N-1)) i}:
+	G consistentAssertion(landingAircrafts[i], landingAllowed[(2*i)] , landingAllowed[(2*i+1)]);
+
+asm consistentAssertiontakeoff{Int(0..(N-1)) i}:
+	G consistentAssertion(takeoffAircrafts[i], takeoffAllowed[(2*i)],takeoffAllowed[(2*i+1)]);
+
+
+// **************************************************************************
+// *** Whenever aircraft is coming, it will eventually land / take off  ***
+// **************************************************************************
+gar Eventuallylanding{Int(0..(N-1)) i}:
+	pRespondsToS(landingAircrafts[i]!=NONE, (landingAllowed[(2*i)] |landingAllowed[(2*i+1)]));
+	
+gar Eventuallytakeoff{Int(0..(N-1)) i}:
+	pRespondsToS(takeoffAircrafts[i]!=NONE , (takeoffAllowed[(2*i)] | takeoffAllowed[(2*i+1)]));
+
+gar oneWayRunwayOnly {Int(0..(doubleN-1)) i}:
+	G !(next(landingAllowed[i]) & next(takeoffAllowed[i]));
+	
+gar oneWayRunwayOnlyBegining {Int(0..(doubleN-1)) i}:
+	!((landingAllowed[i]) & (takeoffAllowed[i]));
+		
+// **************************************************************************
+// ***                          Mechanical Problem                        ***
+// **************************************************************************	
+////
+
+ asm !mechanicalProblem[0] & !mechanicalProblem[1];
+ 
+asm consistentAssertionMechProblem  {Int(0..(N-1)) i}:
+	G consistentAssertionStillNotRepaired(takeoffAircrafts[i],mechanicalProblem[i],repairTruck[i]);
+
+asm RepairedAircraft {Int(0..(N-1)) i}:
+	G (repairTruck[i] -> next(!mechanicalProblem[i]));
+
+gar RepairTruckIfAircraftExistd {Int(0..(N-1)) i}:
+	G (next(takeoffAircrafts[i] = NONE) -> next(!repairTruck[i]));
+	
+gar RepairTruckIfAircraftExistdBegining{Int(0..(N-1)) i}:
+	((takeoffAircrafts[i] = NONE) -> (!repairTruck[i]));
+		
+gar repairTruckOnlyIfBroken {Int(0..(N-1)) i}:
+	G (next(!mechanicalProblem[i]) -> next(!repairTruck[i]));
+
+gar repairTruckOnlyIfBrokenBegin {Int(0..(N-1)) i}:
+	 ((!mechanicalProblem[i]) -> (!repairTruck[i]));
+	
+gar eventuallyRepairTrackArrives {Int(0..(N-1)) i}:
+	pRespondsToS(mechanicalProblem[i] & takeoffAircrafts[i] != NONE,repairTruck[i]);
+ 
+gar noTrafficAllowedWhileNotRepaired  {Int(0..(N-1)) i}:
+	G (next(mechanicalProblem[i] & !repairTruck[i]) -> (next(!takeoffAllowed[(2*i)]) & next(!takeoffAllowed[(2*i+1)])));
+	
+gar noTrafficAllowedWhileNotRepairedBegin  {Int(0..(N-1)) i}:
+	((mechanicalProblem[i] & !repairTruck[i]) -> ((!takeoffAllowed[(2*i)]) & (!takeoffAllowed[(2*i+1)])));	
+
+	
+//// **************************************************************************
+//// ***                          Slippery Runway                           ***
+//// **************************************************************************
+
+asm !slipperyRunway[0] & !slipperyRunway[1] & !slipperyRunway[2] & !slipperyRunway[3];
+
+asm consistentAssertionSlippry {Int (0..(doubleN-1)) i}:
+	G consistentAssertionStillDirty(slipperyRunway[i],cleanTruck[i]); 
+
+asm cleanRunway {Int (0..(doubleN-1)) i}:
+	G (cleanTruck[i]->next(!slipperyRunway[i]));
+	 
+gar cleanTruckOnlyIfSlippry {Int (0..(doubleN-1)) i}:
+	G (next(!slipperyRunway[i]) -> next(!cleanTruck[i]));
+
+gar cleanTruckOnlyIfSlippryBegin {Int (0..(doubleN-1)) i}:
+	 ((!slipperyRunway[i]) -> (!cleanTruck[i]));	
+
+gar eventuallyCleaningTruckArrives {Int (0..(doubleN-1)) i}:
+	pRespondsToS(slipperyRunway[i],cleanTruck[i]);
+
+gar trafficIsNotAllowedWhileSlippery {Int (0..(doubleN-1)) i}:
+	G (next(slipperyRunway[i])  ->(next(!landingAllowed[i]) & next(!takeoffAllowed[i])));
+	
+gar trafficIsNotAllowedWhileSlipperyBegin {Int (0..(doubleN-1)) i}:
+	G ((slipperyRunway[i])  ->((!landingAllowed[i]) & (!takeoffAllowed[i])));	
+
+//// **************************************************************************
+//// ***                        Emergency Landing                           ***
+//// **************************************************************************
+ 
+ 
+//***********************************************// 
+//******              Ido's TRY            ******//
+//***********************************************//
+asm !emergencyLanding[0] & !emergencyLanding[1];
+
+asm G (next(!emergencyLanding[0]) | next(!emergencyLanding[1]));/************** */
+
+asm consistentEmegencyLanding{Int (0..(N-1)) i}:
+	G consistentEmegencyLanding( emergencyLanding[i], rescueTeam[i]);
+
+asm EmergencyHandled{Int (0..(N-1)) i}:
+	G ((rescueTeam[i] & emergencyLanding[i]) -> (next(!emergencyLanding[0]) & next(!emergencyLanding[1]) ) );
+	
+asm emergencyOnlyInAircfartLanding {Int (0..(N-1)) i}:
+	G (next(landingAircrafts[i]=NONE) ->  next(!emergencyLanding[i]));
+
+asm emergencyOnlyInAircfartLandingBegin {Int (0..(N-1)) i}:
+	((landingAircrafts[i]=NONE) ->  (!emergencyLanding[i])); 
+	
+asm notAlwaysEmegency{Int (0..(N-1)) i}:
+	GF (!emergencyLanding[i]);
+
+gar rescueAndAmbulanceOnlyIfEmergency {Int (0..(N-1)) i}:
+	G next(!emergencyLanding[i]) -> next(!rescueTeam[i]);
+	
+gar rescueAndAmbulanceOnlyIfEmergencyBegin {Int (0..(N-1)) i}:
+	(!emergencyLanding[i]) -> (!rescueTeam[i]); 
+		
+gar EmergencylandingNotAllowed{Int (0..(N-1)) i}:
+	G ((next(emergencyLanding[i]) & next(!rescueTeam[i]))-> !(next(landingAllowed[(2*i)]) | next(landingAllowed[(2*i+1)])));
+	
+gar EmergencylandingNotAllowedBegin{Int (0..(N-1)) i}:
+	 (((emergencyLanding[i]) & (!rescueTeam[i]))-> !((landingAllowed[(2*i)]) | (landingAllowed[(2*i+1)])));
+ 	
+gar landingCurfewWheneverEmergencylandingInLine0:
+	G ((next(emergencyLanding[0]) & next(!emergencyLanding[1])) -> (next(!landingAllowed[2]) & next(!landingAllowed[3])));
+	
+gar landingCurfewWheneverEmergencylandingInLine0Begin:
+	(((emergencyLanding[0]) & (!emergencyLanding[1])) -> ((!landingAllowed[2]) & (!landingAllowed[3])));	
+	
+gar landingCurfewWheneverEmergencylandingInLine1:	
+	 (((!emergencyLanding[0]) & (emergencyLanding[1])) -> ((!landingAllowed[0]) & (!landingAllowed[1])));
+	
+gar landingCurfewWheneverEmergencylandingInLine1Begin:	
+	G ((next(!emergencyLanding[0]) & next(emergencyLanding[1])) -> (next(!landingAllowed[0]) & next(!landingAllowed[1])));	
+
+gar rescueTeamComeImmediately{Int (0..(N-1)) i}:
+	G ((emergencyLanding[i] & !rescueTeam[i])-> next(rescueTeam[i]));
+
+gar takeoffCurfewWheneverEmergencylanding{Int (0..(N-1)) i}:
+	G ( next(emergencyLanding[i]) -> (next(!takeoffAllowed[0]) & next(!takeoffAllowed[1]) & next(!takeoffAllowed[2]) & next(!takeoffAllowed[3]) ));
+
+
+gar takeoffCurfewWheneverEmergencylandingBegin{Int (0..(N-1)) i}:
+	 ( (emergencyLanding[i]) -> ((!takeoffAllowed[0]) & (!takeoffAllowed[1]) & (!takeoffAllowed[2]) & (!takeoffAllowed[3]) ));
+
+
+gar EmergencylandingAllowed{Int (0..(N-1)) i}:
+	G ((emergencyLanding[i] & !rescueTeam[i])-> next(landingAllowed[(2*i)] | landingAllowed[(2*i+1)]));	
+	
+
+//***********************************************//
+
+
+//***********************************************//
+//******              Noi's TRY            ******//
+//****** problem: rescue team disappears   ******//
+//***********************************************//
+//asm !emergencyLanding[0] & !emergencyLanding[1];
+//
+//asm EmergencyHandledByRescueTeam{Int (0..(N-1)) i}:
+//	G (rescueTeam[i] -> next(!emergencyLanding[i]));
+//
+//asm notAlwaysEmegency{Int (0..(N-1)) i}:
+//	GF (!emergencyLanding[i]);
+//
+//asm alw !(emergencyLanding[0] & emergencyLanding[1]);
+//
+//asm emergencyOnlyInAircfartLanding {Int (0..(N-1)) i}:
+//	alw !(landingAircrafts[i]=NONE & emergencyLanding[i]);
+//	
+//gar rescueOnlyIfEmergency {Int (0..(N-1)) i}:
+//	G !(!emergencyLanding[i] & rescueTeam[i]);
+//
+//gar rescueTeamComeImmediately{Int (0..(N-1)) i}:
+//	G ((emergencyLanding[i] & !rescueTeam[i])-> next(rescueTeam[i]));
+//	
+//gar EmergencylandingAllowed{Int (0..(N-1)) i}:
+//	G ((emergencyLanding[i] & !rescueTeam[i])-> !(landingAllowed[(2*i)] | landingAllowed[(2*i+1)]));
+//
+//gar landingCurfewWheneverEmergencylandingInLine0:
+//	G ((emergencyLanding[0] & !emergencyLanding[1]) -> (!landingAllowed[2] & !landingAllowed[3]));
+//	
+//gar landingCurfewWheneverEmergencylandingInLine1:	
+//	G ((!emergencyLanding[0] & emergencyLanding[1]) -> (!landingAllowed[0] & !landingAllowed[1]));
+//
+//gar takeoffCurfewWheneverEmergencylanding{Int (0..(N-1)) i}:
+//	G ((emergencyLanding[i]) -> (!takeoffAllowed[0] & !takeoffAllowed[1] & !takeoffAllowed[2] & !takeoffAllowed[3]));
+//***********************************************//
+
+//*****************************************************************************************************//
+//******                                Noi & Benni's TRY with triggers                          ******//
+//******                                     problem: Unrealizable                               ******//
+//******  solution: remove NoRescueTeamWithoutEmergency => problem:rescue team without emergency ******//
+//*****************************************************************************************************//
+
+// level 1	
+//asm notAlwaysEmegency{Int (0..(N-1)) i}:
+//	GF (!emergencyLanding[i]);	
+//	
+//asm !emergencyLanding[0] & !emergencyLanding[1];
+//	
+//gar NoRescueTeamWithoutEmergency{Int (0..(N-1)) i}:
+//	G (!emergencyLanding[i] -> !rescueTeam[i]);
+//	
+////level k
+//gar EmegencyLandingWithoutRescueTeamNotAllowToLand{Int (0..(N-1)) i}:
+//	G (emergencyLanding[i] & !rescueTeam[i])-> (!landingAllowed[(2*i)] & !landingAllowed[(2*i+1)]);
+//	
+//gar sendingRescueTeam{Int (0..(N-1)) i}:
+//	G (emergencyLanding[i] & !rescueTeam[i]) ->next(rescueTeam[i] & emergencyLanding[i] & (landingAllowed[(2*i)] | landingAllowed[(2*i+1)]));
+//
+//gar trig [true]*([!emergencyLanding[0] & !rescueTeam[0]][emergencyLanding[0] & rescueTeam[0]]) |=> false;
+//gar trig [true]*([!emergencyLanding[1] & !rescueTeam[1]][emergencyLanding[1] & rescueTeam[1]]) |=> false;
+//
+////level k+1
+//asm EmergencyHandledByRescueTeam{Int (0..(N-1)) i}:
+//	G (rescueTeam[i] -> next(!emergencyLanding[i]));
+//
+//gar takeoffCurfewWheneverEmergencylanding{Int (0..(N-1)) i}:
+//	G ((emergencyLanding[i] & !rescueTeam[i]) -> (!takeoffAllowed[0] & !takeoffAllowed[1] & !takeoffAllowed[2] & !takeoffAllowed[3]));
+
