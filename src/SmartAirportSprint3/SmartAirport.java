@@ -675,7 +675,7 @@ public class SmartAirport extends JPanel {
 				
 				}
 				else if (plane.type.equals("COMMERCIAL")) {
-					g.drawImage(shadow_commerical_180,plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(shadow_commerical_90,plane.x_shadow, plane.y_shadow, this);
 				
 				}
 				 else if (plane.type.equals("CARGO")) {
@@ -691,7 +691,7 @@ public class SmartAirport extends JPanel {
 				
 				}
 				else if (plane.type.equals("COMMERCIAL")) {
-					g.drawImage(shadow_commerical_180,plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(shadow_commerical_270,plane.x_shadow, plane.y_shadow, this);
 				
 				}
 				
@@ -1064,7 +1064,7 @@ public class SmartAirport extends JPanel {
 				if (cleaningSensors[i]) {
 					if (timeToRemoveDirtOrTruck < 17) {
 						
-						cleaningCars[i].x = cleaningCars[i].x + 16;
+						cleaningCars[i].x = cleaningCars[i].x + 18;
 
 					}
 					if (timeToRemoveDirtOrTruck > 16 & timeToRemoveDirtOrTruck < 23) {
@@ -1075,7 +1075,7 @@ public class SmartAirport extends JPanel {
 
 					if (timeToRemoveDirtOrTruck > 23) {
 						cleaningCars[i].degree = 0;
-						cleaningCars[i].x = cleaningCars[i].x - 16;
+						cleaningCars[i].x = cleaningCars[i].x - 18;
 						if (timeToRemoveDirtOrTruck == 39) {
 							cleaningCars[i] = null;
 						}
