@@ -62,8 +62,8 @@ public class SmartAirport extends JPanel {
 	private Image shadowcargo_270;
 	private Image shadow_commerical_90;
 	private Image shadow_commerical_270;
+	
 	// SlippryRunway variables
-
 	private Image cleaningCar_0;
 	private Image cleaningCar_90;
 	private Image cleaningCar_180;
@@ -72,7 +72,20 @@ public class SmartAirport extends JPanel {
 	boolean[] cleaningSensors = new boolean[4];
 	CleaningTruck[] cleaningCars = new CleaningTruck[4];
 	boolean[] stillCleaning = new boolean[4];
+	
+	//Additional images for takeoff
+	private Image shadow_commerical_0_medium;
+	private Image shadow_commerical_0_small;
+	private Image shadowcargo_0_medium;
+	private Image shadowcargo_0_small;
+	private Image shadow_private_0_medium;
+	private Image shadow_private_0_small;
 
+
+
+	int takeOffIteartion;
+	
+	
 	boolean[] takeoffAllowed = new boolean[4];
 	boolean[] landingAllowed = new boolean[4];
 
@@ -344,7 +357,9 @@ public class SmartAirport extends JPanel {
 				}
 				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof
 						&& rescueTeams[i] != null) {
+					
 					for (int j = 0; j < 23; j++) {
+						
 						landingPlaneExists[i].x += 15;
 						if (j == 9) {
 							landingPlaneExists[i].ground = true;
@@ -360,6 +375,9 @@ public class SmartAirport extends JPanel {
 					}
 					landingPlaneExists[i].EnterLandingOrTakeoof = false;
 					for (int j = 0; j < 50; j++) {
+						if (landingPlaneExists[i]!=null && !landingPlaneExists[i].EnterLandingOrTakeoof & !emergencyLanding[i]){
+							animatedWaitingForLanding(j,landingPlaneExists[i]);
+						}
 						if (landingLine == 0) {
 							if (j < 42) {
 								rescueTeams[i].y -= 12;
@@ -490,7 +508,7 @@ public class SmartAirport extends JPanel {
 					landingPlaneExists[i].EnterLandingOrTakeoof = true;
 					Random rand = new Random();
 					if (rand.nextBoolean() == true) {
-						landingPlaneExists[i].y = landingPlaneExists[i].y + 60;
+						landingPlaneExists[i].y = landingPlaneExists[i].y + 65;
 					} else {
 						landingPlaneExists[i].y = landingPlaneExists[i].y - 40;
 					}
@@ -499,7 +517,7 @@ public class SmartAirport extends JPanel {
 					landingPlaneExists[i].y = landingPlaneExists[i].y - 40;
 				} else if (landingAllowed[2 * i + 1] == true && !slipperyRunway[2 * i + 1]) {
 					landingPlaneExists[i].EnterLandingOrTakeoof = true;
-					landingPlaneExists[i].y = landingPlaneExists[i].y + 60;
+					landingPlaneExists[i].y = landingPlaneExists[i].y + 65;
 				}
 			}
 			if (takeoffPlaneExists[i] != null && mechanicalProblem[i] == false) {
@@ -558,7 +576,7 @@ public class SmartAirport extends JPanel {
 		repaint();
 
 		for (int j = 0; j < 40; j++) {
-
+			takeOffIteartion=j;
 			for (int i = 0; i < 2; i++) {
 				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof & j>=12) {
 
@@ -624,11 +642,48 @@ public class SmartAirport extends JPanel {
 		if (plane.degree == 0) {
 			if (plane.ground == false) {
 				if (plane.type.equals("COMMERCIAL")) {
-					g.drawImage(shadow_commerical_0, plane.x_shadow, plane.y_shadow, this);
+					if (takeOffIteartion<26)
+					{
+						g.drawImage(shadow_commerical_0, plane.x_shadow, plane.y_shadow, this);
+					}
+					if (takeOffIteartion<33 && takeOffIteartion>25)
+					{
+						g.drawImage(shadow_commerical_0_medium, plane.x_shadow, plane.y_shadow, this);
+					}
+					if (takeOffIteartion<40 && takeOffIteartion>32)
+					{
+						g.drawImage(shadow_commerical_0_small, plane.x_shadow, plane.y_shadow, this);
+					}
+					
 				} else if (plane.type.equals("PRIVATE")) {
-					g.drawImage(shadow_private_0, plane.x_shadow, plane.y_shadow, this);
+					if (takeOffIteartion<26)
+					{
+						g.drawImage(shadow_private_0, plane.x_shadow, plane.y_shadow, this);
+					}
+					if (takeOffIteartion<33 && takeOffIteartion>25)
+					{
+						g.drawImage(shadow_private_0_medium, plane.x_shadow, plane.y_shadow, this);
+					}
+					if (takeOffIteartion<40 && takeOffIteartion>32)
+					{
+						g.drawImage(shadow_private_0_small, plane.x_shadow, plane.y_shadow, this);
+					}
+					
 				} else if (plane.type.equals("CARGO")) {
-					g.drawImage(shadowcargo_0, plane.x_shadow, plane.y_shadow, this);
+					
+					if (takeOffIteartion<26)
+					{
+						g.drawImage(shadowcargo_0, plane.x_shadow, plane.y_shadow, this);
+					}
+					if (takeOffIteartion<33 && takeOffIteartion>25)
+					{
+						g.drawImage(shadowcargo_0_medium, plane.x_shadow, plane.y_shadow, this);
+					}
+					if (takeOffIteartion<40 && takeOffIteartion>32)
+					{
+						g.drawImage(shadowcargo_0_small, plane.x_shadow, plane.y_shadow, this);
+					}
+						
 				}
 			} else {
 				if (plane.type.equals("COMMERCIAL")) {
@@ -796,6 +851,16 @@ public class SmartAirport extends JPanel {
 		shadow_commerical_270 = ImageIO.read(new File("img/shadow_commerical_270.png"));
 		
 
+
+		//Additional Images for takeoff
+		shadow_commerical_0_medium = ImageIO.read(new File("img/shadow_commerical_0_medium.png"));
+		shadow_commerical_0_small = ImageIO.read(new File("img/shadow_commerical_0_small.png"));
+		shadowcargo_0_medium=ImageIO.read(new File("img/shadowcargo_0_medium.png"));
+		shadowcargo_0_small=ImageIO.read(new File("img/shadowcargo_0_small.png"));
+		shadow_private_0_medium=ImageIO.read(new File("img/shadow_private_0_medium.png"));
+		shadow_private_0_small=ImageIO.read(new File("img/shadow_private_0_small.png"));
+
+		
 		// images for slippery runway
 		cleaningCar_0 = ImageIO.read(new File("img/cleaningCar_0.png"));
 		cleaningCar_180 = ImageIO.read(new File("img/cleaningCar_180.png"));
