@@ -85,6 +85,8 @@ public class SmartAirport extends JPanel {
 
 	int takeOffIteartion;
 	
+	static boolean inScenario = false;
+	static boolean startScenario = false;
 	
 	boolean[] takeoffAllowed = new boolean[4];
 	boolean[] landingAllowed = new boolean[4];
@@ -95,12 +97,14 @@ public class SmartAirport extends JPanel {
 	ControllerExecutor executor;
 	boolean[] emergencyLanding = new boolean[2];
 	boolean[] slipperyRunway = new boolean[4];
-	boolean[] mechanicalProblem = new boolean[4];
+	static boolean[] mechanicalProblem = new boolean[4];
 
 	RepairTruck[] repairTruck = new RepairTruck[2];
 
 	RescueTeam[] rescueTeams = new RescueTeam[2];
 	Ambulance[] ambulances = new Ambulance[2];
+	
+	static Map<String, String> envMoves = new HashMap<>();
 
 	boolean run = true;
 	boolean finished = false;
@@ -132,7 +136,7 @@ public class SmartAirport extends JPanel {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-
+					
 					Map<String, String> envValues = executor.getCurrInputs();
 					for (int i = 0; i < 4; i++) {
 						String key = String.format("slipperyRunway[%d]", i);
@@ -149,7 +153,7 @@ public class SmartAirport extends JPanel {
 					emergencyLanding[0] = envValues.get("emergencyLanding[0]").equals("true") ? true : false;
 					emergencyLanding[1] = envValues.get("emergencyLanding[1]").equals("true") ? true : false;
 
-					// System.out.println(executor.getCurrInputs().toString());
+					//System.out.println(executor.getCurrInputs().toString());
 					if (!envValues.get("takeoffAircrafts[0]").equals("NONE")) {
 						Airplane plane = new Airplane(650, 170, 0, executor.getCurrInputs().get("takeoffAircrafts[0]"),
 								0, true);
@@ -233,12 +237,51 @@ public class SmartAirport extends JPanel {
 					repaint();
 					animateEmergencyLanding();
 					animateLandingAndTakeoff();
+					
 					updateInputs(inputs, sysValues);
+					if(inScenario){
+						if(envMoves.isEmpty() || envMoves==null)
+						{
+							outputArea.setText(outputArea.getText()+"Done\n");
+//							System.out.println("Done");
+							inScenario = false;
+							startScenario = false;
+							try {
+								Thread.sleep(4000);
+							} catch (InterruptedException e1) {
+								e1.printStackTrace();
+							}
+						}
+						else
+						{
+							for (int i = 0; i < 2; i++) {
+								if(envMoves.get(String.format("mechanicalProblem[%d]", i))!= null){
+									inputs.put((String.format("mechanicalProblem[%d]", i)),"true");
+									envMoves.remove(String.format("mechanicalProblem[%d]", i));
+								}
+							}
+							for (int i = 0; i < 4; i++) {
+								if(envMoves.get(String.format("slipperyRunway[%d]", i))!= null){
+									inputs.put((String.format("slipperyRunway[%d]", i)),"true");
+									envMoves.remove(String.format("slipperyRunway[%d]", i));
+								}
+							}
+						}
+						
+					}
 					System.out.println(inputs.toString());
-					executor.updateState(inputs);
+					
+					
+					try {
+						executor.updateState(inputs);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					//executor.updateState(inputs);
 
 					repaint();
-
+					envMoves.clear();
 				}
 
 				finished = true;
@@ -849,8 +892,6 @@ public class SmartAirport extends JPanel {
 		shadow_private_270 = ImageIO.read(new File("img/shadow_private_270.png"));
 		shadow_commerical_90 = ImageIO.read(new File("img/shadow_commerical_90.png"));
 		shadow_commerical_270 = ImageIO.read(new File("img/shadow_commerical_270.png"));
-		
-
 
 		//Additional Images for takeoff
 		shadow_commerical_0_medium = ImageIO.read(new File("img/shadow_commerical_0_medium.png"));
@@ -859,7 +900,6 @@ public class SmartAirport extends JPanel {
 		shadowcargo_0_small=ImageIO.read(new File("img/shadowcargo_0_small.png"));
 		shadow_private_0_medium=ImageIO.read(new File("img/shadow_private_0_medium.png"));
 		shadow_private_0_small=ImageIO.read(new File("img/shadow_private_0_small.png"));
-
 		
 		// images for slippery runway
 		cleaningCar_0 = ImageIO.read(new File("img/cleaningCar_0.png"));
@@ -878,175 +918,20 @@ public class SmartAirport extends JPanel {
 		for (int i = 0; i < 4; i++) {
 			takeoffAllowed[i] = false;
 		}
-
-	}
-
-	public static JPanel createHeadLinePanel() {
-		JPanel headPanel = new JPanel();
-		JLabel headLineLabel = new JLabel("<html><span style='font-size:20px'>Smart Airport Simulator</span></html>");
-		headPanel.add(headLineLabel);
-		return headPanel;
-	}
-
-	public static JPanel createEventsPanel(SmartAirport smartAirport) {
-		JPanel eventsPanel = new JPanel(new BorderLayout());
-		JPanel headLinePanel = new JPanel();
-		JPanel eventsPanelToggelsLanding = new JPanel(new BorderLayout());
-		JPanel eventsPanelToggelsTakeoff = new JPanel(new BorderLayout());
-		JPanel eventsPanelToggels = new JPanel();
-		JPanel eventsPanelToggelsAndLabel = new JPanel(new BorderLayout());
-		JPanel dirtyRunwayLinePanel = new JPanel();
-		JPanel dirtyRunwayComboAndButton = new JPanel();
-		JPanel eventsPaneldirtyRunway = new JPanel(new BorderLayout());
-
-		JLabel headLineLabel = new JLabel("<html><span style='font-size:14px'>Add landings & takeoffs</span></html>");
-		headLinePanel.add(headLineLabel);
-
-		JToggleButton landingNorthToggleButton = new JToggleButton("Landing North");
-		JToggleButton landingSouthToggleButton = new JToggleButton("Landing South");
-		JToggleButton takeoffNorthToggleButton = new JToggleButton("Takeoff North");
-		JToggleButton takeoffSouthToggleButton = new JToggleButton("Takeoff South");
-		JPanel manualAddbuttonPanel = new JPanel();
-		JButton manualAddButton = new JButton("Go");
-
-		manualAddButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// implement
-			}
-		});
-
-		String[] runWays = { "-----", "Takeoof North", "Takeoof South", "Landing North", "Landing South" };
-		JComboBox<String> dirtyRunwayCombo = new JComboBox<>(runWays);
-
-		JButton dirtyRunwayButton = new JButton("Go");
-		dirtyRunwayButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// implement
-			}
-		});
-
-		JLabel dirtyRunwayLineLabel = new JLabel("<html><span style='font-size:14px'>Dirty a Runway</span></html>");
-		dirtyRunwayLinePanel.add(dirtyRunwayLineLabel);
-
-		dirtyRunwayComboAndButton.add(dirtyRunwayCombo, BorderLayout.WEST);
-		dirtyRunwayComboAndButton.add(dirtyRunwayButton, BorderLayout.EAST);
-
-		eventsPaneldirtyRunway.add(dirtyRunwayLinePanel, BorderLayout.NORTH);
-		eventsPaneldirtyRunway.add(dirtyRunwayComboAndButton, BorderLayout.SOUTH);
-
-		landingNorthToggleButton.addItemListener(new ItemListener() {
-
-			public void itemStateChanged(ItemEvent itemEvent) {
-				int state = itemEvent.getStateChange();
-
-				if (state == ItemEvent.SELECTED) {
-					// implement
-				} else {
-
-					// implement
-				}
-			}
-		});
-		landingSouthToggleButton.addItemListener(new ItemListener() {
-
-			public void itemStateChanged(ItemEvent itemEvent) {
-				int state = itemEvent.getStateChange();
-
-				if (state == ItemEvent.SELECTED) {
-					// implement
-				} else {
-
-					// implement
-				}
-			}
-		});
-		takeoffNorthToggleButton.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent itemEvent) {
-				int state = itemEvent.getStateChange();
-
-				if (state == ItemEvent.SELECTED) {
-					// implement
-				} else {
-
-					// implement
-				}
-			}
-		});
-		takeoffSouthToggleButton.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent itemEvent) {
-				int state = itemEvent.getStateChange();
-
-				if (state == ItemEvent.SELECTED) {
-					// implement
-				} else {
-					// implement
-				}
-			}
-		});
-		manualAddButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-
-			}
-		});
-
-		manualAddbuttonPanel.add(manualAddButton);
-
-		eventsPanelToggelsLanding.add(landingNorthToggleButton, BorderLayout.NORTH);
-		eventsPanelToggelsLanding.add(landingSouthToggleButton, BorderLayout.SOUTH);
-
-		eventsPanelToggelsTakeoff.add(takeoffNorthToggleButton, BorderLayout.NORTH);
-		eventsPanelToggelsTakeoff.add(takeoffSouthToggleButton, BorderLayout.SOUTH);
-
-		eventsPanelToggels.add(eventsPanelToggelsLanding, BorderLayout.WEST);
-		eventsPanelToggels.add(eventsPanelToggelsTakeoff, BorderLayout.EAST);
-
-		eventsPanelToggelsAndLabel.add(headLinePanel, BorderLayout.NORTH);
-		eventsPanelToggelsAndLabel.add(eventsPanelToggels, BorderLayout.CENTER);
-		eventsPanelToggelsAndLabel.add(manualAddbuttonPanel, BorderLayout.SOUTH);
-
-		eventsPanel.add(eventsPanelToggelsAndLabel, BorderLayout.NORTH);
-		eventsPanel.add(eventsPaneldirtyRunway, BorderLayout.SOUTH);
-
-		return eventsPanel;
-	}
-
-	private static JPanel createScenariosPanel(SmartAirport smartAirport) {
-
-		JPanel scenariosHeadLine = new JPanel();
-		JPanel scenariosComboAndButton = new JPanel();
-
-		JPanel eventsPanelScenarios = new JPanel(new BorderLayout());
-
-		JLabel scenariosHeadLineLabel = new JLabel("<html><span style='font-size:14px'>Scenarios</span></html>");
-		scenariosHeadLine.add(scenariosHeadLineLabel);
-
-		String[] scenarios = { "-----", "Emergency Landing", "Dirty runways", "Mechanical Problem" };
-		JComboBox<String> scenariosCombo = new JComboBox<>(scenarios);
-
-		JButton scenariosButton = new JButton("Go");
-		scenariosButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// implement
-			}
-		});
-
-		scenariosComboAndButton.add(scenariosCombo, BorderLayout.WEST);
-		scenariosComboAndButton.add(scenariosButton, BorderLayout.EAST);
-
-		eventsPanelScenarios.add(scenariosHeadLine, BorderLayout.NORTH);
-		eventsPanelScenarios.add(scenariosComboAndButton, BorderLayout.SOUTH);
-
-		return eventsPanelScenarios;
 	}
 
 	public static JPanel createControlPanel(SmartAirport smartAirport) {
 		JPanel controlPanel = new JPanel(new BorderLayout());
 		JPanel controlPanelHeadAndEvents = new JPanel(new BorderLayout());
+		JPanel controlPanelEvents = new JPanel(new BorderLayout());
 		JPanel controlPanelScenarionsAndOutput = new JPanel(new BorderLayout());
 		JPanel outputPanelAndLabel = new JPanel(new BorderLayout());
-		JPanel headPanel = createHeadLinePanel();
-		JPanel eventsPanel = createEventsPanel(smartAirport);
-		JPanel scenariosPanel = createScenariosPanel(smartAirport);
+		JPanel headPanel = AirportPanel.createHeadLinePanel();
+		JPanel eventsPanel = AirportPanel.createEventsPanel(smartAirport);
+		JPanel scenariosPanel = AirportPanel.createScenariosPanel(smartAirport);
+		JPanel dirtyRunway = AirportPanel.createDirtyRunwayPanel(smartAirport);
+		JPanel EmergencyPanel = AirportPanel.createEmergencyLandingPanel(smartAirport);
+		JPanel MechanicalPanel = AirportPanel.createMechanicalProblemPanel(smartAirport);
 		JPanel outputPanel = new JPanel();
 		JPanel outputLabelPanel = new JPanel();
 
@@ -1056,10 +941,15 @@ public class SmartAirport extends JPanel {
 		outputPanel.add(outputArea);
 		outputPanelAndLabel.add(outputLabelPanel, BorderLayout.NORTH);
 		outputPanelAndLabel.add(outputPanel, BorderLayout.CENTER);
-
+		
+		controlPanelEvents.add(EmergencyPanel, BorderLayout.NORTH);
+		controlPanelEvents.add(dirtyRunway,BorderLayout.CENTER);
+		controlPanelEvents.add(MechanicalPanel, BorderLayout.SOUTH);
+		
 		controlPanelHeadAndEvents.add(headPanel, BorderLayout.NORTH);
-		controlPanelHeadAndEvents.add(eventsPanel, BorderLayout.SOUTH);
-
+		controlPanelHeadAndEvents.add(eventsPanel, BorderLayout.CENTER);
+		controlPanelHeadAndEvents.add(controlPanelEvents,  BorderLayout.SOUTH);
+		
 		controlPanelScenarionsAndOutput.add(scenariosPanel, BorderLayout.NORTH);
 		controlPanelScenarionsAndOutput.add(outputPanelAndLabel, BorderLayout.CENTER);
 
@@ -1185,6 +1075,11 @@ public class SmartAirport extends JPanel {
 			aircraft.degree=180;
 		}
 		
+		
+	}
+
+	public void setStartScenario() {
+		startScenario = true;
 		
 	}
 	
