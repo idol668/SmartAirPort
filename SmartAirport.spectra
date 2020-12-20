@@ -70,7 +70,7 @@ asm consistentAssertionMechProblem  {Int(0..(N-1)) i}:
 asm RepairedAircraft {Int(0..(N-1)) i}:
 	G (repairTruck[i] -> next(!mechanicalProblem[i]));
 
-gar RepairTruckIfAircraftExistd {Int(0..(N-1)) i}:
+gar RepairTruckIfAircraftExited {Int(0..(N-1)) i}:
 	G (next(takeoffAircrafts[i] = NONE) -> next(!repairTruck[i]));
 	
 gar RepairTruckIfAircraftExistdBegining{Int(0..(N-1)) i}:
@@ -98,7 +98,7 @@ gar noTrafficAllowedWhileNotRepairedBegin  {Int(0..(N-1)) i}:
 
 asm !slipperyRunway[0] & !slipperyRunway[1] & !slipperyRunway[2] & !slipperyRunway[3];
 
-asm consistentAssertionSlippry {Int (0..(doubleN-1)) i}:
+asm consistentAssertionSlippery {Int (0..(doubleN-1)) i}:
 	G consistentAssertionStillDirty(slipperyRunway[i],cleanTruck[i]); 
 
 asm cleanRunway {Int (0..(doubleN-1)) i}:
