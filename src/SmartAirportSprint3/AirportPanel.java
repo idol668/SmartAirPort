@@ -14,12 +14,36 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 public class AirportPanel extends SmartAirport{
-
-
+	
+	static Boolean AddlandingNorth = false;
+	static Boolean AddlandingSouth = false;
+	static Boolean AddtakeoffNorth = false;
+	static Boolean AddtakeoffSouth = false;
+	
 	public AirportPanel() throws IOException {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
+	public static void performAddAirfarts(SmartAirport smartairport, String planesType) {
+		if(inScenario  || planesType.equals("-----"))
+			return;
+		inScenario = true;
+		outputArea.setText("Adding Aircrafts:\n");
+		if(AddlandingNorth == true) {
+			envMoves.put("landingAircrafts[0]",planesType.toUpperCase());
+		}
+		if(AddlandingSouth == true) {
+			envMoves.put("landingAircrafts[1]",planesType.toUpperCase());
+		}
+		if(AddtakeoffNorth == true) {
+			envMoves.put("takeoffAircrafts[0]",planesType.toUpperCase());
+		}
+		if(AddtakeoffSouth == true) {
+			envMoves.put("takeoffAircrafts[1]",planesType.toUpperCase());
+		}	
+	}
+	
 	public static void performMechanicalProblem(SmartAirport smartairport, String aircraft) {
 		if(inScenario || aircraft.equals("-----"))
 			return;
@@ -52,6 +76,20 @@ public class AirportPanel extends SmartAirport{
 			envMoves.put("slipperyRunway[3]",String.valueOf(true));
 		}
 	}
+	
+	public static void performEmergencyLanding(SmartAirport smartairport, String aircraft) {
+		if(inScenario || aircraft.equals("-----"))
+			return;
+		inScenario = true;
+		outputArea.setText("Perform Emergency Landing:\n");
+		if(aircraft.equals("Landing North")) {
+			envMoves.put("emergencyLanding[0]",String.valueOf(true));
+			
+		}
+		else {
+			envMoves.put("emergencyLanding[1]",String.valueOf(true));
+		}
+	}
 
 	public static JPanel createHeadLinePanel() {
 		JPanel headPanel = new JPanel();
@@ -76,70 +114,66 @@ public class AirportPanel extends SmartAirport{
 		JToggleButton takeoffNorthToggleButton = new JToggleButton("Takeoff North");
 		JToggleButton takeoffSouthToggleButton = new JToggleButton("Takeoff South");
 		JPanel manualAddbuttonPanel = new JPanel();
-		JButton manualAddButton = new JButton("Go");
-
-		manualAddButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// implement
-			}
-		});
 		
-		landingNorthToggleButton.addItemListener(new ItemListener() {
+		String[] planesType = { "-----", "Cargo", "Private", "Commercial"};
+		JComboBox<String> planesTypeCombo = new JComboBox<>(planesType);
 
-			public void itemStateChanged(ItemEvent itemEvent) {
+		landingNorthToggleButton.addItemListener(new ItemListener() {
+		public void itemStateChanged(ItemEvent itemEvent) {
 				int state = itemEvent.getStateChange();
 
 				if (state == ItemEvent.SELECTED) {
-					// implement
+					AddlandingNorth = true;
 				} else {
-
-					// implement
+					AddlandingNorth = false;
 				}
 			}
 		});
 		landingSouthToggleButton.addItemListener(new ItemListener() {
-
-			public void itemStateChanged(ItemEvent itemEvent) {
+		public void itemStateChanged(ItemEvent itemEvent) {
 				int state = itemEvent.getStateChange();
 
 				if (state == ItemEvent.SELECTED) {
-					// implement
+					AddlandingSouth = true;
 				} else {
-
-					// implement
+					AddlandingSouth = false;
 				}
 			}
 		});
+		
 		takeoffNorthToggleButton.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent itemEvent) {
+		public void itemStateChanged(ItemEvent itemEvent) {
 				int state = itemEvent.getStateChange();
 
 				if (state == ItemEvent.SELECTED) {
-					// implement
+					AddtakeoffNorth = true;
 				} else {
-
-					// implement
+					AddtakeoffNorth = false;
 				}
 			}
 		});
+		
 		takeoffSouthToggleButton.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent itemEvent) {
+		public void itemStateChanged(ItemEvent itemEvent) {
 				int state = itemEvent.getStateChange();
 
 				if (state == ItemEvent.SELECTED) {
-					// implement
+					AddtakeoffSouth = true;
 				} else {
-					// implement
+					AddtakeoffSouth = false;
 				}
 			}
 		});
+		
+		JButton manualAddButton = new JButton("Go");
 		manualAddButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				performAddAirfarts(smartAirport, planesTypeCombo.getSelectedItem().toString());
 			}
 		});
 
-		manualAddbuttonPanel.add(manualAddButton);
+		manualAddbuttonPanel.add(planesTypeCombo, BorderLayout.NORTH);
+		manualAddbuttonPanel.add(manualAddButton, BorderLayout.SOUTH);
 
 		eventsPanelToggelsLanding.add(landingNorthToggleButton, BorderLayout.NORTH);
 		eventsPanelToggelsLanding.add(landingSouthToggleButton, BorderLayout.SOUTH);
@@ -202,7 +236,11 @@ public class AirportPanel extends SmartAirport{
 		JButton emergencyButton = new JButton("Go");
 		emergencyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// implement
+				if(startScenario)
+        			return;
+				smartAirport.setStartScenario();
+				performEmergencyLanding(smartAirport,emergencyCombo.getSelectedItem().toString());
+				
 			}
 		});
 		emergencyComboAndButton.add(emergencyCombo, BorderLayout.WEST);

@@ -183,6 +183,9 @@ gar takeoffCurfewWheneverEmergencylandingBegin{Int (0..(N-1)) i}:
 
 gar EmergencylandingAllowed{Int (0..(N-1)) i}:
 	G ((emergencyLanding[i] & !rescueTeam[i])-> next(landingAllowed[(2*i)] | landingAllowed[(2*i+1)]));	
+
+gar whenrescueTeamComeAllowedtoland{Int (0..(N-1)) i}:
+	G (next(rescueTeam[i]) ->next(landingAllowed[(2*i)] | landingAllowed[(2*i+1)]));
 	
 
 //***********************************************//
