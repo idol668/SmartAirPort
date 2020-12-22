@@ -97,7 +97,7 @@ public class SecondaryAnimation {
 					repairTruck[0].truckImage = repairtruck_r;
 					repairTruck[0].x = repairTruck[0].x + 10;
 				}
-				if (repairTruck[0].y > 170) {
+				if (repairTruck[0].y > 290) {
 					repairTruck[0].y = repairTruck[0].y - 20;
 					repairTruck[0].man_y = repairTruck[0].man_y - 19;
 				} else {
@@ -110,7 +110,7 @@ public class SecondaryAnimation {
 					repairTruck[1].truckImage = repairtruck_r;
 					repairTruck[1].x = repairTruck[1].x + 10;
 				}
-				if (repairTruck[1].y > 460) {
+				if (repairTruck[1].y > 370) {
 					repairTruck[1].y = repairTruck[1].y - 5;
 					repairTruck[1].man_y = repairTruck[1].man_y - 5;
 				} else {
@@ -121,6 +121,7 @@ public class SecondaryAnimation {
 		}
 		
 	}
+	
 
 
 }

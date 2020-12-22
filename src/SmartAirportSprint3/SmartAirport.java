@@ -26,6 +26,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
+import SmartAirportSprint3.AuxiliaryMethods;
+
 import tau.smlab.syntech.controller.jit.BasicJitController;
 import tau.smlab.syntech.controller.executor.ControllerExecutor;
 
@@ -74,12 +76,14 @@ public class SmartAirport extends JPanel {
 	boolean[] stillCleaning = new boolean[4];
 	
 	//Additional images for takeoff
-	private Image shadow_commerical_0_medium;
-	private Image shadow_commerical_0_small;
-	private Image shadowcargo_0_medium;
-	private Image shadowcargo_0_small;
-	private Image shadow_private_0_medium;
-	private Image shadow_private_0_small;
+	private Image privateplane_90;
+	private Image privateplane_270;
+	private Image commercialplane_90;
+	private Image commercialplane_270;
+	private Image cargoplane_90;
+	private Image cargoplane_270;
+
+
 
 
 
@@ -152,34 +156,32 @@ public class SmartAirport extends JPanel {
 
 					emergencyLanding[0] = envValues.get("emergencyLanding[0]").equals("true") ? true : false;
 					emergencyLanding[1] = envValues.get("emergencyLanding[1]").equals("true") ? true : false;
-
+					
+					
+					AuxiliaryMethods auxMethods = new AuxiliaryMethods(takeoffPlaneExists,landingPlaneExists,repairTruck,cleaningCars,rescueTeams);
 					//System.out.println(executor.getCurrInputs().toString());
 					if (!envValues.get("takeoffAircrafts[0]").equals("NONE")) {
-						Airplane plane = new Airplane(650, 170, 0, executor.getCurrInputs().get("takeoffAircrafts[0]"),
-								0, true);
+						Airplane plane= auxMethods.putPlanesInWaitingArea("takeoff",0,executor.getCurrInputs().get("takeoffAircrafts[0]"));
 						takeoffPlaneExists[0] = plane;
 					} else {
 						takeoffPlaneExists[0] = null;
 					}
 
 					if (!envValues.get("takeoffAircrafts[1]").equals("NONE")) {
-						Airplane plane = new Airplane(650, 470, 0, executor.getCurrInputs().get("takeoffAircrafts[1]"),
-								1, true);
+						Airplane plane= auxMethods.putPlanesInWaitingArea("takeoff",1,executor.getCurrInputs().get("takeoffAircrafts[1]"));;
 						takeoffPlaneExists[1] = plane;
 					} else {
 						takeoffPlaneExists[1] = null;
 					}
 
 					if (!envValues.get("landingAircrafts[0]").equals("NONE")) {
-						Airplane plane = new Airplane(50, 165, 180, executor.getCurrInputs().get("landingAircrafts[0]"),
-								0, false);
+						Airplane plane= auxMethods.putPlanesInWaitingArea("landing",0,executor.getCurrInputs().get("landingAircrafts[0]"));
 						landingPlaneExists[0] = plane;
 					} else {
 						landingPlaneExists[0] = null;
 					}
 					if (!envValues.get("landingAircrafts[1]").equals("NONE")) {
-						Airplane plane = new Airplane(50, 465, 180, executor.getCurrInputs().get("landingAircrafts[1]"),
-								0, false);
+						Airplane plane =auxMethods.putPlanesInWaitingArea("landing",1,executor.getCurrInputs().get("landingAircrafts[1]"));
 						landingPlaneExists[1] = plane;
 					} else {
 						landingPlaneExists[1] = null;
@@ -232,14 +234,14 @@ public class SmartAirport extends JPanel {
 					if (cleaningSensors[3]) {
 						cleaningCars[3] = new CleaningTruck(10, 555, 180, 450, 575);
 					}
-					System.out.println(sysValues.toString());
+					//System.out.println(sysValues.toString());
 					repaint();
 					animateEmergencyLanding();
 					animateLandingAndTakeoff();
-					
-					updateInputs(inputs, sysValues);
+					auxMethods.updateInputs(inputs, sysValues, takeoffAllowed, landingAllowed, mechanicalProblem, cleaningSensors, slipperyRunway, emergencyLanding);
+					//updateInputs(inputs, sysValues);
 					updatePanelInputs(inputs, sysValues);
-					System.out.println(inputs.toString());
+					//System.out.println(inputs.toString());
 					
 					
 					try {
@@ -327,7 +329,7 @@ public class SmartAirport extends JPanel {
 			}
 		}
 	}
-
+/*
 	public void updateInputs(Map<String, String> inputs, Map<String, String> sysValues) {
 
 		for (int i = 0; i < takeoffPlaneExists.length; i++) {
@@ -412,8 +414,9 @@ public class SmartAirport extends JPanel {
 		}
 		return planeType;
 	}
-
+*/
 	public void animateEmergencyLanding() {
+		SecondaryAnimation secondarySimulator = new SecondaryAnimation(cleaningSensors,cleaningCars,stillCleaning,slipperyRunway,repairTruck,mechanicalProblem,repairtruck_r);
 		int landingLine = 0;
 		for (int i = 0; i < 2; i++) {
 			if (emergencyLanding[i] && landingPlaneExists[i] != null) {
@@ -511,7 +514,7 @@ public class SmartAirport extends JPanel {
 								}
 							}
 						}
-
+						
 						repaint();
 
 						try {
@@ -564,6 +567,8 @@ public class SmartAirport extends JPanel {
 
 	public void animateLandingAndTakeoff() {
 		SecondaryAnimation secondarySimulator = new SecondaryAnimation(cleaningSensors,cleaningCars,stillCleaning,slipperyRunway,repairTruck,mechanicalProblem,repairtruck_r);
+		Airplane[] planes = new Airplane[2];
+		int [] runwaysTakeOff = new int[2];
 		for (int i = 0; i < 2; i++) {
 			if (landingPlaneExists[i] != null && !emergencyLanding[i]) {
 				if (landingAllowed[2 * i] == true && landingAllowed[2 * i + 1] == true) {
@@ -572,11 +577,12 @@ public class SmartAirport extends JPanel {
 					if (rand.nextBoolean() == true) {
 						landingPlaneExists[i].y = landingPlaneExists[i].y + 65;
 					} else {
-						landingPlaneExists[i].y = landingPlaneExists[i].y - 40;
+							landingPlaneExists[i].y = landingPlaneExists[i].y-40;
 					}
 				} else if (landingAllowed[2 * i] == true && !secondarySimulator.slipperyRunway[2 * i]) {
 					landingPlaneExists[i].EnterLandingOrTakeoof = true;
-					landingPlaneExists[i].y = landingPlaneExists[i].y - 40;
+						landingPlaneExists[i].y = landingPlaneExists[i].y-40;
+					
 				} else if (landingAllowed[2 * i + 1] == true && !secondarySimulator.slipperyRunway[2 * i + 1]) {
 					landingPlaneExists[i].EnterLandingOrTakeoof = true;
 					landingPlaneExists[i].y = landingPlaneExists[i].y + 65;
@@ -585,33 +591,38 @@ public class SmartAirport extends JPanel {
 				landingPlaneExists[i].y_shadow =landingPlaneExists[i].y;
 			}
 			if (takeoffPlaneExists[i] != null && secondarySimulator.mechanicalProblem[i] == false) {
+				
 				if (takeoffAllowed[2 * i] == true && takeoffAllowed[2 * i + 1] == true) {
 					takeoffPlaneExists[i].EnterLandingOrTakeoof = true;
 					Random rand = new Random();
 					if (rand.nextBoolean() == true) {
-						takeoffPlaneExists[i].y = takeoffPlaneExists[i].y + 64;
-						takeoffPlaneExists[i].y_shadow = takeoffPlaneExists[i].y_shadow + 64;
+						planes[i]=takeoffPlaneExists[i];
+						runwaysTakeOff[i]=2*i+1;
 					} else {
-						takeoffPlaneExists[i].y = takeoffPlaneExists[i].y - 46;
-						takeoffPlaneExists[i].y_shadow = takeoffPlaneExists[i].y_shadow - 46;
+						planes[i]=takeoffPlaneExists[i];
+						runwaysTakeOff[i]=2*i;
 
 					}
 				} else if (takeoffAllowed[2 * i] == true && !secondarySimulator.slipperyRunway[2 * i]) {
+					
 					takeoffPlaneExists[i].EnterLandingOrTakeoof = true;
-					takeoffPlaneExists[i].y = takeoffPlaneExists[i].y - 46;
-					takeoffPlaneExists[i].y_shadow = takeoffPlaneExists[i].y_shadow - 46;
+					planes[i]=takeoffPlaneExists[i];
+					runwaysTakeOff[i]= 2*i;
 
 				} else if (takeoffAllowed[2 * i + 1] == true && !secondarySimulator.slipperyRunway[2 * i + 1]) {
+					planes[i]=takeoffPlaneExists[i];
 					takeoffPlaneExists[i].EnterLandingOrTakeoof = true;
-					takeoffPlaneExists[i].y = takeoffPlaneExists[i].y + 64;
-					takeoffPlaneExists[i].y_shadow = takeoffPlaneExists[i].y_shadow + 64;
+					runwaysTakeOff[i]= 2*i+1;
 				} else {
 					takeoffPlaneExists[i].EnterLandingOrTakeoof = false;
 				}
 			} else if (takeoffPlaneExists[i] != null && secondarySimulator.mechanicalProblem[i] == true) {
 				takeoffPlaneExists[i].EnterLandingOrTakeoof = false;
 			}
+			
 		}
+		
+		
 
 		boolean planeOrTruckMooving = false;
 		for (int i = 0; i < 2; i++) {
@@ -636,9 +647,7 @@ public class SmartAirport extends JPanel {
 		if (!planeOrTruckMooving) {
 			return;
 		}
-
-		repaint();
-
+		animateGetToTakeOffSpot(runwaysTakeOff,planes);
 		for (int j = 0; j < 50; j++) {
 			takeOffIteartion=j;
 			for (int i = 0; i < 2; i++) {
@@ -665,10 +674,26 @@ public class SmartAirport extends JPanel {
 						{
 							if (j>33 && j<40)
 							{
+								if (landingPlaneExists[i].y>165 && landingPlaneExists[i].y<400)
+								{
+									landingPlaneExists[i].y-=1;
+								}
+								if (landingPlaneExists[i].y>400 && landingPlaneExists[i].y<500)
+								{
+									landingPlaneExists[i].y+=2;
+								}
 								landingPlaneExists[i].x += 15;
 							}
 							else
 							{
+								if (landingPlaneExists[i].y>165 && landingPlaneExists[i].y<400)
+								{
+									landingPlaneExists[i].y-=1;
+								}
+								if (landingPlaneExists[i].y>400 && landingPlaneExists[i].y<500)
+								{
+									landingPlaneExists[i].y+=1;
+								}
 								landingPlaneExists[i].x += 10;
 							}
 								
@@ -684,7 +709,7 @@ public class SmartAirport extends JPanel {
 					secondarySimulator.animatedWaitingForLanding(j,landingPlaneExists[i]);
 				}
 				if (takeoffPlaneExists[i] != null && takeoffPlaneExists[i].EnterLandingOrTakeoof & j>=22) {
-
+					
 					takeoffPlaneExists[i].x -= 20;
 					takeoffPlaneExists[i].x_shadow = (int) Math.round(takeoffPlaneExists[i].x_shadow - 20);
 					takeoffPlaneExists[i].y_shadow = (int) Math.round(takeoffPlaneExists[i].y_shadow - 1);
@@ -799,7 +824,26 @@ public class SmartAirport extends JPanel {
 
 				}
 			}
+			
+			else {
+				if (plane.type.equals("COMMERCIAL")) {
+					g.drawImage(shadow_commerical_90, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(commercialplane_90, plane.x, plane.y, this);
+				
+				} else if (plane.type.equals("PRIVATE")) {
+					g.drawImage(shadow_private_90, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(privateplane_90, plane.x, plane.y, this);
+				} else if (plane.type.equals("CARGO")) {
+					g.drawImage(shadowcargo_90, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(cargoplane_90, plane.x, plane.y, this);
+
+				}
+
+			}
+			
 		}
+		
+		
 		if (plane.degree==270) {
 			if (plane.ground == false) {
 				if (plane.type.equals("PRIVATE")) {
@@ -817,7 +861,23 @@ public class SmartAirport extends JPanel {
 			 	}
 				
 			}
+			else {
+				if (plane.type.equals("COMMERCIAL")) {
+					g.drawImage(shadow_commerical_270, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(commercialplane_270, plane.x, plane.y, this);
+				
+				} else if (plane.type.equals("PRIVATE")) {
+					g.drawImage(shadow_private_270, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(privateplane_270, plane.x, plane.y, this);
+				} else if (plane.type.equals("CARGO")) {
+					g.drawImage(shadowcargo_270, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(cargoplane_270, plane.x, plane.y, this);
+
+				}
+
+			}
 		}
+		
 		return;
 	}
 
@@ -912,12 +972,13 @@ public class SmartAirport extends JPanel {
 		shadow_commerical_270 = ImageIO.read(new File("img/shadow_commerical_270.png"));
 
 		//Additional Images for takeoff
-		shadow_commerical_0_medium = ImageIO.read(new File("img/shadow_commerical_0_medium.png"));
-		shadow_commerical_0_small = ImageIO.read(new File("img/shadow_commerical_0_small.png"));
-		shadowcargo_0_medium=ImageIO.read(new File("img/shadowcargo_0_medium.png"));
-		shadowcargo_0_small=ImageIO.read(new File("img/shadowcargo_0_small.png"));
-		shadow_private_0_medium=ImageIO.read(new File("img/shadow_private_0_medium.png"));
-		shadow_private_0_small=ImageIO.read(new File("img/shadow_private_0_small.png"));
+		cargoplane_90 = ImageIO.read(new File("img/cargoplane_90.png"));
+		cargoplane_270 = ImageIO.read(new File("img/cargoplane_270.png"));
+		privateplane_90 = ImageIO.read(new File("img/privateplane_90.png"));
+		privateplane_270 = ImageIO.read(new File("img/privateplane_270.png"));
+		commercialplane_90 = ImageIO.read(new File("img/commercialplane_90.png"));
+		commercialplane_270 = ImageIO.read(new File("img/commercialplane_270.png"));
+
 		
 		// images for slippery runway
 		cleaningCar_0 = ImageIO.read(new File("img/cleaningCar_0.png"));
@@ -1035,5 +1096,72 @@ public class SmartAirport extends JPanel {
 		
 	}
 	
+	
+	public void animateGetToTakeOffSpot(int[] runway, Airplane[] planes)
+	{
+		Map <Airplane,Boolean> gotToTakeOffSpot = new HashMap<Airplane,Boolean>();
+		Map <Airplane,Integer> runwayToPlane = new HashMap<Airplane,Integer>();
 
+		for (int i=0; i<planes.length;i++)
+		{
+			if (planes[i]!=null)
+			{
+				gotToTakeOffSpot.put(planes[i], false);
+				runwayToPlane.put(planes[i],runway[i]);
+			}
+			
+			
+		}
+	for (Airplane plane: runwayToPlane.keySet() )
+	{
+		for (int j=0; j<16;j++ )
+		{
+			int runwayPlane= runwayToPlane.get(plane);
+		
+			if (j==15)
+			{
+				plane.degree=0;
+				break;
+			}
+			if (runwayPlane==0)
+			{
+				plane.degree=270;
+				plane.y-=10;
+				plane.y_shadow-=10;
+			}
+			if (runwayPlane==1)
+			{
+				plane.degree=270;
+				plane.y-=4;
+				plane.y_shadow-=4;
+			}
+			if (runwayPlane==2)
+			{
+				plane.degree=90;
+				plane.y+=4;
+				plane.y_shadow+=4;
+			}
+			if (runwayPlane==3)
+			{
+				plane.degree=90;
+				plane.y+=11;
+				plane.y_shadow+=11;
+			}
+			
+			
+			repaint();
+
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+		}
+	}
+		
+	}
+	
+
+	
 }
