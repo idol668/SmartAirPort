@@ -19,7 +19,7 @@ public class AuxiliaryMethods {
 		this.cleaningCars=cleaningCars;
 		this.rescueTeams=rescueTeams;
 	}
-	public Airplane putPlanesInWaitingArea(String state,int spotInWaitingArea,String planeType)
+	public static Airplane putPlanesInWaitingArea(String state,int spotInWaitingArea,String planeType)
 	{
 		Airplane plane=null;
 		if (state.equals("takeoff"))
@@ -62,7 +62,7 @@ public class AuxiliaryMethods {
 		return plane;
 	}
 	
-	public void updateInputs(Map<String, String> inputs, Map<String, String> sysValues, boolean [] takeoffAllowed,boolean[] landingAllowed,boolean[] mechanicalProblem, boolean[] cleaningSensors,boolean[] slipperyRunway, boolean[] emergencyLanding) {
+	public  void updateInputs(Map<String, String> inputs, Map<String, String> sysValues, boolean [] takeoffAllowed,boolean[] landingAllowed,boolean[] mechanicalProblem, boolean[] cleaningSensors,boolean[] slipperyRunway, boolean[] emergencyLanding) {
 
 		for (int i = 0; i < takeoffPlaneExists.length; i++) {
 
@@ -131,7 +131,7 @@ public class AuxiliaryMethods {
 		}
 	}
 	
-	public String acquireRandomPlane() {
+	public static String acquireRandomPlane() {
 		String planeType = "";
 		Random rd = new Random();
 		double chance = rd.nextDouble();
