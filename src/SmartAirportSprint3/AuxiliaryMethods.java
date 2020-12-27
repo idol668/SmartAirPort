@@ -66,7 +66,7 @@ public class AuxiliaryMethods {
 
 		for (int i = 0; i < takeoffPlaneExists.length; i++) {
 
-			if (takeoffPlaneExists[i] != null && !takeoffAllowed[2 * i] && !takeoffAllowed[2 * i + 1]){
+			if (takeoffPlaneExists[i] != null && ((!takeoffAllowed[2 * i] && !takeoffAllowed[2 * i + 1]) || mechanicalProblem[i])){
 				inputs.put((String.format("takeoffAircrafts[%d]", i)), takeoffPlaneExists[i].type);
 			} else {
 				inputs.put((String.format("takeoffAircrafts[%d]", i)), acquireRandomPlane());
