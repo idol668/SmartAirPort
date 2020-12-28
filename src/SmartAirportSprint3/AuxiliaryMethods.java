@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
 
-public class AuxiliaryMethods  {
+public class AuxiliaryMethods {
 
 	public AuxiliaryMethods() throws IOException {
 	}
@@ -37,23 +37,27 @@ public class AuxiliaryMethods  {
 		return plane;
 	}
 
-	public static  void updateInputs(Map<String, String> inputs, Map<String, String> sysValues) {
+	public static void updateInputs(Map<String, String> inputs, Map<String, String> sysValues) {
 		// take off and landing planes
 		for (int i = 0; i < SmartAirport.takeoffPlaneExists.length; i++) {
 
-			if (SmartAirport.takeoffPlaneExists[i] != null && ((!SmartAirport.takeoffAllowed[2 * i] && !SmartAirport.takeoffAllowed[2 * i + 1]) || SmartAirport.mechanicalProblem[i])) {
+			if (SmartAirport.takeoffPlaneExists[i] != null
+					&& ((!SmartAirport.takeoffAllowed[2 * i] && !SmartAirport.takeoffAllowed[2 * i + 1])
+							|| SmartAirport.mechanicalProblem[i])) {
 				inputs.put((String.format("takeoffAircrafts[%d]", i)), SmartAirport.takeoffPlaneExists[i].type);
 			} else {
 				setInput(inputs, String.format("takeoffAircrafts[%d]", i), SmartAirport.scenario);
 			}
 
-			if (SmartAirport.landingPlaneExists[i] != null && !SmartAirport.landingAllowed[2 * i] && !SmartAirport.landingAllowed[2 * i + 1]) {
+			if (SmartAirport.landingPlaneExists[i] != null && !SmartAirport.landingAllowed[2 * i]
+					&& !SmartAirport.landingAllowed[2 * i + 1]) {
 				inputs.put((String.format("landingAircrafts[%d]", i)), SmartAirport.landingPlaneExists[i].type);
 			} else {
 				setInput(inputs, String.format("landingAircrafts[%d]", i), SmartAirport.scenario);
 			}
 			// mechanical Problem
-			if (SmartAirport.takeoffPlaneExists[i] != null && SmartAirport.mechanicalProblem[i] && SmartAirport.repairTruck[i] == null) {
+			if (SmartAirport.takeoffPlaneExists[i] != null && SmartAirport.mechanicalProblem[i]
+					&& SmartAirport.repairTruck[i] == null) {
 				inputs.put((String.format("mechanicalProblem[%d]", i)), String.valueOf(true));
 
 			} else if (SmartAirport.repairTruck[i] != null) {
@@ -103,7 +107,8 @@ public class AuxiliaryMethods  {
 				}
 			}
 		} else {
-			if ((rescueArrived0 && SmartAirport.emergencyLanding[0]) || (rescueArrived1 && SmartAirport.emergencyLanding[1])) {
+			if ((rescueArrived0 && SmartAirport.emergencyLanding[0])
+					|| (rescueArrived1 && SmartAirport.emergencyLanding[1])) {
 				inputs.put("emergencyLanding[0]", String.valueOf(false));
 				inputs.put("emergencyLanding[1]", String.valueOf(false));
 			} else if (SmartAirport.emergencyLanding[0] && !rescueArrived0) {
@@ -116,11 +121,8 @@ public class AuxiliaryMethods  {
 				setEmergencyLandingInputs(inputs, SmartAirport.scenario);
 			}
 		}
-		SmartAirport.scenarioCounter--;
-		if(SmartAirport.scenarioCounter==0) {
-			SmartAirport.scenario= "none";
-			SmartAirport.inScenario =false;
-			SmartAirport.startScenario = false;
+		if (SmartAirport.scenarioCounter > -1) {
+			SmartAirport.scenarioCounter--;
 		}
 	}
 
@@ -158,7 +160,7 @@ public class AuxiliaryMethods  {
 			if (emegencyChance <= 0.5) {
 				inputs.put("emergencyLanding[0]", String.valueOf(true));
 				inputs.put("emergencyLanding[1]", String.valueOf(false));
-			} else  {
+			} else {
 				inputs.put("emergencyLanding[0]", String.valueOf(false));
 				inputs.put("emergencyLanding[1]", String.valueOf(true));
 			}
@@ -286,5 +288,18 @@ public class AuxiliaryMethods  {
 			planeType = "CARGO";
 		}
 		return planeType;
+	}
+
+	public static void handleEndOfScenario() {
+		boolean scenarioOver = (SmartAirport.inScenario && SmartAirport.scenarioCounter == 0)
+				|| (SmartAirport.inManualScenario
+						&& (SmartAirport.envMoves.isEmpty() || SmartAirport.envMoves == null));
+		if (scenarioOver) {
+			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "Done\n");
+			SmartAirport.inScenario = false;
+			SmartAirport.inManualScenario = false;
+			SmartAirport.startScenario = false;
+			SmartAirport.scenario = "none";
+		}
 	}
 }
