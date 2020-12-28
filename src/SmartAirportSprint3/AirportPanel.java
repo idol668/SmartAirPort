@@ -13,9 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
-
-
-public class AirportPanel  {
+public class AirportPanel {
 
 	static Boolean AddlandingNorth = false;
 	static Boolean AddlandingSouth = false;
@@ -23,13 +21,13 @@ public class AirportPanel  {
 	static Boolean AddtakeoffSouth = false;
 
 	public AirportPanel() throws IOException {
-		
+
 	}
 
 	public static void performAircraftsAddition(SmartAirport smartairport, String planesType) {
-		if (SmartAirport.inScenario || planesType.equals("-----"))
+		if (SmartAirport.inScenario || SmartAirport.inManualScenario || planesType.equals("-----"))
 			return;
-		SmartAirport.inScenario = true;
+		SmartAirport.inManualScenario = true;
 		SmartAirport.outputArea.setText("Adding Aircrafts:\n");
 		if (AddlandingNorth == true) {
 			SmartAirport.envMoves.put("landingAircrafts[0]", planesType.toUpperCase());
@@ -46,9 +44,9 @@ public class AirportPanel  {
 	}
 
 	public static void performMechanicalProblem(SmartAirport smartairport, String aircraft) {
-		if (SmartAirport.inScenario || aircraft.equals("-----"))
+		if (SmartAirport.inScenario || SmartAirport.inManualScenario || aircraft.equals("-----"))
 			return;
-		SmartAirport.inScenario = true;
+		SmartAirport.inManualScenario = true;
 		SmartAirport.outputArea.setText("Perform Mechnical problem:\n");
 		if (aircraft.equals("Takeoff North")) {
 			SmartAirport.envMoves.put("mechanicalProblem[0]", String.valueOf(true));
@@ -58,9 +56,9 @@ public class AirportPanel  {
 	}
 
 	public static void performSlipperyRunway(SmartAirport smartairport, String runway) {
-		if (SmartAirport.inScenario || runway.equals("-----"))
+		if (SmartAirport.inScenario || SmartAirport.inManualScenario || runway.equals("-----"))
 			return;
-		SmartAirport.inScenario = true;
+		SmartAirport.inManualScenario = true;
 		SmartAirport.outputArea.setText("perform Dirty runway:\n");
 		if (runway.equals("First Runway")) {
 			SmartAirport.envMoves.put("slipperyRunway[0]", String.valueOf(true));
@@ -74,9 +72,9 @@ public class AirportPanel  {
 	}
 
 	public static void performEmergencyLanding(SmartAirport smartairport, String aircraft) {
-		if (SmartAirport.inScenario || aircraft.equals("-----"))
+		if (SmartAirport.inScenario || SmartAirport.inManualScenario || aircraft.equals("-----"))
 			return;
-		SmartAirport.inScenario = true;
+		SmartAirport.inManualScenario = true;
 		SmartAirport.outputArea.setText("Perform Emergency Landing:\n");
 		if (aircraft.equals("Landing North")) {
 			SmartAirport.envMoves.put("emergencyLanding[0]", String.valueOf(true));
@@ -290,7 +288,7 @@ public class AirportPanel  {
 		JLabel scenariosHeadLineLabel = new JLabel("<html><span style='font-size:14px'>Scenarios</span></html>");
 		scenariosHeadLine.add(scenariosHeadLineLabel);
 
-		String[] scenarios = { "-----", "rush hour", "slippery slope", "being a mechanic is hard","scared of flying"};
+		String[] scenarios = { "-----", "rush hour", "slippery slope", "being a mechanic is hard", "scared of flying" };
 		JComboBox<String> scenariosCombo = new JComboBox<>(scenarios);
 
 		JButton scenariosButton = new JButton("Go");
@@ -313,7 +311,7 @@ public class AirportPanel  {
 	}
 
 	protected static void setScenario(SmartAirport smartAirport, String name) {
-		if(SmartAirport.inScenario)
+		if (SmartAirport.inScenario || SmartAirport.inManualScenario)
 			return;
 		SmartAirport.wait = true;
 		SmartAirport.outputArea.setText("Start scenario: " + name + "\n");
@@ -322,26 +320,25 @@ public class AirportPanel  {
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		
-		switch(name)
-		{
-			case "rush hour":
-				setScenarioAndCounter("rush hour",6);
-                break;
-			case "slippery slope":
-				setScenarioAndCounter("slippery slope",6);
-                break;
-			case "being a mechanic is hard":
-				setScenarioAndCounter("being a mechanic is hard",6);
-                break;
-			case "scared of flying":
-				setScenarioAndCounter("scared of flying",4);
-                break;
+
+		switch (name) {
+		case "rush hour":
+			setScenarioAndCounter("rush hour", 6);
+			break;
+		case "slippery slope":
+			setScenarioAndCounter("slippery slope", 6);
+			break;
+		case "being a mechanic is hard":
+			setScenarioAndCounter("being a mechanic is hard", 6);
+			break;
+		case "scared of flying":
+			setScenarioAndCounter("scared of flying", 4);
+			break;
 		}
-		
+
 		SmartAirport.inScenario = true;
 		SmartAirport.wait = false;
-		
+
 	}
 
 	private static void setScenarioAndCounter(String scenrioName, int scenarioNumOfSteps) {
