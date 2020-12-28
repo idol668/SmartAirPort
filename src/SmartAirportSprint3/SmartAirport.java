@@ -244,14 +244,7 @@ public class SmartAirport extends JPanel {
 					repaint();
 					animateEmergencyLanding();
 					animateLandingAndTakeoff();
-					AuxiliaryMethods auxMethods = null;
-					try {
-						auxMethods = new AuxiliaryMethods();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					auxMethods.updateInputs(inputs, sysValues);
+					AuxiliaryMethods.updateInputs(inputs, sysValues);
 					System.out.println("afterinputs" + inputs.toString());
 					updatePanelInputs(inputs, sysValues);
 					// System.out.println(inputs.toString());

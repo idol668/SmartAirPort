@@ -37,11 +37,11 @@ public class AuxiliaryMethods  {
 		return plane;
 	}
 
-	public void updateInputs(Map<String, String> inputs, Map<String, String> sysValues) {
+	public static  void updateInputs(Map<String, String> inputs, Map<String, String> sysValues) {
 		// take off and landing planes
 		for (int i = 0; i < SmartAirport.takeoffPlaneExists.length; i++) {
 
-			if (SmartAirport.takeoffPlaneExists[i] != null && !SmartAirport.takeoffAllowed[2 * i] && !SmartAirport.takeoffAllowed[2 * i + 1]) {
+			if (SmartAirport.takeoffPlaneExists[i] != null && ((!SmartAirport.takeoffAllowed[2 * i] && !SmartAirport.takeoffAllowed[2 * i + 1]) || SmartAirport.mechanicalProblem[i])) {
 				inputs.put((String.format("takeoffAircrafts[%d]", i)), SmartAirport.takeoffPlaneExists[i].type);
 			} else {
 				setInput(inputs, String.format("takeoffAircrafts[%d]", i), SmartAirport.scenario);
@@ -124,7 +124,7 @@ public class AuxiliaryMethods  {
 		}
 	}
 
-	private void setInput(Map<String, String> inputs, String envVar, String scenario) {
+	private static void setInput(Map<String, String> inputs, String envVar, String scenario) {
 		switch (scenario) {
 		case "none":
 			getInputNoneScenario(inputs, envVar);
@@ -145,7 +145,7 @@ public class AuxiliaryMethods  {
 
 	}
 
-	private void setEmergencyLandingInputs(Map<String, String> inputs, String scenario) {
+	private static void setEmergencyLandingInputs(Map<String, String> inputs, String scenario) {
 		switch (scenario) {
 		case "rush hour":
 		case "slippery slope":
@@ -179,7 +179,7 @@ public class AuxiliaryMethods  {
 		}
 	}
 
-	private void getInputNoneScenario(Map<String, String> inputs, String envVar) {
+	private static void getInputNoneScenario(Map<String, String> inputs, String envVar) {
 		if (envVar.startsWith("takeoffAircrafts")) {
 			inputs.put(envVar, acquireRandomPlane(false));
 		} else if (envVar.startsWith("landingAircrafts")) {
@@ -193,7 +193,7 @@ public class AuxiliaryMethods  {
 		}
 	}
 
-	private void getInputScaredOfFlyingScenario(Map<String, String> inputs, String envVar) {
+	private static void getInputScaredOfFlyingScenario(Map<String, String> inputs, String envVar) {
 		if (envVar.startsWith("takeoffAircrafts")) {
 			inputs.put(envVar, acquireRandomPlane(false));
 		} else if (envVar.startsWith("landingAircrafts")) {
@@ -213,7 +213,7 @@ public class AuxiliaryMethods  {
 		}
 	}
 
-	private void getInputBeingAMechanicIsHardScenario(Map<String, String> inputs, String envVar) {
+	private static void getInputBeingAMechanicIsHardScenario(Map<String, String> inputs, String envVar) {
 		if (envVar.startsWith("takeoffAircrafts")) {
 			inputs.put(envVar, acquireRandomPlane(true));
 		} else if (envVar.startsWith("landingAircrafts")) {
@@ -233,7 +233,7 @@ public class AuxiliaryMethods  {
 		}
 	}
 
-	private void getInputSlipperySlopeScenario(Map<String, String> inputs, String envVar) {
+	private static void getInputSlipperySlopeScenario(Map<String, String> inputs, String envVar) {
 		if (envVar.startsWith("takeoffAircrafts")) {
 			inputs.put(envVar, acquireRandomPlane(false));
 		} else if (envVar.startsWith("landingAircrafts")) {
@@ -253,7 +253,7 @@ public class AuxiliaryMethods  {
 		}
 	}
 
-	private void getInputRushHourScenario(Map<String, String> inputs, String envVar) {
+	private static void getInputRushHourScenario(Map<String, String> inputs, String envVar) {
 		if (envVar.startsWith("takeoffAircrafts")) {
 			inputs.put(envVar, acquireRandomPlane(true));
 		} else if (envVar.startsWith("landingAircrafts")) {
