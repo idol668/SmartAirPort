@@ -86,7 +86,7 @@ public class SmartAirport extends JPanel {
 	private Image commercialplane_270;
 	private Image cargoplane_90;
 	private Image cargoplane_270;
-
+	private Image flashlight;
 	int takeOffIteartion;
 
 	static boolean[] takeoffAllowed = new boolean[4];
@@ -501,7 +501,7 @@ public class SmartAirport extends JPanel {
 					if (j < 21) {
 						landingPlaneExists[i].x_shadow += 18;
 						landingPlaneExists[i].x += 20;
-						if (j>16 && j<21){
+						if (j>15 && j<21){
 							landingPlaneExists[i].y -=1; 
 
 						}
@@ -607,6 +607,25 @@ public class SmartAirport extends JPanel {
 
 	private void drawRescueTeam(Graphics g, RescueTeam rescue) {
 		g.drawImage(rescue.rescueteamImage, rescue.x, rescue.y, this);
+		g.drawImage(flashlight, 175, 135, this);
+		g.drawImage(flashlight, 175, 205, this);
+		g.drawImage(flashlight, 175, 225, this);
+		g.drawImage(flashlight, 175, 300, this);
+		g.drawImage(flashlight, 175, 435, this);
+		g.drawImage(flashlight, 175, 510, this);
+		g.drawImage(flashlight, 175, 535, this);
+		g.drawImage(flashlight, 175, 610, this);
+		g.drawImage(flashlight, 600, 135, this);
+		g.drawImage(flashlight, 600, 205, this);
+		g.drawImage(flashlight, 600, 225, this);
+		g.drawImage(flashlight, 600, 300, this);
+		g.drawImage(flashlight, 600, 435, this);
+		g.drawImage(flashlight, 600, 510, this);
+		g.drawImage(flashlight, 600, 535, this);
+		g.drawImage(flashlight, 600, 610, this);
+
+
+
 	}
 
 	private void drawAmbulance(Graphics g, Ambulance ambu) {
@@ -830,6 +849,7 @@ public class SmartAirport extends JPanel {
 		repairman = ImageIO.read(new File("img/man1.png"));
 		repairtruck_up = ImageIO.read(new File("img/repairtruck_up.png"));
 		repairtruck_r = ImageIO.read(new File("img/repairtruck_right.png"));
+		flashlight =ImageIO.read(new File("img/flashlight.png"));
 
 		// Images for waiting to land
 
