@@ -44,37 +44,37 @@ public class AuxiliaryMethods {
 			if (SmartAirport.takeoffPlaneExists[i] != null
 					&& ((!SmartAirport.takeoffAllowed[2 * i] && !SmartAirport.takeoffAllowed[2 * i + 1])
 							|| SmartAirport.mechanicalProblem[i])) {
-				inputs.put((String.format("takeoffAircrafts[%d]", i)), SmartAirport.takeoffPlaneExists[i].type);
+				inputs.put(getTakeOffString(i), SmartAirport.takeoffPlaneExists[i].type);
 			} else {
-				setInput(inputs, String.format("takeoffAircrafts[%d]", i), SmartAirport.scenario);
+				setInput(inputs, getTakeOffString(i), SmartAirport.scenario);
 			}
 
 			if (SmartAirport.landingPlaneExists[i] != null && !SmartAirport.landingAllowed[2 * i]
 					&& !SmartAirport.landingAllowed[2 * i + 1]) {
-				inputs.put((String.format("landingAircrafts[%d]", i)), SmartAirport.landingPlaneExists[i].type);
+				inputs.put(getLandingString(i), SmartAirport.landingPlaneExists[i].type);
 			} else {
-				setInput(inputs, String.format("landingAircrafts[%d]", i), SmartAirport.scenario);
+				setInput(inputs, getLandingString(i), SmartAirport.scenario);
 			}
 			// mechanical Problem
 			if (SmartAirport.takeoffPlaneExists[i] != null && SmartAirport.mechanicalProblem[i]
 					&& SmartAirport.repairTruck[i] == null) {
-				inputs.put((String.format("mechanicalProblem[%d]", i)), String.valueOf(true));
+				inputs.put(getMechanicalProblemString(i), String.valueOf(true));
 
 			} else if (SmartAirport.repairTruck[i] != null) {
-				inputs.put((String.format("mechanicalProblem[%d]", i)), String.valueOf(false));
+				inputs.put(getMechanicalProblemString(i), String.valueOf(false));
 
 			} else {
-				setInput(inputs, String.format("mechanicalProblem[%d]", i), SmartAirport.scenario);
+				setInput(inputs, getMechanicalProblemString(i), SmartAirport.scenario);
 			}
 		}
 		// slippery Runway
 		for (int i = 0; i < 4; i++) {
 			if (SmartAirport.slipperyRunway[i] && !SmartAirport.cleaningSensors[i]) {
-				inputs.put((String.format("slipperyRunway[%d]", i)), String.valueOf(true));
+				inputs.put(getSlipperyString(i), String.valueOf(true));
 			} else if (SmartAirport.cleaningSensors[i]) {
-				inputs.put((String.format("slipperyRunway[%d]", i)), String.valueOf(false));
+				inputs.put(getSlipperyString(i), String.valueOf(false));
 			} else {
-				setInput(inputs, String.format("slipperyRunway[%d]", i), SmartAirport.scenario);
+				setInput(inputs, getSlipperyString(i), SmartAirport.scenario);
 			}
 		}
 		// emergency Landing
@@ -123,6 +123,76 @@ public class AuxiliaryMethods {
 		}
 		if (SmartAirport.scenarioCounter > -1) {
 			SmartAirport.scenarioCounter--;
+		}
+	}
+	
+	public static void updatePanelInputs(Map<String, String> inputs, Map<String, String> sysValues) {
+		if (SmartAirport.inManualScenario) {
+			for (int i = 0; i < 2; i++) {
+				String Direction = ((i == 0) ? "north" : "south");
+				if (SmartAirport.envMoves.get(String.format("takeoffAircrafts[%d]", i)) != null) {
+					String planeType = SmartAirport.envMoves.get(String.format("takeoffAircrafts[%d]", i));
+					//if already there is aircraft in this position
+					if (SmartAirport.takeoffPlaneExists[i] != null && SmartAirport.takeoffPlaneExists[i].type.equals(planeType)) {
+						continue;
+					}
+					//if there is no aircraft in the position OR the aircraft have no mechanical problem and already took off
+					if (SmartAirport.takeoffPlaneExists[i] == null || (!SmartAirport.mechanicalProblem[i] && (SmartAirport.takeoffAllowed[2 * i] || SmartAirport.takeoffAllowed[2 * i + 1]))) {
+						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + Direction + " "
+								+ planeType.toLowerCase() + " takeoff aircraft\n");
+						inputs.put((String.format("takeoffAircrafts[%d]", i)), planeType);
+						SmartAirport.envMoves.remove(String.format("takeoffAircrafts[%d]", i));
+					}
+				}
+				if (SmartAirport.envMoves.get(getLandingString(i)) != null) {
+					String planeType = SmartAirport.envMoves.get(getLandingString(i));
+					//if already there is aircraft in this position
+					if (SmartAirport.landingPlaneExists[i] != null && SmartAirport.landingPlaneExists[i].type.equals(planeType)) {
+						continue;
+					}
+					//if there is no aircraft in the position OR the aircraft already landed
+					if (SmartAirport.landingPlaneExists[i] == null || (SmartAirport.landingAllowed[2 * i] || SmartAirport.landingAllowed[2 * i + 1])) {
+						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + Direction + " "
+								+ planeType.toLowerCase() + " land aircraft\n");
+						inputs.put(getLandingString(i), planeType);
+						SmartAirport.envMoves.remove(getLandingString(i));
+					}
+				}
+
+				if (SmartAirport.envMoves.get(getMechanicalProblemString(i)) != null) {
+					//if this aircraft already fixed
+					if (SmartAirport.repairTruck[i] != null) {
+						continue;
+					}
+					inputs.put(getMechanicalProblemString(i), "true");
+					SmartAirport.envMoves.remove(getMechanicalProblemString(i));
+				}
+				if (SmartAirport.envMoves.get(getEmergencyLandingString(i)) != null) {
+					int j = ((i == 0) ? 1 : 0);
+					boolean rescueArrived = sysValues.get(getRescueTeamString(i)).equals("true");
+					boolean isAircaftLanding = !(inputs.get(getLandingString(i)).equals("NONE"));
+					//if aircraft in the parallel runway is landed in emergency
+					if (SmartAirport.emergencyLanding[j]) {
+						continue;
+					}
+					//if there is a aircraft landing and is not already handled by rescue team.
+					if (isAircaftLanding && !(SmartAirport.emergencyLanding[i] && rescueArrived)) {
+						inputs.put(getEmergencyLandingString(i), String.valueOf(true));
+						inputs.put(getEmergencyLandingString(j), String.valueOf(false));
+						SmartAirport.envMoves.remove(getEmergencyLandingString(i));
+					}
+				}
+			}
+			for (int i = 0; i < 4; i++) {
+				if (SmartAirport.envMoves.get(getSlipperyString(i)) != null) {
+					//if this runway already slippery OR just cleaned;
+					if(SmartAirport.slipperyRunway[i] || SmartAirport.cleaningSensors[i]) {
+						continue;
+					}
+					inputs.put(getSlipperyString(i), "true");
+					SmartAirport.envMoves.remove(getSlipperyString(i));
+				}
+			}
 		}
 	}
 
@@ -302,4 +372,24 @@ public class AuxiliaryMethods {
 			SmartAirport.scenario = "none";
 		}
 	}
+	
+	public static String getTakeOffString(int i) {
+		return (String.format("takeoffAircrafts[%d]", i));
+	}
+	public static String getLandingString(int i) {
+		return (String.format("landingAircrafts[%d]", i));
+	}
+	public static String getMechanicalProblemString(int i) {
+		return (String.format("mechanicalProblem[%d]", i));
+	}
+	public static String getRescueTeamString(int i) {
+		return (String.format("rescueTeam[%d]", i));
+	}
+	public static String getEmergencyLandingString(int i) {
+		return (String.format("emergencyLanding[%d]", i));
+	}
+	public static String getSlipperyString(int i) {
+		return (String.format("slipperyRunway[%d]", i));
+	}
+	
 }
