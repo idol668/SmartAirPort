@@ -63,24 +63,31 @@ public class SecondaryAnimation {
 		if (iteration <10)
 		{
 			aircraft.x_shadow += 4;
+			aircraft.x += 4;
 		}
 		
 		if (iteration>9 & iteration <20)
 		{
 			aircraft.degree=90;
 			aircraft.y_shadow += 3;
+			aircraft.y += 3;
+
 		}
 		
 		if (iteration>19 & iteration <30)
 		{
 			aircraft.degree=0;
 			aircraft.x_shadow -= 4;
+			aircraft.x -= 4;
+
 		}
 		
 		if (iteration>29 & iteration <38)
 		{
 			aircraft.degree=270;
 			aircraft.y_shadow -= 3;
+			aircraft.y -= 3;
+
 		}
 		
 		if (iteration==39)
