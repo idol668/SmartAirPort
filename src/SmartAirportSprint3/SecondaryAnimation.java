@@ -4,7 +4,7 @@ import java.awt.Image;
 
 public class SecondaryAnimation {
 	
-	/*--------------- This class will deal with the animation of our features such as : Slippery runway and Mechanical Problem--------------------*/
+	/*--------------- This class will deal with the animation and drawing functions of our features such as : Slippery runway and Mechanical Problem--------------------*/
 	
 	boolean[] cleaningSensors;
 	CleaningTruck [] cleaningCars;
@@ -25,7 +25,7 @@ public class SecondaryAnimation {
 		this.repairtruck_r=repairtruck_r;
 
 	}
-	
+	/*This Function will simulate the dirty runway functionality that was described in the specification */
 	public void animatedCleanTruck(int timeToRemoveDirtOrTruck) {
 
 		for (int i = 0; i < 4; i++) {
@@ -55,8 +55,11 @@ public class SecondaryAnimation {
 
 			}
 		}
-
 	}
+	
+	
+	
+	/*The Function will make the planes that are waiting to land to go in circles until they'll get the chance to land */
 	public void animatedWaitingForLanding(int iteration, Airplane aircraft)
 	{
 		
@@ -96,6 +99,7 @@ public class SecondaryAnimation {
 		}
 	}
 	
+	/*This function will simulate the mechanical problem feature that was described in the specification*/
 	public void animateRepairTruck(int i) {
 		if (i>22)
 		{
@@ -118,8 +122,8 @@ public class SecondaryAnimation {
 					repairTruck[1].x = repairTruck[1].x + 10;
 				}
 				if (repairTruck[1].y > 400) {
-					repairTruck[1].y = repairTruck[1].y - 5;
-					repairTruck[1].man_y = repairTruck[1].man_y - 5;
+					repairTruck[1].y = repairTruck[1].y - 7;
+					repairTruck[1].man_y = repairTruck[1].man_y - 6;
 				} else {
 					repairTruck[1].man_x = repairTruck[1].man_x - 10;
 					repairTruck[1].remove_truck += 1;
@@ -128,7 +132,7 @@ public class SecondaryAnimation {
 		}
 		
 	}
+		
 	
-
-
+	
 }

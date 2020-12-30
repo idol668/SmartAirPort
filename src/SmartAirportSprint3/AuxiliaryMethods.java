@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
 
+import tau.smlab.syntech.controller.executor.ControllerExecutor;
+
 public class AuxiliaryMethods {
 
 	public AuxiliaryMethods() throws IOException {
@@ -390,6 +392,63 @@ public class AuxiliaryMethods {
 	}
 	public static String getSlipperyString(int i) {
 		return (String.format("slipperyRunway[%d]", i));
+	}
+	
+	public static void getEnvInputs(ControllerExecutor executor)
+	{
+		Map<String, String> envValues = executor.getCurrInputs();
+		for (int i = 0; i < 4; i++) {
+			String key = String.format("slipperyRunway[%d]", i);
+			SmartAirport.slipperyRunway[i] = envValues.get(key).equals("true") ? true : false;
+			if (SmartAirport.slipperyRunway[i]) {
+				SmartAirport.stillCleaning[i] = true;
+			} else {
+				SmartAirport.stillCleaning[i] = false;
+			}
+		}
+		for (int i = 0; i < 2; i++) {
+			String key_mech = String.format("mechanicalProblem[%d]", i);
+			String key_emerg =String.format("emergencyLanding[%d]", i);
+			SmartAirport.mechanicalProblem[i] = envValues.get(key_mech).equals("true") ? true : false;
+			SmartAirport.emergencyLanding[i] = envValues.get(key_emerg).equals("true") ? true : false;
+
+			
+		}
+	}
+	
+	public static void getSysInputs(ControllerExecutor executor)
+	{
+		Map<String, String> sysValues = executor.getCurrOutputs();
+		String key = "";
+		for (int i = 0; i < 4; i++) {
+			key = String.format("takeoffAllowed[%d]", i);
+			SmartAirport.takeoffAllowed[i] = sysValues.get(key).equals("true") ? true : false;
+			key = String.format("landingAllowed[%d]", i);
+			SmartAirport.landingAllowed[i] = sysValues.get(key).equals("true") ? true : false;
+			key = String.format("cleanTruck[%d]", i);
+			SmartAirport.cleaningSensors[i] = sysValues.get(key).equals("true") ? true : false;
+		}
+		
+		for (int i = 0; i < 2; i++) {
+			key = String.format("repairTruck[%d]", i);
+			if (sysValues.get(key).equals("true")) {
+				SmartAirport.repairTruck[i] = new RepairTruck(730, 520, i, SmartAirport.repairtruck_up);
+			} else {
+				SmartAirport.repairTruck[i] = null;
+			}
+			key = String.format("rescueTeam[%d]", i);
+			if (sysValues.get(key).equals("true")) {
+				SmartAirport.rescueTeams[i] = new RescueTeam(310, 650, i, SmartAirport.rescueteam_up);
+			} else {
+				SmartAirport.rescueTeams[i] = null;
+			}
+
+			/*
+			 * key = String.format("ambulance[%d]", i); if
+			 * (sysValues.get(key).equals("true")) { ambulances[i] = new Ambulance(345, 640,
+			 * i, ambuImage_up); } else { ambulances[i] = null; }
+			 */
+		}
 	}
 	
 }

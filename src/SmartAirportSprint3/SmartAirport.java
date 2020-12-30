@@ -33,9 +33,6 @@ import tau.smlab.syntech.controller.executor.ControllerExecutor;
 
 public class SmartAirport extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private Image airport;
 	private Image shadow_private_0;
@@ -51,9 +48,9 @@ public class SmartAirport extends JPanel {
 	private Image shadowcargo_0;
 	private Image shadowcargo_180;
 	private Image repairman;
-	private Image repairtruck_up;
+	static Image repairtruck_up;
 	private Image repairtruck_r;
-	private Image rescueteam_up;
+	static Image rescueteam_up;
 	private Image ambuImage_up;
 	private Image rescueteam_r;
 	private Image rescueteam_down;
@@ -74,7 +71,7 @@ public class SmartAirport extends JPanel {
 	private Image cleaningCar_90;
 	private Image cleaningCar_180;
 	private Image cleaningCar_270;
-	private Image oilAndDirt;
+	static Image oilAndDirt;
 	static boolean[] cleaningSensors = new boolean[4];
 	static CleaningTruck[] cleaningCars = new CleaningTruck[4];
 	static boolean[] stillCleaning = new boolean[4];
@@ -145,7 +142,9 @@ public class SmartAirport extends JPanel {
 					}
 
 					Map<String, String> envValues = executor.getCurrInputs();
-					for (int i = 0; i < 4; i++) {
+					AuxiliaryMethods.getEnvInputs(executor);
+					
+					/*for (int i = 0; i < 4; i++) {
 						String key = String.format("slipperyRunway[%d]", i);
 						slipperyRunway[i] = envValues.get(key).equals("true") ? true : false;
 						if (slipperyRunway[i]) {
@@ -158,7 +157,7 @@ public class SmartAirport extends JPanel {
 					mechanicalProblem[1] = envValues.get("mechanicalProblem[1]").equals("true") ? true : false;
 
 					emergencyLanding[0] = envValues.get("emergencyLanding[0]").equals("true") ? true : false;
-					emergencyLanding[1] = envValues.get("emergencyLanding[1]").equals("true") ? true : false;
+					emergencyLanding[1] = envValues.get("emergencyLanding[1]").equals("true") ? true : false;*/
 
 					// System.out.println(executor.getCurrInputs().toString());
 					if (!envValues.get("takeoffAircrafts[0]").equals("NONE")) {
@@ -193,7 +192,8 @@ public class SmartAirport extends JPanel {
 					}
 
 					Map<String, String> sysValues = executor.getCurrOutputs();
-					String key = "";
+					AuxiliaryMethods.getSysInputs(executor);
+					/*String key = "";	
 					for (int i = 0; i < 4; i++) {
 						key = String.format("takeoffAllowed[%d]", i);
 						takeoffAllowed[i] = sysValues.get(key).equals("true") ? true : false;
@@ -215,13 +215,13 @@ public class SmartAirport extends JPanel {
 						} else {
 							rescueTeams[i] = null;
 						}
-
+					}*/
 						/*
 						 * key = String.format("ambulance[%d]", i); if
 						 * (sysValues.get(key).equals("true")) { ambulances[i] = new Ambulance(345, 640,
 						 * i, ambuImage_up); } else { ambulances[i] = null; }
 						 */
-					}
+					
 
 					// Create new CleaningCars
 					if (cleaningSensors[0]) {
@@ -410,7 +410,9 @@ public class SmartAirport extends JPanel {
 					}
 				}
 			}
+			rescueTeams[i] = null;
 		}
+		
 	}
 
 	public void animateLandingAndTakeoff() {
@@ -558,8 +560,8 @@ public class SmartAirport extends JPanel {
 					if (j>29)
 					{
 						if (takeoffPlaneExists[i].y > 500 && takeoffPlaneExists[i].y < 650) {
-							takeoffPlaneExists[i].y_shadow += 1;
-							takeoffPlaneExists[i].y+=1; 
+							takeoffPlaneExists[i].y_shadow += 2;
+							takeoffPlaneExists[i].y+=2; 
 
 						}
 						if (takeoffPlaneExists[i].y > 230 && takeoffPlaneExists[i].y < 330) {
@@ -605,7 +607,8 @@ public class SmartAirport extends JPanel {
 		}
 	}
 
-	private void drawRescueTeam(Graphics g, RescueTeam rescue) {
+	private void drawRescueTeam(Graphics g, RescueTeam rescue) 
+	{
 		g.drawImage(rescue.rescueteamImage, rescue.x, rescue.y, this);
 		g.drawImage(flashlight, 175, 135, this);
 		g.drawImage(flashlight, 175, 205, this);
@@ -770,7 +773,7 @@ public class SmartAirport extends JPanel {
 		return;
 	}
 
-	public void paintComponent(Graphics g) {
+	public  void   paintComponent(Graphics g) {
 		super.paintComponent(g);
 
 		g.drawImage(airport, 0, 0, this);
