@@ -92,7 +92,7 @@ public class SmartAirport extends JPanel {
 	static Airplane[] takeoffPlaneExists = new Airplane[2];
 	static Airplane[] landingPlaneExists = new Airplane[2];
 
-	ControllerExecutor executor;
+	static ControllerExecutor executor;
 	static boolean[] emergencyLanding = new boolean[2];
 	static boolean[] slipperyRunway = new boolean[4];
 	static boolean[] mechanicalProblem = new boolean[2];
@@ -131,7 +131,7 @@ public class SmartAirport extends JPanel {
 					e1.printStackTrace();
 				}
 				executor.initState(inputs);
-
+				System.out.println("init input" + executor.getCurrInputs().toString());
 				repaint();
 				while (run) {
 
@@ -260,7 +260,7 @@ public class SmartAirport extends JPanel {
 					AuxiliaryMethods.updateInputs(inputs, sysValues);
 					// System.out.println("afterinputs" + inputs.toString());
 					AuxiliaryMethods.updatePanelInputs(inputs, sysValues);
-					// System.out.println(inputs.toString());
+					 System.out.println(inputs.toString());
 					try {
 						executor.updateState(inputs);
 					} catch (Exception e) {
