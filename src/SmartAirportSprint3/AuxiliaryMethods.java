@@ -82,8 +82,8 @@ public class AuxiliaryMethods {
 		// emergency Landing
 		boolean rescueArrived0 = sysValues.get("rescueTeam[0]").equals("true");
 		boolean rescueArrived1 = sysValues.get("rescueTeam[1]").equals("true");
-		boolean isntLanding0 = SmartAirport.executor.getCurrInputs().get("landingAircrafts[0]").equals("NONE");
-		boolean isntLanding1 = SmartAirport.executor.getCurrInputs().get("landingAircrafts[1]").equals("NONE");
+		boolean isntLanding0 = inputs.get("landingAircrafts[0]").equals("NONE");
+		boolean isntLanding1 = inputs.get("landingAircrafts[1]").equals("NONE");
 
 		if (isntLanding0 || isntLanding1) {
 			if (isntLanding0 && isntLanding1) {
@@ -91,7 +91,7 @@ public class AuxiliaryMethods {
 				inputs.put("emergencyLanding[1]", String.valueOf(false));
 			} else if (isntLanding0) {
 				inputs.put("emergencyLanding[0]", String.valueOf(false));
-				if (rescueArrived1 && SmartAirport.emergencyLanding[1]) {
+				if ( (rescueArrived0 && SmartAirport.emergencyLanding[0])  || (rescueArrived1 && SmartAirport.emergencyLanding[1] )) {
 					inputs.put("emergencyLanding[1]", String.valueOf(false));
 				} else if (SmartAirport.emergencyLanding[1] && !rescueArrived1) {
 					inputs.put("emergencyLanding[1]", String.valueOf(true));
@@ -100,7 +100,7 @@ public class AuxiliaryMethods {
 				}
 			} else if (isntLanding1) {
 				inputs.put("emergencyLanding[1]", String.valueOf(false));
-				if (rescueArrived0 && SmartAirport.emergencyLanding[0]) {
+				if ( (rescueArrived0 && SmartAirport.emergencyLanding[0])  || (rescueArrived1 && SmartAirport.emergencyLanding[1] )) {
 					inputs.put("emergencyLanding[0]", String.valueOf(false));
 				} else if (SmartAirport.emergencyLanding[0] && !rescueArrived0) {
 					inputs.put("emergencyLanding[0]", String.valueOf(true));
