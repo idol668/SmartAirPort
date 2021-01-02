@@ -1,6 +1,7 @@
 package SmartAirportSprint3;
 
 import java.awt.Image;
+import java.util.concurrent.TimeUnit;
 
 public class SecondaryAnimation {
 	
@@ -25,6 +26,62 @@ public class SecondaryAnimation {
 		this.repairtruck_r=repairtruck_r;
 
 	}
+	public static void movingRescueTeamToLandingLine(int landingLine, int loopStep, RescueTeam rescueTeam) {
+		switch (landingLine) {
+			case 0:
+				if (loopStep < 42) {
+					rescueTeam.y -= 11;
+				} else {
+					rescueTeam.rescueteamImage = SmartAirport.rescueteam_r;
+					try {
+						TimeUnit.MICROSECONDS.sleep(250);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				break;
+			case 1:
+				if (loopStep < 35) {
+					rescueTeam.y -= 11;
+				} else {
+					rescueTeam.rescueteamImage = SmartAirport.rescueteam_r;
+					try {
+						TimeUnit.MICROSECONDS.sleep(150);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				break;
+			case 2:
+				if (loopStep < 12) {
+					rescueTeam.y -= 12;
+				}
+				if (loopStep < 13) {
+					rescueTeam.y -= 5;
+				} else {
+					rescueTeam.rescueteamImage = SmartAirport.rescueteam_r;
+					try {
+						TimeUnit.MICROSECONDS.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				break;
+			case 3:
+				if (loopStep < 6) {
+					rescueTeam.y -= 12;
+				} else {
+					rescueTeam.rescueteamImage = SmartAirport.rescueteam_r;
+					try {
+						TimeUnit.MICROSECONDS.sleep(10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				break;
+		}
+	}
+
 	/*This Function will simulate the dirty runway functionality that was described in the specification */
 	public void animatedCleanTruck(int timeToRemoveDirtOrTruck) {
 

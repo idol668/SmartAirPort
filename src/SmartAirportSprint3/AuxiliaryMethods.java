@@ -12,27 +12,38 @@ public class AuxiliaryMethods {
 	}
 
 	public static Airplane putPlanesInWaitingArea(String state, int spotInWaitingArea, String planeType) {
+		int takeoff_pos_x = 650;
+		int landing_pos_x = 50;
+		int takeoff_pos_north_y = 300;
+		int takeoff_pos_south_y = 390;
+		int landing_pos_north_y = 165;
+		int landing_pos_south_y = 475;
+		int landing_pos_commercial_north_y = 185;
+		int landing_pos_commercial_south_y = 500;
+		int degree_0 = 0;
+		int degree_180 = 180;
 		Airplane plane = null;
+		
 		if (state.equals("takeoff")) {
 			if (spotInWaitingArea == 0) {
-				plane = new Airplane(650, 300, 0, planeType, 0, true);
+				plane = new Airplane(takeoff_pos_x, takeoff_pos_north_y, degree_0, planeType, 0, true);
 			} else {
-				plane = new Airplane(650, 390, 0, planeType, 1, true);
+				plane = new Airplane(takeoff_pos_x, takeoff_pos_south_y, degree_0, planeType, 1, true);
 			}
 		}
 		if (state.equals("landing")) {
 			if (spotInWaitingArea == 0) {
 				if (planeType.equals("COMMERCIAL")) {
-					plane = new Airplane(50, 180, 180, planeType, 0, false);
+					plane = new Airplane(landing_pos_x, landing_pos_commercial_north_y, degree_180, planeType, 0, false);
 				} else {
-					plane = new Airplane(50, 155, 180, planeType, 0, false);
+					plane = new Airplane(landing_pos_x, landing_pos_north_y, degree_180, planeType, 0, false);
 				}
 
 			} else {
 				if (planeType.equals("COMMERCIAL")) {
-					plane = new Airplane(50, 500, 180, planeType, 1, false);
+					plane = new Airplane(landing_pos_x, landing_pos_commercial_south_y, degree_180, planeType, 1, false);
 				} else {
-					plane = new Airplane(50, 475, 180, planeType, 1, false);
+					plane = new Airplane(landing_pos_x, landing_pos_south_y, degree_180, planeType, 1, false);
 				}
 			}
 		}
@@ -438,7 +449,7 @@ public class AuxiliaryMethods {
 			}
 			key = String.format("rescueTeam[%d]", i);
 			if (sysValues.get(key).equals("true")) {
-				SmartAirport.rescueTeams[i] = new RescueTeam(310, 650, i, SmartAirport.rescueteam_up);
+				SmartAirport.rescueTeams[i] = new RescueTeam(320, 650, i, SmartAirport.rescueteam_up, SmartAirport.flashlight);
 			} else {
 				SmartAirport.rescueTeams[i] = null;
 			}

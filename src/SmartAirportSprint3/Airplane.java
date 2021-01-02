@@ -24,4 +24,21 @@ public class Airplane {
 		this.EnterLandingOrTakeoof =false;
 	}
 	
+	public void setPlaneToFirstRunway() {
+		this.EnterLandingOrTakeoof = true;
+		this.y -= 40;
+	}
+	
+	public void setPlaneToSecondRunway() {
+		this.EnterLandingOrTakeoof = true;
+		this.y += 60;
+	}
+	
+	public void movingPlaneAndShadow(int num) {
+		this.x += num;
+		this.x_shadow += num;
+	}
+	
+
+	
 }

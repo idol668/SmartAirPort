@@ -52,7 +52,7 @@ public class SmartAirport extends JPanel {
 	private Image repairtruck_r;
 	static Image rescueteam_up;
 	private Image ambuImage_up;
-	private Image rescueteam_r;
+	static Image rescueteam_r;
 	private Image rescueteam_down;
 	private Image ambuImage_r;
 	boolean[] aircraftForLanding = new boolean[2];
@@ -83,7 +83,7 @@ public class SmartAirport extends JPanel {
 	private Image commercialplane_270;
 	private Image cargoplane_90;
 	private Image cargoplane_270;
-	private Image flashlight;
+	static Image flashlight;
 	int takeOffIteartion;
 
 	static boolean[] takeoffAllowed = new boolean[4];
@@ -280,22 +280,19 @@ public class SmartAirport extends JPanel {
 		for (int i = 0; i < 2; i++) {
 			if (emergencyLanding[i] && landingPlaneExists[i] != null) {
 				if (landingAllowed[2 * i] == true && landingAllowed[2 * i + 1] == true) {
-					landingPlaneExists[i].EnterLandingOrTakeoof = true;
 					Random rand = new Random();
 					if (rand.nextBoolean() == true) {
-						landingPlaneExists[i].y = landingPlaneExists[i].y + 60;
+						landingPlaneExists[i].setPlaneToSecondRunway();
 						landingLine = i * 2 + 1;
 					} else {
-						landingPlaneExists[i].y = landingPlaneExists[i].y - 40;
+						landingPlaneExists[i].setPlaneToFirstRunway();
 						landingLine = i * 2;
 					}
 				} else if (landingAllowed[2 * i] == true && !slipperyRunway[2 * i]) {
-					landingPlaneExists[i].EnterLandingOrTakeoof = true;
-					landingPlaneExists[i].y = landingPlaneExists[i].y - 40;
+					landingPlaneExists[i].setPlaneToFirstRunway();
 					landingLine = i * 2;
 				} else if (landingAllowed[2 * i + 1] == true && !slipperyRunway[2 * i + 1]) {
-					landingPlaneExists[i].EnterLandingOrTakeoof = true;
-					landingPlaneExists[i].y = landingPlaneExists[i].y + 60;
+					landingPlaneExists[i].setPlaneToSecondRunway();
 					landingLine = i * 2 + 1;
 				}
 				landingPlaneExists[i].x_shadow = landingPlaneExists[i].x;
@@ -303,10 +300,9 @@ public class SmartAirport extends JPanel {
 				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof
 						&& rescueTeams[i] != null) {
 
-					for (int j = 0; j < 23; j++) {
-
-						landingPlaneExists[i].x += 15;
-						landingPlaneExists[i].x_shadow += 15;
+					for (int j = 0; j < 22; j++) {
+						landingPlaneExists[i].movingPlaneAndShadow(15);
+						rescueTeams[i].TurnFlashLight();
 						if (j == 9) {
 							landingPlaneExists[i].ground = true;
 						}
@@ -318,68 +314,20 @@ public class SmartAirport extends JPanel {
 							e.printStackTrace();
 						}
 					}
+					landingPlaneExists[i].movingPlaneAndShadow(4);
 					landingPlaneExists[i].EnterLandingOrTakeoof = false;
+					
 					for (int j = 0; j < 50; j++) {
-						if (landingLine == 0) {
-							if (j < 42) {
-								rescueTeams[i].y -= 12;
-							} else {
-								try {
-									TimeUnit.MICROSECONDS.sleep(250);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-							}
-						} else if (landingLine == 1) {
-							if (j < 35) {
-								rescueTeams[i].y -= 12;
-							} else {
-								try {
-									TimeUnit.MICROSECONDS.sleep(150);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-							}
-						}
-						if (landingLine == 2) {
-							if (j < 12) {
-								rescueTeams[i].y -= 12;
-							}
-							if (j < 14) {
-								rescueTeams[i].y -= 5;
-							} else {
-								rescueTeams[i].rescueteamImage = rescueteam_r;
-								try {
-									TimeUnit.MICROSECONDS.sleep(100);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-							}
-						}
-						if (landingLine == 3) {
-							if (j < 6) {
-								rescueTeams[i].y -= 12;
-							} else {
-								rescueTeams[i].rescueteamImage = rescueteam_r;
-								try {
-									TimeUnit.MICROSECONDS.sleep(100);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-							}
-						}
-
+						SecondaryAnimation.movingRescueTeamToLandingLine(landingLine, j, rescueTeams[i]);
 						repaint();
-
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					}
-					for (int j = 0; j < 35; j++) {
-						landingPlaneExists[i].x += 15;
-						landingPlaneExists[i].x_shadow += 15;
+					for (int j = 0; j < 40; j++) {
+						landingPlaneExists[i].movingPlaneAndShadow(10);
 						if (landingLine == 2 || landingLine == 3) {
 							if (j < 2) {
 								rescueTeams[i].x += 1;
@@ -396,7 +344,8 @@ public class SmartAirport extends JPanel {
 							}
 						} else {
 							if (rescueTeams[i] != null) {
-								rescueTeams[i].y -= 12;
+								rescueTeams[i].rescueteamImage = rescueteam_down;
+								rescueTeams[i].y += 13;
 							}
 						}
 						repaint();
@@ -609,22 +558,22 @@ public class SmartAirport extends JPanel {
 	private void drawRescueTeam(Graphics g, RescueTeam rescue) 
 	{
 		g.drawImage(rescue.rescueteamImage, rescue.x, rescue.y, this);
-		g.drawImage(flashlight, 175, 135, this);
-		g.drawImage(flashlight, 175, 205, this);
-		g.drawImage(flashlight, 175, 225, this);
-		g.drawImage(flashlight, 175, 300, this);
-		g.drawImage(flashlight, 175, 435, this);
-		g.drawImage(flashlight, 175, 510, this);
-		g.drawImage(flashlight, 175, 535, this);
-		g.drawImage(flashlight, 175, 610, this);
-		g.drawImage(flashlight, 600, 135, this);
-		g.drawImage(flashlight, 600, 205, this);
-		g.drawImage(flashlight, 600, 225, this);
-		g.drawImage(flashlight, 600, 300, this);
-		g.drawImage(flashlight, 600, 435, this);
-		g.drawImage(flashlight, 600, 510, this);
-		g.drawImage(flashlight, 600, 535, this);
-		g.drawImage(flashlight, 600, 610, this);
+		g.drawImage(rescue.flashlight, 175, 135, this);
+		g.drawImage(rescue.flashlight, 175, 205, this);
+		g.drawImage(rescue.flashlight, 175, 225, this);
+		g.drawImage(rescue.flashlight, 175, 300, this);
+		g.drawImage(rescue.flashlight, 175, 435, this);
+		g.drawImage(rescue.flashlight, 175, 510, this);
+		g.drawImage(rescue.flashlight, 175, 535, this);
+		g.drawImage(rescue.flashlight, 175, 610, this);
+		g.drawImage(rescue.flashlight, 600, 135, this);
+		g.drawImage(rescue.flashlight, 600, 205, this);
+		g.drawImage(rescue.flashlight, 600, 225, this);
+		g.drawImage(rescue.flashlight, 600, 300, this);
+		g.drawImage(rescue.flashlight, 600, 435, this);
+		g.drawImage(rescue.flashlight, 600, 510, this);
+		g.drawImage(rescue.flashlight, 600, 535, this);
+		g.drawImage(rescue.flashlight, 600, 610, this);
 
 
 
@@ -835,7 +784,8 @@ public class SmartAirport extends JPanel {
 	};
 
 	private void initialFields() throws IOException {
-		airport = ImageIO.read(new File("img/airport.png"));
+		//airport = ImageIO.read(new File("img/airport.png"));
+		airport = ImageIO.read(new File("img/airport_v2.png"));
 		commercialplane_0 = ImageIO.read(new File("img/commercialplane_0.png"));
 		privateplane_0 = ImageIO.read(new File("img/privateplane_0.png"));
 		cargoplane_0 = ImageIO.read(new File("img/cargoplane_0.png"));
