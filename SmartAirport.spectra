@@ -87,10 +87,15 @@ gar RepairTruckIfAircraftExited {Int(0..(N-1)) i}:
 // For the completeness of the controller we added this gar for the beginning state of the controller 
 gar RepairTruckIfAircraftExistdBegining{Int(0..(N-1)) i}:
 	((takeoffAircrafts[i] = NONE) -> (!repairTruck[i]));
+	
+// Gar 4 - Repair team should be send only if mechanical problem exists, we used trigger to describe behavior that  should never happen
+gar  trig [true]*([!mechanicalProblem[0] & repairTruck[0]]) |=> false;
+gar  trig [true]*([!mechanicalProblem[1] & repairTruck[1]]) |=> false;
 
-// Gar 4 - repair team should be send only if mechanical problem exists		
-gar repairTruckOnlyIfBroken {Int(0..(N-1)) i}:
-	G (next(!mechanicalProblem[i]) -> next(!repairTruck[i]));
+
+// Gar 4 - Repair team should be send only if mechanical problem exists,another version without triggers and with parametric approach 	
+//gar repairTruckOnlyIfBroken {Int(0..(N-1)) i}:
+	//G (next(!mechanicalProblem[i]) -> next(!repairTruck[i]));
 
 // For the completeness of the controller we added this gar for the beginning state of the controller 
 gar repairTruckOnlyIfBrokenBegin {Int(0..(N-1)) i}:
@@ -123,10 +128,16 @@ asm consistentAssertionSlippery {Int (0..(doubleN-1)) i}:
 // Asm 7- If a clean team to runway i in the next state runway i won't be slippery 
 asm cleanRunway {Int (0..(doubleN-1)) i}:
 	G (cleanTruck[i]->next(!slipperyRunway[i]));
+	
+//// Gar  7 - Clean team won't be send to a not slippery runway, we used triggers to describe a behavior that shouldn't happen 
+gar  trig [true]*([!slipperyRunway[0] & cleanTruck[0]]) |=> false;
+gar  trig [true]*([!slipperyRunway[1] & cleanTruck[1]]) |=> false;
+gar  trig [true]*([!slipperyRunway[2] & cleanTruck[2]]) |=> false;
+gar  trig [true]*([!slipperyRunway[3] & cleanTruck[3]]) |=> false;
 
-// Gar  7 - Clean team won't be send to a not slippery runway  	 
-gar cleanTruckOnlyIfSlippry {Int (0..(doubleN-1)) i}:
-	G (next(!slipperyRunway[i]) -> next(!cleanTruck[i]));
+// Gar  7 - Clean team won't be send to a not slippery runway- with a more parametric approach
+//gar cleanTruckOnlyIfSlippry {Int (0..(doubleN-1)) i}:
+	//G (next(!slipperyRunway[i]) -> next(!cleanTruck[i]));
 
 // For the completeness of the controller we added this gar for the beginning state of the controller 		
 gar cleanTruckOnlyIfSlippryBegin {Int (0..(doubleN-1)) i}:
@@ -174,6 +185,7 @@ asm emergencyOnlyInAircfartLandingBegin {Int (0..(N-1)) i}:
 // Asm 13 - We would like to have infinite amount of times without emergency landings in at least one waiting area - to avoid starvation 	
 asm notAlwaysEmegency{Int (0..(N-1)) i}:
 	GF (!emergencyLanding[i]);
+
 
 //Gar 10 - Rescue team should be send only if an emergency landing occurred
 gar rescueOnlyIfEmergency {Int (0..(N-1)) i}:
