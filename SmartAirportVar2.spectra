@@ -30,7 +30,7 @@ sys boolean[N] rescueTeam;
 sys boolean[doubleN] cleanTruck;
 
 
-//sys boolean[N] ambulance;
+sys boolean[N] ambulance;
 
 
 // ********************************************************************************************
@@ -144,89 +144,51 @@ gar trafficIsNotAllowedWhileSlippery {Int (0..(doubleN-1)) i}:
 gar trafficIsNotAllowedWhileSlipperyBegin {Int (0..(doubleN-1)) i}:
 	G ((slipperyRunway[i])  ->((!landingAllowed[i]) & (!takeoffAllowed[i])));	
 
-//// **************************************************************************
-//// ***                        Emergency Landing                           ***
-//// **************************************************************************
+//// *************************************************************************************
+//// ***                        Emergency Landing Var 2                                ***
+//// ***                        Issue : Unrealizable                                   ***
+//// *** It can be solved by removing the gar NoRescueTeamWithoutEmergency             ***
+//// *** But It caused a bad behavior - rescue team came without an emergency condition***
+//// **************************************************************************************
 
-// Asm 8 - In the first state of the controller we won't allow emergency landings
-//This assumption will prevent the environment from starting in a state from which the system can lead it to violation 
+//// *** We used this var to understand our specification issues and create our current emergency landing specification***
+//Note we didn't finish the specification since we encountered too many issues along the way.
+//We came to the conclusion that we should re-think our automaton states and transitions again
+
+// level 1
+// Asm 8 - There are infinite amount of times where we dont have an emergency landing issue on at least one waiting area
+asm notAlwaysEmegency{Int (0..(N-1)) i}:
+	GF (!emergencyLanding[i]);	
+	
+// Asm 9 - In the beginning state we wouldn't like an emergency landing
 asm !emergencyLanding[0] & !emergencyLanding[1];
 
-// Asm 9 - We allow only one emergency landing at a time
-asm G (next(!emergencyLanding[0]) | next(!emergencyLanding[1]));/************** */
-
-// Asm 10 - If a plane experiencing emergency landing issue, it will remain in this state until the condition is handled 
-asm consistentEmegencyLanding{Int (0..(N-1)) i}:
-	G consistentEmegencyLanding( emergencyLanding[i], rescueTeam[i]);
-	
-// Asm 11 - If the emergency landing is handled in the next state we won't have another emergency landing on both landing waiting areas 
-asm EmergencyHandled{Int (0..(N-1)) i}:
-	G ((rescueTeam[i] & emergencyLanding[i]) -> (next(!emergencyLanding[0]) & next(!emergencyLanding[1]) ) );
-	
-//Asm 12 - The system shouldn't send a rescue team to a none object
-asm emergencyOnlyInAircfartLanding {Int (0..(N-1)) i}:
-	G (next(landingAircrafts[i]=NONE) ->  next(!emergencyLanding[i]));
-
-// For the completeness of the controller we added this asm for the beginning state of the controller 		
-asm emergencyOnlyInAircfartLandingBegin {Int (0..(N-1)) i}:
-	((landingAircrafts[i]=NONE) ->  (!emergencyLanding[i])); 
-
-// Asm 13 - We would like to have infinite amount of times without emergency landings in at least one waiting area - to avoid starvation 	
-asm notAlwaysEmegency{Int (0..(N-1)) i}:
-	GF (!emergencyLanding[i]);
-
-//Gar 10 - Rescue team should be send only if an emergency landing occurred
-gar rescueOnlyIfEmergency {Int (0..(N-1)) i}:
-	G next(!emergencyLanding[i]) -> next(!rescueTeam[i]);
-	
-// For the 	completeness of the controller we added this gar for the beginning state of the controller 			
-gar rescueOnlyIfEmergencyBegin {Int (0..(N-1)) i}:
-	(!emergencyLanding[i]) -> (!rescueTeam[i]); 
-
+//Gar 10 - Rescue team should be send only if an emergency landing occurred	
+gar NoRescueTeamWithoutEmergency{Int (0..(N-1)) i}:
+	G (next(!emergencyLanding[i]) -> next(!rescueTeam[i]));
+////level k
 //Gar 11 -If a rescue team isn't sent to handle the emergency landing the plane won't be allowed to land in the *same* state	
-gar EmergencylandingNotAllowed{Int (0..(N-1)) i}:
-	G ((next(emergencyLanding[i]) & next(!rescueTeam[i]))-> !(next(landingAllowed[(2*i)]) | next(landingAllowed[(2*i+1)])));
-
-// For the completeness of the controller we added this gar for the beginning state of the controller 			
-gar EmergencylandingNotAllowedBegin{Int (0..(N-1)) i}:
-	 (((emergencyLanding[i]) & (!rescueTeam[i]))-> !((landingAllowed[(2*i)]) | (landingAllowed[(2*i+1)])));
- 
-// Gar 12 - If emergency landing happened in either waiting area 0 or 1 we won't allow to other planes to preform landing  	
-gar landingCurfewWheneverEmergencylandingInLine0:
-	G ((next(emergencyLanding[0]) & next(!emergencyLanding[1])) -> (next(!landingAllowed[2]) & next(!landingAllowed[3])));
-
-// For the completeness of the controller we added this gar for the beginning state of the controller 			
-gar landingCurfewWheneverEmergencylandingInLine0Begin:
-	(((emergencyLanding[0]) & (!emergencyLanding[1])) -> ((!landingAllowed[2]) & (!landingAllowed[3])));	
-
-// For the 	completeness of the controller we added this gar for the beginning state of the controller 			
-gar landingCurfewWheneverEmergencylandingInLine1:	
-	 (((!emergencyLanding[0]) & (emergencyLanding[1])) -> ((!landingAllowed[0]) & (!landingAllowed[1])));
+gar EmegencyLandingWithoutRescueTeamNotAllowToLand{Int (0..(N-1)) i}:
+	G next((emergencyLanding[i] & !rescueTeam[i]))-> next((!landingAllowed[(2*i)] & !landingAllowed[(2*i+1)]));
 	
-gar landingCurfewWheneverEmergencylandingInLine1Begin:	
-	G ((next(!emergencyLanding[0]) & next(emergencyLanding[1])) -> (next(!landingAllowed[0]) & next(!landingAllowed[1])));	
+//Gar 12 -If we are in emergency landing state with no rescue team in the next state rescue team will be sent and landing will be allowed
+gar sendingRescueTeam{Int (0..(N-1)) i}:
+	G (emergencyLanding[i] & !rescueTeam[i]) ->next(rescueTeam[i] & emergencyLanding[i] & (landingAllowed[(2*i)] | landingAllowed[(2*i+1)]));
 
-// Gar 13- If emergency landing occurred and rescue team wasn't sent, in the next state the system will send a rescue team 
-gar rescueTeamComeImmediately{Int (0..(N-1)) i}:
-	G ((emergencyLanding[i] & !rescueTeam[i])-> next(rescueTeam[i]));
+// Gar 13 - We won't allow a state where at some point we have both emergency landing and rescue team or not emergency landing and rescue team
+// In the automaton we tried to think of we wouldn't like to have this  kind of state transition .
+// If we didnt have an emergency landing and rescue team and in the next state we had an emergency landing,
+// only on the next state a rescue team will come to handle the condition
+gar trig [true]*([!emergencyLanding[0] & !rescueTeam[0]][emergencyLanding[0] & rescueTeam[0]]) |=> false;
+gar trig [true]*([!emergencyLanding[1] & !rescueTeam[1]][emergencyLanding[1] & rescueTeam[1]]) |=> false;
 
-//Gar 14 - If emergency landing condition occurred take offs aren't allowed in the airport 
+////level k+1
+// asm 10 - If rescue team came there will be no emergency landing in the next state
+asm EmergencyHandledByRescueTeam{Int (0..(N-1)) i}:
+	G (rescueTeam[i] -> next(!emergencyLanding[i]));
+	
+//Gar 14 - If emergency landing condition occurred take offs aren't allowed in the airport  
 gar takeoffCurfewWheneverEmergencylanding{Int (0..(N-1)) i}:
-	G ( next(emergencyLanding[i]) -> (next(!takeoffAllowed[0]) & next(!takeoffAllowed[1]) & next(!takeoffAllowed[2]) & next(!takeoffAllowed[3]) ));
-
-// For the completeness of the controller we added this gar for the beginning state of the controller 			
-gar takeoffCurfewWheneverEmergencylandingBegin{Int (0..(N-1)) i}:
-	 ( (emergencyLanding[i]) -> ((!takeoffAllowed[0]) & (!takeoffAllowed[1]) & (!takeoffAllowed[2]) & (!takeoffAllowed[3]) ));
-
-//Gar 15 - If emergency landing occurred in the *next* state landing will be allowed 
-gar EmergencylandingAllowed{Int (0..(N-1)) i}:
-	G ((emergencyLanding[i] & !rescueTeam[i])-> next(landingAllowed[(2*i)] | landingAllowed[(2*i+1)]));	
-
-// Gar 16- If rescue teams comes you are allowed to land in the respective runways  
-gar whenrescueTeamComeAllowedtoland{Int (0..(N-1)) i}:
-	G (next(rescueTeam[i]) ->next(landingAllowed[(2*i)] | landingAllowed[(2*i+1)]));
+	G (next((emergencyLanding[i] & !rescueTeam[i])) -> next((!takeoffAllowed[0] & !takeoffAllowed[1] & !takeoffAllowed[2] & !takeoffAllowed[3])));
 	
-// For the completeness of the controller we added this gar for the beginning state of the controller 				
-gar whenrescueTeamComeAllowedtolandBegin{Int (0..(N-1)) i}:
-	(rescueTeam[i]) ->(landingAllowed[(2*i)] | landingAllowed[(2*i+1)]);	
 

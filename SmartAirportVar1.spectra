@@ -30,7 +30,7 @@ sys boolean[N] rescueTeam;
 sys boolean[doubleN] cleanTruck;
 
 
-//sys boolean[N] ambulance;
+sys boolean[N] ambulance;
 
 
 // ********************************************************************************************
@@ -145,11 +145,10 @@ gar trafficIsNotAllowedWhileSlipperyBegin {Int (0..(doubleN-1)) i}:
 	G ((slipperyRunway[i])  ->((!landingAllowed[i]) & (!takeoffAllowed[i])));	
 
 //// **************************************************************************
-//// ***                        Emergency Landing                           ***
+//// ***            Emergency Landing  Var 1- Additional Feature in the end ***
 //// **************************************************************************
 
-// Asm 8 - In the first state of the controller we won't allow emergency landings
-//This assumption will prevent the environment from starting in a state from which the system can lead it to violation 
+// Asm 8 - In the first state of the controller we won't allow emergency landings 
 asm !emergencyLanding[0] & !emergencyLanding[1];
 
 // Asm 9 - We allow only one emergency landing at a time
@@ -162,7 +161,7 @@ asm consistentEmegencyLanding{Int (0..(N-1)) i}:
 // Asm 11 - If the emergency landing is handled in the next state we won't have another emergency landing on both landing waiting areas 
 asm EmergencyHandled{Int (0..(N-1)) i}:
 	G ((rescueTeam[i] & emergencyLanding[i]) -> (next(!emergencyLanding[0]) & next(!emergencyLanding[1]) ) );
-	
+		
 //Asm 12 - The system shouldn't send a rescue team to a none object
 asm emergencyOnlyInAircfartLanding {Int (0..(N-1)) i}:
 	G (next(landingAircrafts[i]=NONE) ->  next(!emergencyLanding[i]));
@@ -229,4 +228,15 @@ gar whenrescueTeamComeAllowedtoland{Int (0..(N-1)) i}:
 // For the completeness of the controller we added this gar for the beginning state of the controller 				
 gar whenrescueTeamComeAllowedtolandBegin{Int (0..(N-1)) i}:
 	(rescueTeam[i]) ->(landingAllowed[(2*i)] | landingAllowed[(2*i+1)]);	
+
+//Var1 Gar 1 -	Ambulance should be send only in emergency landing condition and only if the plane is of type commercial or private 
+gar sendAmbulanceInCommerAndPrivate {Int (0..(N-1)) i}:
+	G (emergencyLanding[i] & (landingAircrafts[i]=PRIVATE |landingAircrafts[i]=COMMERCIAL ) & !ambulance[i] )-> next(ambulance[i]);
+
+//Var1 Gar 2 -	Ambulance should be send only in emergency landing condition 
+//Note that we don't need anymore gar or asm since all the rules we wanted for the emergency landing are already defined above
+//This two rules are adding another feature to the spec- Handle emergency landing according to plane types
+gar AmbuOnlyifEmergency {Int (0..(N-1)) i}:
+	G next(!emergencyLanding[i]) -> next(!ambulance[i]);
+	
 
