@@ -239,7 +239,8 @@ public class SmartAirport extends JPanel {
 					if (cleaningSensors[3]) {
 						cleaningCars[3] = new CleaningTruck(10, 555, 180, 450, 575);
 					}
-					System.out.println(sysValues.toString());
+					System.out.println("System Values:"+sysValues.toString());
+					System.out.println("Env Values:"+envValues.toString());
 					repaint();
 					animateEmergencyLanding();
 					animateLandingAndTakeoff();
@@ -258,9 +259,7 @@ public class SmartAirport extends JPanel {
 					}
 
 					AuxiliaryMethods.updateInputs(inputs, sysValues);
-					// System.out.println("afterinputs" + inputs.toString());
 					AuxiliaryMethods.updatePanelInputs(inputs, sysValues);
-					 System.out.println(inputs.toString());
 					try {
 						executor.updateState(inputs);
 					} catch (Exception e) {
