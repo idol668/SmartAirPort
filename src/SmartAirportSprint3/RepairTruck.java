@@ -2,6 +2,9 @@ package SmartAirportSprint3;
 
 import java.awt.Image;
 
+//****************************************************************************************
+//***                Class that represents the repair team in our airport            ***
+//****************************************************************************************
 public class RepairTruck {
 	int x;
 	int y;
@@ -13,13 +16,15 @@ public class RepairTruck {
 	
 	
 	public RepairTruck(int x, int y,int line, Image truckImage) {
-		this.x = x;
+		this.x = x; // the x and y value represents the location of the truck in the airport
 		this.y = y;
 		this.line = line;
-		this.man_x = x;
+		this.man_x = x; // the x and y value represents the repair man location
 		this.man_y = y;
 		this.truckImage = truckImage;
 	}
+	
+	
 	public void setImage(Image newtruckImage) {
 		this.truckImage = newtruckImage;
 	}

@@ -6,24 +6,33 @@ import java.util.Random;
 
 import tau.smlab.syntech.controller.executor.ControllerExecutor;
 
+//****************************************************************************************
+//***              This class will contain our auxiliary methods                       ***
+//***              This methods are often used during our simulation                   ***
+//****************************************************************************************
+
 public class AuxiliaryMethods {
 
 	public AuxiliaryMethods() throws IOException {
 	}
 
+	// This function sets the planes in their respective waiting area using by changing its x and y values
+	// The waiting area is a spot in the airport where the planes are waiting to get their landing or take off permissions
 	public static Airplane putPlanesInWaitingArea(String state, int spotInWaitingArea, String planeType) {
-		int takeoff_pos_x = 650;
-		int landing_pos_x = 50;
-		int takeoff_pos_north_y = 300;
-		int takeoff_pos_south_y = 390;
-		int landing_pos_north_y = 165;
-		int landing_pos_south_y = 475;
+		int takeoff_pos_x = 650; // the x value of the planes that are waiting for take off 
+		int landing_pos_x = 50;  // the x value of the planes that are waiting for landing 
+		int takeoff_pos_north_y = 300; // the y value of the planes that are waiting for takeoff in north
+		int takeoff_pos_south_y = 390; // the y value of the planes that are waiting for for takeoff in south 
+		int landing_pos_north_y = 165; // the y value of the planes that are waiting for landing in north
+		int landing_pos_south_y = 475; // the y value of the planes that are waiting for landing in south
 		int landing_pos_commercial_north_y = 185;
 		int landing_pos_commercial_south_y = 500;
 		int degree_0 = 0;
 		int degree_180 = 180;
 		Airplane plane = null;
 		
+		//An Airplane object is created according to its state take off or landing
+		// If its take off we will pass the correct x and y values, else we will pass the landing x and y value
 		if (state.equals("takeoff")) {
 			if (spotInWaitingArea == 0) {
 				plane = new Airplane(takeoff_pos_x, takeoff_pos_north_y, degree_0, planeType, 0, true);
@@ -50,8 +59,12 @@ public class AuxiliaryMethods {
 		return plane;
 	}
 
+	//This function updates the state of the inputs in the controller
+	// We update the environment values according to the guarantees we defined in the specification 
 	public static void updateInputs(Map<String, String> inputs, Map<String, String> sysValues) {
-		// take off and landing planes
+		
+		// take off and landing planes - we update their state hence if they did perform take off or landing
+		// if they didn't perform the landing or takeoff we will tell the controller that they are still waiting for the permission 
 		for (int i = 0; i < SmartAirport.takeoffPlaneExists.length; i++) {
 
 			if (SmartAirport.takeoffPlaneExists[i] != null
@@ -68,7 +81,7 @@ public class AuxiliaryMethods {
 			} else {
 				setInput(inputs, getLandingString(i), SmartAirport.scenario);
 			}
-			// mechanical Problem
+			// mechanical Problem - we update the mechanical issue in the plane according to if a repair truck arrived and fixed the issue or not
 			if (SmartAirport.takeoffPlaneExists[i] != null && SmartAirport.mechanicalProblem[i]
 					&& SmartAirport.repairTruck[i] == null) {
 				inputs.put(getMechanicalProblemString(i), String.valueOf(true));
@@ -80,7 +93,7 @@ public class AuxiliaryMethods {
 				setInput(inputs, getMechanicalProblemString(i), SmartAirport.scenario);
 			}
 		}
-		// slippery Runway
+		// slippery runway - we update the controller according to the road condition- is it still slippery or cleaned by the cleaning truck
 		for (int i = 0; i < 4; i++) {
 			if (SmartAirport.slipperyRunway[i] && !SmartAirport.cleaningSensors[i]) {
 				inputs.put(getSlipperyString(i), String.valueOf(true));
@@ -139,6 +152,7 @@ public class AuxiliaryMethods {
 		}
 	}
 	
+	// This function updates the panel inputs - which is caused by an event when the user clicks on one of the buttons
 	public static void updatePanelInputs(Map<String, String> inputs, Map<String, String> sysValues) {
 		if (SmartAirport.inManualScenario) {
 			for (int i = 0; i < 2; i++) {
@@ -208,7 +222,10 @@ public class AuxiliaryMethods {
 			}
 		}
 	}
-
+	
+	// This function is used to describe the state of our simulator
+	// If the simulator is on manual or automatic state we will give it the value none
+	// Else if we chose a scenario, we will update the state of our simulator to the right scenario value 
 	private static void setInput(Map<String, String> inputs, String envVar, String scenario) {
 		switch (scenario) {
 		case "none":
@@ -230,6 +247,9 @@ public class AuxiliaryMethods {
 
 	}
 
+	// This function sets the emergency landing input in each scenario
+	// In case we are in none (automatic mode)- we would like to stimulate the simulator in the first state and get values 
+	// for the emergency landing 
 	private static void setEmergencyLandingInputs(Map<String, String> inputs, String scenario) {
 		switch (scenario) {
 		case "rush hour":
@@ -263,7 +283,9 @@ public class AuxiliaryMethods {
 			break;
 		}
 	}
-
+	
+	// This function is used when we are not in a scenario and in the first state in our simulator
+	// When we are in automatic state, we would like to stimulate the controller by giving the first environment values
 	private static void getInputNoneScenario(Map<String, String> inputs, String envVar) {
 		if (envVar.startsWith("takeoffAircrafts")) {
 			inputs.put(envVar, acquireRandomPlane(false));
@@ -278,6 +300,7 @@ public class AuxiliaryMethods {
 		}
 	}
 
+	// This function is used to get the inputs on the being scared of flying scenario
 	private static void getInputScaredOfFlyingScenario(Map<String, String> inputs, String envVar) {
 		if (envVar.startsWith("takeoffAircrafts")) {
 			inputs.put(envVar, acquireRandomPlane(false));
@@ -298,6 +321,7 @@ public class AuxiliaryMethods {
 		}
 	}
 
+	// This function is used to get the inputs on the being mechanic is hard scenario
 	private static void getInputBeingAMechanicIsHardScenario(Map<String, String> inputs, String envVar) {
 		if (envVar.startsWith("takeoffAircrafts")) {
 			inputs.put(envVar, acquireRandomPlane(true));
@@ -318,6 +342,7 @@ public class AuxiliaryMethods {
 		}
 	}
 
+	// This function is used to get the inputs on the slippery slope scenario 
 	private static void getInputSlipperySlopeScenario(Map<String, String> inputs, String envVar) {
 		if (envVar.startsWith("takeoffAircrafts")) {
 			inputs.put(envVar, acquireRandomPlane(false));
@@ -338,6 +363,7 @@ public class AuxiliaryMethods {
 		}
 	}
 
+	// This function is used to get the inputs in the rush hour scenario 
 	private static void getInputRushHourScenario(Map<String, String> inputs, String envVar) {
 		if (envVar.startsWith("takeoffAircrafts")) {
 			inputs.put(envVar, acquireRandomPlane(true));
@@ -352,6 +378,8 @@ public class AuxiliaryMethods {
 		}
 	}
 
+	// This function is used to for the initial run in our simulator and in some of the scenarios 
+	// This function gets a random plane type 
 	public static String acquireRandomPlane(boolean onlyAirCraft) {
 		String planeType = "";
 		Random rd = new Random();
@@ -405,6 +433,8 @@ public class AuxiliaryMethods {
 		return (String.format("slipperyRunway[%d]", i));
 	}
 	
+	// This function is used in order to get the environment inputs from the controller
+	// This inputs are used to correctly draw the state of the airport
 	public static void getEnvInputs(ControllerExecutor executor)
 	{
 		Map<String, String> envValues = executor.getCurrInputs();
@@ -427,6 +457,8 @@ public class AuxiliaryMethods {
 		}
 	}
 	
+	// This function is used in order to get the system inputs from the controller
+	// This inputs are used to correctly draw the state of the airport
 	public static void getSysInputs(ControllerExecutor executor)
 	{
 		Map<String, String> sysValues = executor.getCurrOutputs();

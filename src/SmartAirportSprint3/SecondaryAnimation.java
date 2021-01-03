@@ -3,9 +3,9 @@ package SmartAirportSprint3;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+
+
 public class SecondaryAnimation {
-	
-	/*--------------- This class will deal with the animation and drawing functions of our features such as : Slippery runway and Mechanical Problem--------------------*/
 	
 	static boolean[] cleaningSensors;
 	static CleaningTruck [] cleaningCars;

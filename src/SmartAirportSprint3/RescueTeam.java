@@ -2,6 +2,9 @@ package SmartAirportSprint3;
 
 import java.awt.Image;
 
+//****************************************************************************************
+//***                Class that represents the rescue team in our airport            ***
+//****************************************************************************************
 public class RescueTeam {
 	int x;
 	int y;
@@ -13,15 +16,16 @@ public class RescueTeam {
 	
 	
 	public RescueTeam(int x, int y,	int line,Image rescueteamImage, Image flashlight) {
-		this.x = x;
+		this.x = x; // the x and y value represents the location of the truck in the airport
 		this.y = y;
 		this.line =line;
-		this.is_flashlight_on = true;
+		this.is_flashlight_on = true; // when emergency landing performed the airport flashlights are showcased 
 		this.rescueteamImage = rescueteamImage;
 		this.flashlight_on = flashlight;
 		this.flashlight = flashlight;
 	}
 	
+	//This function turns the flashlights on and off in order to emphasize that this is an emergency landing
 	public void TurnFlashLight() {
 		if(is_flashlight_on == true) {
 			this.flashlight = null;
