@@ -1,4 +1,4 @@
-package SmartAirportSprint3;
+package SmartAirport;
 
 import java.io.IOException;
 import java.util.Map;
@@ -12,23 +12,26 @@ import tau.smlab.syntech.controller.executor.ControllerExecutor;
 //****************************************************************************************
 
 public class AuxiliaryMethods {
+	static int degree_0 = 0;
+	static int degree_180 = 180;
 
 	public AuxiliaryMethods() throws IOException {
 	}
 
-	// This function sets the planes in their respective waiting area using by changing its x and y values
-	// The waiting area is a spot in the airport where the planes are waiting to get their landing or take off permissions
+	/*
+	 *  This function sets the planes in their respective waiting area using by changing its x and y values
+	 *  The waiting area is a spot in the airport where the planes are waiting to get their landing or take off permissions
+	 */
 	public static Airplane putPlanesInWaitingArea(String state, int spotInWaitingArea, String planeType) {
-		int takeoff_pos_x = 650; // the x value of the planes that are waiting for take off 
-		int landing_pos_x = 50;  // the x value of the planes that are waiting for landing 
+		int takeoff_pos_x 		= 650; // the x value of the planes that are waiting for take off 
+		int landing_pos_x 		= 50;  // the x value of the planes that are waiting for landing 
 		int takeoff_pos_north_y = 300; // the y value of the planes that are waiting for takeoff in north
 		int takeoff_pos_south_y = 390; // the y value of the planes that are waiting for for takeoff in south 
 		int landing_pos_north_y = 165; // the y value of the planes that are waiting for landing in north
 		int landing_pos_south_y = 475; // the y value of the planes that are waiting for landing in south
 		int landing_pos_commercial_north_y = 185;
 		int landing_pos_commercial_south_y = 500;
-		int degree_0 = 0;
-		int degree_180 = 180;
+
 		Airplane plane = null;
 		
 		//An Airplane object is created according to its state take off or landing
@@ -59,8 +62,10 @@ public class AuxiliaryMethods {
 		return plane;
 	}
 
-	//This function updates the state of the inputs in the controller
-	// We update the environment values according to the guarantees we defined in the specification 
+	/*
+	 * This function updates the state of the inputs in the controller
+	 * We update the environment values according to the guarantees we defined in the specification 
+	 */
 	public static void updateInputs(Map<String, String> inputs, Map<String, String> sysValues) {
 		
 		// take off and landing planes - we update their state hence if they did perform take off or landing
@@ -223,9 +228,11 @@ public class AuxiliaryMethods {
 		}
 	}
 	
-	// This function is used to describe the state of our simulator
-	// If the simulator is on manual or automatic state we will give it the value none
-	// Else if we chose a scenario, we will update the state of our simulator to the right scenario value 
+	/*
+	 * This function is used to describe the state of our simulator
+	 * If the simulator is on manual or automatic state we will give it the value none
+	 * Else if we chose a scenario, we will update the state of our simulator to the right scenario value
+	 */
 	private static void setInput(Map<String, String> inputs, String envVar, String scenario) {
 		switch (scenario) {
 		case "none":
@@ -247,9 +254,11 @@ public class AuxiliaryMethods {
 
 	}
 
-	// This function sets the emergency landing input in each scenario
-	// In case we are in none (automatic mode)- we would like to stimulate the simulator in the first state and get values 
-	// for the emergency landing 
+	/*
+	 *  This function sets the emergency landing input in each scenario
+	 *  In case we are in none (automatic mode)- we would like to stimulate the simulator in the first state and get values
+	 *  for the emergency landing 
+	 */
 	private static void setEmergencyLandingInputs(Map<String, String> inputs, String scenario) {
 		switch (scenario) {
 		case "rush hour":
@@ -482,12 +491,56 @@ public class AuxiliaryMethods {
 			} else {
 				SmartAirport.rescueTeams[i] = null;
 			}
-
-			/*
-			 * key = String.format("ambulance[%d]", i); if
-			 * (sysValues.get(key).equals("true")) { ambulances[i] = new Ambulance(345, 640,
-			 * i, ambuImage_up); } else { ambulances[i] = null; }
-			 */
+		}
+	}
+	
+	public static int planePositionByRunwayNumber(int runwayLine) {
+		int planePosition;
+		switch (runwayLine) {
+			case 0:
+				planePosition = 155;
+				break;
+			case 1:
+				planePosition = 255;
+				break;
+			case 2:
+				planePosition = 455;
+				break;
+			default: // in case of the last runway line.
+				planePosition = 555;
+		}
+		return planePosition;
+	}
+	
+	/*
+	 * This function is used for creating cleaning car in case the cleaning sensor is on 
+	 */
+	public static void createCleaningCars(int runwayLine, boolean isCleaningSensorsOn) {
+		if(isCleaningSensorsOn) {
+			// the x position of the cleaning truck and the oil is permanent in all runway lines
+			int cleantruck_x_pos = 10;
+			int oil_x_pos 		 = 450;
+			// the x position of the cleaning truck and the oil changed according to runway line
+			int cleantruck_y_pos;
+			int oil_y_pos;
+			switch (runwayLine) {
+				case 0:
+					cleantruck_y_pos = 155;
+					oil_y_pos = 175;
+					break;
+				case 1:
+					cleantruck_y_pos = 255;
+					oil_y_pos = 275;
+					break;
+				case 2:
+					cleantruck_y_pos = 455;
+					oil_y_pos = 475;
+					break;
+				default: // in case of the last runway line.
+					cleantruck_y_pos = 555;
+					oil_y_pos = 575;	
+			}
+			SmartAirport.cleaningCars[runwayLine] = new CleaningTruck(cleantruck_x_pos, cleantruck_y_pos, degree_180, oil_x_pos, oil_y_pos);
 		}
 	}
 	

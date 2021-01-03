@@ -1,4 +1,4 @@
-package SmartAirportSprint3;
+package SmartAirport;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

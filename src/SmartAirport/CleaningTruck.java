@@ -1,4 +1,4 @@
-package SmartAirportSprint3;
+package SmartAirport;
 
 
 //****************************************************************************************
@@ -21,7 +21,5 @@ public class CleaningTruck {
 		this.x_oil=x_oil; //the x and y values of the oil in the runway (the reason for the slippery runway)
 		this.y_oil=y_oil;
 	}
-	
-
 
 }
