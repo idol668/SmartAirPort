@@ -278,7 +278,7 @@ public class SmartAirport extends JPanel {
 	public void animateEmergencyLanding() {
 		for (int i = 0; i < 2; i++) {
 			if (emergencyLanding[i] && landingPlaneExists[i] != null) {
-				SecondaryAnimation.setLandingPlaneInPositionLine(i,landingAllowed[2 * i], landingAllowed[2 * i + 1], landingPlaneExists[i]);
+				SecondaryAnimation.animateGetPlaneToLandingSpot(i,landingAllowed[2 * i], landingAllowed[2 * i + 1], landingPlaneExists[i]);
 				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof
 						&& rescueTeams[i] != null) {
 
@@ -351,7 +351,7 @@ public class SmartAirport extends JPanel {
 		int[] runwaysTakeOff = new int[2];
 		for (int i = 0; i < 2; i++) {
 			if (landingPlaneExists[i] != null && !emergencyLanding[i]) {
-				SecondaryAnimation.setLandingPlaneInPositionLine(i,landingAllowed[2 * i], landingAllowed[2 * i + 1], landingPlaneExists[i]);
+				SecondaryAnimation.animateGetPlaneToLandingSpot(i,landingAllowed[2 * i], landingAllowed[2 * i + 1], landingPlaneExists[i]);
 			}
 			if (takeoffPlaneExists[i] != null && mechanicalProblem[i] == false) {
 

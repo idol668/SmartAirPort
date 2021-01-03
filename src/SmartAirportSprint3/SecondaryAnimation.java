@@ -25,7 +25,7 @@ public class SecondaryAnimation {
 
 	}
 	
-	public static void setLandingPlaneInPositionLine(int line,boolean landingAllowedFirstLine, boolean landingAllowedSecondLine, Airplane landingPlane) {
+	public static void animateGetPlaneToLandingSpot(int line,boolean landingAllowedFirstLine, boolean landingAllowedSecondLine, Airplane landingPlane) {
 		if (landingAllowedFirstLine && landingAllowedSecondLine) {
 			Random rand = new Random();
 			if (rand.nextBoolean() == true) {
