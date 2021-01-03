@@ -439,8 +439,7 @@ public class AuxiliaryMethods {
 	{
 		Map<String, String> envValues = executor.getCurrInputs();
 		for (int i = 0; i < 4; i++) {
-			String key = String.format("slipperyRunway[%d]", i);
-			SmartAirport.slipperyRunway[i] = envValues.get(key).equals("true") ? true : false;
+			SmartAirport.slipperyRunway[i] = envValues.get( getSlipperyString(i)).equals("true") ? true : false;
 			if (SmartAirport.slipperyRunway[i]) {
 				SmartAirport.stillCleaning[i] = true;
 			} else {
@@ -448,10 +447,8 @@ public class AuxiliaryMethods {
 			}
 		}
 		for (int i = 0; i < 2; i++) {
-			String key_mech = String.format("mechanicalProblem[%d]", i);
-			String key_emerg =String.format("emergencyLanding[%d]", i);
-			SmartAirport.mechanicalProblem[i] = envValues.get(key_mech).equals("true") ? true : false;
-			SmartAirport.emergencyLanding[i] = envValues.get(key_emerg).equals("true") ? true : false;
+			SmartAirport.mechanicalProblem[i] = envValues.get(getMechanicalProblemString(i)).equals("true") ? true : false;
+			SmartAirport.emergencyLanding[i] = envValues.get(getEmergencyLandingString(i)).equals("true") ? true : false;
 
 			
 		}
@@ -475,13 +472,13 @@ public class AuxiliaryMethods {
 		for (int i = 0; i < 2; i++) {
 			key = String.format("repairTruck[%d]", i);
 			if (sysValues.get(key).equals("true")) {
-				SmartAirport.repairTruck[i] = new RepairTruck(730, 520, i, SmartAirport.repairtruck_up);
+				SmartAirport.repairTruck[i] = new RepairTruck(730, 520, i, AirportImages.repairtruck_up);
 			} else {
 				SmartAirport.repairTruck[i] = null;
 			}
 			key = String.format("rescueTeam[%d]", i);
 			if (sysValues.get(key).equals("true")) {
-				SmartAirport.rescueTeams[i] = new RescueTeam(320, 650, i, SmartAirport.rescueteam_up, SmartAirport.flashlight);
+				SmartAirport.rescueTeams[i] = new RescueTeam(320, 650, i, AirportImages.rescueteam_up, AirportImages.flashlight);
 			} else {
 				SmartAirport.rescueTeams[i] = null;
 			}

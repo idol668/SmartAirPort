@@ -34,56 +34,11 @@ import tau.smlab.syntech.controller.executor.ControllerExecutor;
 public class SmartAirport extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private Image airport;
-	private Image shadow_private_0;
-	private Image shadow_private_180;
-	private Image shadow_commerical_0;
-	private Image shadow_commerical_180;
-	private Image commercialplane_0;
-	private Image commercialplane_180;
-	private Image privateplane_0;
-	private Image privateplane_180;
-	private Image cargoplane_0;
-	private Image cargoplane_180;
-	private Image shadowcargo_0;
-	private Image shadowcargo_180;
-	private Image repairman;
-	static Image repairtruck_up;
-	static Image repairtruck_r;
-	static Image rescueteam_up;
-	static Image rescueteam_r;
-	private Image rescueteam_down;
-	private Image ambuImage_up;
-	private Image ambuImage_r;
 	boolean[] aircraftForLanding = new boolean[2];
 	boolean[] aircraftForTakeoff = new boolean[2];
-
-	// images for waiting to land
-	private Image shadow_private_90;
-	private Image shadow_private_270;
-	private Image shadowcargo_90;
-	private Image shadowcargo_270;
-	private Image shadow_commerical_90;
-	private Image shadow_commerical_270;
-
-	// SlippryRunway variables
-	private Image cleaningCar_0;
-	private Image cleaningCar_90;
-	private Image cleaningCar_180;
-	private Image cleaningCar_270;
-	static Image oilAndDirt;
 	static boolean[] cleaningSensors = new boolean[4];
 	static CleaningTruck[] cleaningCars = new CleaningTruck[4];
 	static boolean[] stillCleaning = new boolean[4];
-
-	// Additional images for takeoff
-	private Image privateplane_90;
-	private Image privateplane_270;
-	private Image commercialplane_90;
-	private Image commercialplane_270;
-	private Image cargoplane_90;
-	private Image cargoplane_270;
-	static Image flashlight;
 	int takeOffIteartion;
 
 	static boolean[] takeoffAllowed = new boolean[4];
@@ -117,7 +72,7 @@ public class SmartAirport extends JPanel {
 	static JTextArea outputArea = new JTextArea("Here will be the output for scenarios and events \n", 0, 20);
 
 	public SmartAirport() throws IOException {
-		initialFields();
+		AirportImages.initialFields();
 		initScene();
 
 		Thread animationThread = new Thread(new Runnable() {
@@ -143,23 +98,6 @@ public class SmartAirport extends JPanel {
 
 					Map<String, String> envValues = executor.getCurrInputs();
 					AuxiliaryMethods.getEnvInputs(executor);
-					
-					/*for (int i = 0; i < 4; i++) {
-						String key = String.format("slipperyRunway[%d]", i);
-						slipperyRunway[i] = envValues.get(key).equals("true") ? true : false;
-						if (slipperyRunway[i]) {
-							stillCleaning[i] = true;
-						} else {
-							stillCleaning[i] = false;
-						}
-					}
-					mechanicalProblem[0] = envValues.get("mechanicalProblem[0]").equals("true") ? true : false;
-					mechanicalProblem[1] = envValues.get("mechanicalProblem[1]").equals("true") ? true : false;
-
-					emergencyLanding[0] = envValues.get("emergencyLanding[0]").equals("true") ? true : false;
-					emergencyLanding[1] = envValues.get("emergencyLanding[1]").equals("true") ? true : false;*/
-
-					// System.out.println(executor.getCurrInputs().toString());
 					if (!envValues.get("takeoffAircrafts[0]").equals("NONE")) {
 						Airplane plane = AuxiliaryMethods.putPlanesInWaitingArea("takeoff", 0,
 								executor.getCurrInputs().get("takeoffAircrafts[0]"));
@@ -193,36 +131,7 @@ public class SmartAirport extends JPanel {
 
 					Map<String, String> sysValues = executor.getCurrOutputs();
 					AuxiliaryMethods.getSysInputs(executor);
-					/*String key = "";	
-					for (int i = 0; i < 4; i++) {
-						key = String.format("takeoffAllowed[%d]", i);
-						takeoffAllowed[i] = sysValues.get(key).equals("true") ? true : false;
-						key = String.format("landingAllowed[%d]", i);
-						landingAllowed[i] = sysValues.get(key).equals("true") ? true : false;
-						key = String.format("cleanTruck[%d]", i);
-						cleaningSensors[i] = sysValues.get(key).equals("true") ? true : false;
-					}
-					for (int i = 0; i < 2; i++) {
-						key = String.format("repairTruck[%d]", i);
-						if (sysValues.get(key).equals("true")) {
-							repairTruck[i] = new RepairTruck(730, 520, i, repairtruck_up);
-						} else {
-							repairTruck[i] = null;
-						}
-						key = String.format("rescueTeam[%d]", i);
-						if (sysValues.get(key).equals("true")) {
-							rescueTeams[i] = new RescueTeam(310, 650, i, rescueteam_up);
-						} else {
-							rescueTeams[i] = null;
-						}
-					}*/
-						/*
-						 * key = String.format("ambulance[%d]", i); if
-						 * (sysValues.get(key).equals("true")) { ambulances[i] = new Ambulance(345, 640,
-						 * i, ambuImage_up); } else { ambulances[i] = null; }
-						 */
 					
-
 					// Create new CleaningCars
 					if (cleaningSensors[0]) {
 						cleaningCars[0] = new CleaningTruck(10, 155, 180, 450, 175);
@@ -315,7 +224,7 @@ public class SmartAirport extends JPanel {
 								rescueTeams[i].x += 1;
 							}
 							if (rescueTeams[i] != null) {
-								rescueTeams[i].rescueteamImage = rescueteam_down;
+								rescueTeams[i].rescueteamImage = AirportImages.rescueteam_down;
 							}
 
 							if (rescueTeams[i] != null && rescueTeams[i].y < 660) {
@@ -326,7 +235,7 @@ public class SmartAirport extends JPanel {
 							}
 						} else {
 							if (rescueTeams[i] != null) {
-								rescueTeams[i].rescueteamImage = rescueteam_down;
+								rescueTeams[i].rescueteamImage = AirportImages.rescueteam_down;
 								rescueTeams[i].y += 13;
 							}
 						}
@@ -546,9 +455,9 @@ public class SmartAirport extends JPanel {
 
 	private void drawTruck(Graphics g, RepairTruck truck) {
 		if (truck.line == 0) {
-			g.drawImage(repairman, truck.man_x + 40, truck.man_y + 40, this);
+			g.drawImage(AirportImages.repairman, truck.man_x + 40, truck.man_y + 40, this);
 		} else {
-			g.drawImage(repairman, truck.man_x + 40, truck.man_y + 15, this);
+			g.drawImage(AirportImages.repairman, truck.man_x + 40, truck.man_y + 15, this);
 		}
 		g.drawImage(truck.truckImage, truck.x, truck.y, this);
 	}
@@ -557,28 +466,28 @@ public class SmartAirport extends JPanel {
 		if (plane.degree == 0) {
 			if (plane.ground == false) {
 				if (plane.type.equals("COMMERCIAL")) {
-					g.drawImage(shadow_commerical_0, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(commercialplane_0, plane.x+10, plane.y+8, this);
+					g.drawImage(AirportImages.shadow_commerical_0, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.commercialplane_0, plane.x+10, plane.y+8, this);
 				} else if (plane.type.equals("PRIVATE")) {
-					g.drawImage(shadow_private_0, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(privateplane_0,  plane.x+10, plane.y+8, this);
+					g.drawImage(AirportImages.shadow_private_0, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.privateplane_0,  plane.x+10, plane.y+8, this);
 
 				} else if (plane.type.equals("CARGO")) {
-					g.drawImage(shadowcargo_0, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(cargoplane_0,  plane.x+10, plane.y+8, this);
+					g.drawImage(AirportImages.shadowcargo_0, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.cargoplane_0,  plane.x+10, plane.y+8, this);
 
 				}
 			} else {
 				if (plane.type.equals("COMMERCIAL")) {
-					g.drawImage(shadow_commerical_0, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(commercialplane_0, plane.x, plane.y, this);
+					g.drawImage(AirportImages.shadow_commerical_0, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.commercialplane_0, plane.x, plane.y, this);
 
 				} else if (plane.type.equals("PRIVATE")) {
-					g.drawImage(shadow_private_0, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(privateplane_0, plane.x, plane.y, this);
+					g.drawImage(AirportImages.shadow_private_0, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.privateplane_0, plane.x, plane.y, this);
 				} else if (plane.type.equals("CARGO")) {
-					g.drawImage(shadowcargo_0, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(cargoplane_0, plane.x, plane.y, this);
+					g.drawImage(AirportImages.shadowcargo_0, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.cargoplane_0, plane.x, plane.y, this);
 
 				}
 			}
@@ -586,29 +495,29 @@ public class SmartAirport extends JPanel {
 		if (plane.degree == 180) {
 			if (plane.ground == false) {
 				if (plane.type.equals("COMMERCIAL")) {
-					g.drawImage(shadow_commerical_180, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(commercialplane_180, plane.x+10, plane.y+8, this);
+					g.drawImage(AirportImages.shadow_commerical_180, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.commercialplane_180, plane.x+10, plane.y+8, this);
 				} else if (plane.type.equals("PRIVATE")) {
-					g.drawImage(shadow_private_180, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(privateplane_180,  plane.x+10, plane.y+8, this);
+					g.drawImage(AirportImages.shadow_private_180, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.privateplane_180,  plane.x+10, plane.y+8, this);
 
 				} else if (plane.type.equals("CARGO")) {
-					g.drawImage(shadowcargo_180, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(cargoplane_180, plane.x+10, plane.y+8, this);
+					g.drawImage(AirportImages.shadowcargo_180, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.cargoplane_180, plane.x+10, plane.y+8, this);
 
 
 				}
 			} else {
 				if (plane.type.equals("COMMERCIAL")) {
-					g.drawImage(shadow_commerical_180, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(commercialplane_180, plane.x, plane.y, this);
+					g.drawImage(AirportImages.shadow_commerical_180, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.commercialplane_180, plane.x, plane.y, this);
 
 				} else if (plane.type.equals("PRIVATE")) {
-					g.drawImage(shadow_private_180, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(privateplane_180, plane.x, plane.y, this);
+					g.drawImage(AirportImages.shadow_private_180, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.privateplane_180, plane.x, plane.y, this);
 				} else if (plane.type.equals("CARGO")) {
-					g.drawImage(shadowcargo_180, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(cargoplane_180, plane.x, plane.y, this);
+					g.drawImage(AirportImages.shadowcargo_180, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.cargoplane_180, plane.x, plane.y, this);
 				}
 			}
 		}
@@ -616,33 +525,33 @@ public class SmartAirport extends JPanel {
 		if (plane.degree == 90) {
 			if (plane.ground == false) {
 				if (plane.type.equals("PRIVATE")) {
-					g.drawImage(shadow_private_90, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(privateplane_90,  plane.x+10, plane.y+8, this);
+					g.drawImage(AirportImages.shadow_private_90, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.privateplane_90,  plane.x+10, plane.y+8, this);
 
 
 				} else if (plane.type.equals("COMMERCIAL")) {
-					g.drawImage(shadow_commerical_90, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(commercialplane_90,  plane.x+10, plane.y+8, this);
+					g.drawImage(AirportImages.shadow_commerical_90, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.commercialplane_90,  plane.x+10, plane.y+8, this);
 					
 
 				} else if (plane.type.equals("CARGO")) {
-					g.drawImage(shadowcargo_90, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(cargoplane_90, plane.x+10, plane.y+8, this);
+					g.drawImage(AirportImages.shadowcargo_90, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.cargoplane_90, plane.x+10, plane.y+8, this);
 
 				}
 			}
 
 			else {
 				if (plane.type.equals("COMMERCIAL")) {
-					g.drawImage(shadow_commerical_90, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(commercialplane_90, plane.x, plane.y, this);
+					g.drawImage(AirportImages.shadow_commerical_90, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.commercialplane_90, plane.x, plane.y, this);
 
 				} else if (plane.type.equals("PRIVATE")) {
-					g.drawImage(shadow_private_90, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(privateplane_90, plane.x, plane.y, this);
+					g.drawImage(AirportImages.shadow_private_90, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.privateplane_90, plane.x, plane.y, this);
 				} else if (plane.type.equals("CARGO")) {
-					g.drawImage(shadowcargo_90, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(cargoplane_90, plane.x, plane.y, this);
+					g.drawImage(AirportImages.shadowcargo_90, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.cargoplane_90, plane.x, plane.y, this);
 				}
 			}
 		}
@@ -650,32 +559,32 @@ public class SmartAirport extends JPanel {
 		if (plane.degree == 270) {
 			if (plane.ground == false) {
 				if (plane.type.equals("PRIVATE")) {
-					g.drawImage(shadow_private_270, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(privateplane_270, plane.x+10, plane.y+8, this);
+					g.drawImage(AirportImages.shadow_private_270, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.privateplane_270, plane.x+10, plane.y+8, this);
 
 
 				} else if (plane.type.equals("COMMERCIAL")) {
-					g.drawImage(shadow_commerical_270, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(commercialplane_270,  plane.x+10, plane.y+8, this);
+					g.drawImage(AirportImages.shadow_commerical_270, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.commercialplane_270,  plane.x+10, plane.y+8, this);
 				}
 
 				else if (plane.type.equals("CARGO")) {
-					g.drawImage(shadowcargo_270, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(cargoplane_270,  plane.x+10, plane.y+8, this);
+					g.drawImage(AirportImages.shadowcargo_270, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.cargoplane_270,  plane.x+10, plane.y+8, this);
 
 				}
 
 			} else {
 				if (plane.type.equals("COMMERCIAL")) {
-					g.drawImage(shadow_commerical_270, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(commercialplane_270, plane.x, plane.y, this);
+					g.drawImage(AirportImages.shadow_commerical_270, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.commercialplane_270, plane.x, plane.y, this);
 
 				} else if (plane.type.equals("PRIVATE")) {
-					g.drawImage(shadow_private_270, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(privateplane_270, plane.x, plane.y, this);
+					g.drawImage(AirportImages.shadow_private_270, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.privateplane_270, plane.x, plane.y, this);
 				} else if (plane.type.equals("CARGO")) {
-					g.drawImage(shadowcargo_270, plane.x_shadow, plane.y_shadow, this);
-					g.drawImage(cargoplane_270, plane.x, plane.y, this);
+					g.drawImage(AirportImages.shadowcargo_270, plane.x_shadow, plane.y_shadow, this);
+					g.drawImage(AirportImages.cargoplane_270, plane.x, plane.y, this);
 				}
 			}
 		}
@@ -685,7 +594,7 @@ public class SmartAirport extends JPanel {
 	public  void   paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		g.drawImage(airport, 0, 0, this);
+		g.drawImage(AirportImages.airport, 0, 0, this);
 
 		if (repairTruck[0] != null) {
 			drawTruck(g, repairTruck[0]);
@@ -744,60 +653,6 @@ public class SmartAirport extends JPanel {
 		}
 	};
 
-	private void initialFields() throws IOException {
-		//airport = ImageIO.read(new File("img/airport.png"));
-		airport = ImageIO.read(new File("img/airport_v2.png"));
-		commercialplane_0 = ImageIO.read(new File("img/commercialplane_0.png"));
-		privateplane_0 = ImageIO.read(new File("img/privateplane_0.png"));
-		cargoplane_0 = ImageIO.read(new File("img/cargoplane_0.png"));
-		commercialplane_180 = ImageIO.read(new File("img/commercialplane_180.png"));
-		privateplane_180 = ImageIO.read(new File("img/privateplane_180.png"));
-		cargoplane_180 = ImageIO.read(new File("img/cargoplane_180.png"));
-		shadowcargo_0 = ImageIO.read(new File("img/shadowcargo_0.png"));
-		shadow_private_0 = ImageIO.read(new File("img/shadow_private_0.png"));
-		shadow_commerical_0 = ImageIO.read(new File("img/shadow_commerical_0.png"));
-		shadow_private_180 = ImageIO.read(new File("img/shadow_private_180.png"));
-		shadow_commerical_180 = ImageIO.read(new File("img/shadow_commerical_180.png"));
-		shadowcargo_180 = ImageIO.read(new File("img/shadowcargo_180.png"));
-		repairman = ImageIO.read(new File("img/man1.png"));
-		repairtruck_up = ImageIO.read(new File("img/repairtruck_up.png"));
-		repairtruck_r = ImageIO.read(new File("img/repairtruck_right.png"));
-		flashlight =ImageIO.read(new File("img/flashlight.png"));
-
-		// Images for waiting to land
-
-		shadowcargo_90 = ImageIO.read(new File("img/shadowcargo_90.png"));
-		shadowcargo_270 = ImageIO.read(new File("img/shadowcargo_270.png"));
-		shadow_commerical_90 = ImageIO.read(new File("img/shadow_commerical_90.png"));
-		shadow_commerical_270 = ImageIO.read(new File("img/shadow_commerical_270.png"));
-		shadow_private_90 = ImageIO.read(new File("img/shadow_private_90.png"));
-		shadow_private_270 = ImageIO.read(new File("img/shadow_private_270.png"));
-		shadow_commerical_90 = ImageIO.read(new File("img/shadow_commerical_90.png"));
-		shadow_commerical_270 = ImageIO.read(new File("img/shadow_commerical_270.png"));
-
-		// Additional Images for takeoff
-		cargoplane_90 = ImageIO.read(new File("img/cargoplane_90.png"));
-		cargoplane_270 = ImageIO.read(new File("img/cargoplane_270.png"));
-		privateplane_90 = ImageIO.read(new File("img/privateplane_90.png"));
-		privateplane_270 = ImageIO.read(new File("img/privateplane_270.png"));
-		commercialplane_90 = ImageIO.read(new File("img/commercialplane_90.png"));
-		commercialplane_270 = ImageIO.read(new File("img/commercialplane_270.png"));
-
-		// images for slippery runway
-		cleaningCar_0 = ImageIO.read(new File("img/cleaningCar_0.png"));
-		cleaningCar_180 = ImageIO.read(new File("img/cleaningCar_180.png"));
-		cleaningCar_90 = ImageIO.read(new File("img/cleaningCar_90.png"));
-		cleaningCar_270 = ImageIO.read(new File("img/cleaningCar_270.png"));
-		oilAndDirt = ImageIO.read(new File("img/oil.png"));
-
-		// images for Emergency landing
-		ambuImage_up = ImageIO.read(new File("img/ambulance_up.png"));
-		rescueteam_up = ImageIO.read(new File("img/rescueTeam_up.png"));
-		ambuImage_r = ImageIO.read(new File("img/ambulance_to_right.png"));
-		rescueteam_r = ImageIO.read(new File("img/rescueTeam_to_right.png"));
-		rescueteam_down = ImageIO.read(new File("img/rescueTeam_down.png"));
-
-	}
 
 	public static JPanel createControlPanel(SmartAirport smartAirport) {
 		JPanel controlPanel = new JPanel(new BorderLayout());
@@ -857,35 +712,35 @@ public class SmartAirport extends JPanel {
 
 	private void drawOil(Graphics g, int i) {
 		if (i == 0) {
-			g.drawImage(oilAndDirt, 320, 175, this);
+			g.drawImage(AirportImages.oilAndDirt, 320, 175, this);
 		}
 
 		if (i == 1) {
-			g.drawImage(oilAndDirt, 320, 275, this);
+			g.drawImage(AirportImages.oilAndDirt, 320, 275, this);
 		}
 
 		if (i == 2) {
-			g.drawImage(oilAndDirt, 320, 475, this);// 1
+			g.drawImage(AirportImages.oilAndDirt, 320, 475, this);// 1
 		}
 
 		if (i == 3) {
-			g.drawImage(oilAndDirt, 320, 575, this);// 1
+			g.drawImage(AirportImages.oilAndDirt, 320, 575, this);// 1
 		}
 	}
 
 	private void drawCleaningTruck(Graphics g, CleaningTruck cleanCar) {
 		if (cleanCar.degree == 0) {
-			g.drawImage(cleaningCar_0, cleanCar.x, cleanCar.y, this);
+			g.drawImage(AirportImages.cleaningCar_0, cleanCar.x, cleanCar.y, this);
 		}
 
 		if (cleanCar.degree == 180) {
-			g.drawImage(cleaningCar_180, cleanCar.x, cleanCar.y, this);
+			g.drawImage(AirportImages.cleaningCar_180, cleanCar.x, cleanCar.y, this);
 		}
 		if (cleanCar.degree == 90) {
-			g.drawImage(cleaningCar_90, cleanCar.x, cleanCar.y, this);
+			g.drawImage(AirportImages.cleaningCar_90, cleanCar.x, cleanCar.y, this);
 		}
 		if (cleanCar.degree == 270) {
-			g.drawImage(cleaningCar_270, cleanCar.x, cleanCar.y, this);
+			g.drawImage(AirportImages.cleaningCar_270, cleanCar.x, cleanCar.y, this);
 		}
 	}
 

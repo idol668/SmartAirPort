@@ -3,7 +3,12 @@ package SmartAirportSprint3;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-
+//*********************************************************************************************
+//***              This class will contain some of our animation methods                    ***
+//*** This methods are used for the features such as mechanical and slippery runway problem ***
+//*** Note: They are secondary animation since the main functionality is of the             ***
+//***  landing and takeoff that performed by the planes                                      *** 
+//*********************************************************************************************
 
 public class SecondaryAnimation {
 	
@@ -25,6 +30,7 @@ public class SecondaryAnimation {
 
 	}
 	
+	// This function moves the plane from its waiting landing area to the runway it is going to use while performing landing
 	public static void animateGetPlaneToLandingSpot(int line,boolean landingAllowedFirstLine, boolean landingAllowedSecondLine, Airplane landingPlane) {
 		if (landingAllowedFirstLine && landingAllowedSecondLine) {
 			Random rand = new Random();
@@ -45,13 +51,15 @@ public class SecondaryAnimation {
 		landingPlane.setShadowUnderPlane();
 	}
 	
+	// This function moves the rescue team to the correct spot
+	// The correct spot is determined by the runway that is used by the plane while performing the emergency landing
 	public static void movingRescueTeamToLandingLine(int landingLine, int loopStep, RescueTeam rescueTeam) {
 		switch (landingLine) {
 			case 0:
 				if (loopStep < 42) {
 					rescueTeam.y -= 11;
 				} else {
-					rescueTeam.rescueteamImage = SmartAirport.rescueteam_r;
+					rescueTeam.rescueteamImage = AirportImages.rescueteam_r;
 					try {
 						TimeUnit.MICROSECONDS.sleep(250);
 					} catch (InterruptedException e) {
@@ -63,7 +71,7 @@ public class SecondaryAnimation {
 				if (loopStep < 35) {
 					rescueTeam.y -= 11;
 				} else {
-					rescueTeam.rescueteamImage = SmartAirport.rescueteam_r;
+					rescueTeam.rescueteamImage = AirportImages.rescueteam_r;
 					try {
 						TimeUnit.MICROSECONDS.sleep(150);
 					} catch (InterruptedException e) {
@@ -78,7 +86,7 @@ public class SecondaryAnimation {
 				if (loopStep < 13) {
 					rescueTeam.y -= 5;
 				} else {
-					rescueTeam.rescueteamImage = SmartAirport.rescueteam_r;
+					rescueTeam.rescueteamImage = AirportImages.rescueteam_r;
 					try {
 						TimeUnit.MICROSECONDS.sleep(100);
 					} catch (InterruptedException e) {
@@ -90,7 +98,7 @@ public class SecondaryAnimation {
 				if (loopStep < 6) {
 					rescueTeam.y -= 12;
 				} else {
-					rescueTeam.rescueteamImage = SmartAirport.rescueteam_r;
+					rescueTeam.rescueteamImage =AirportImages.rescueteam_r;
 					try {
 						TimeUnit.MICROSECONDS.sleep(10);
 					} catch (InterruptedException e) {
@@ -175,13 +183,15 @@ public class SecondaryAnimation {
 		}
 	}
 	
-	/*This function will simulate the mechanical problem feature that was described in the specification*/
+	//This function will simulate the mechanical problem feature that was described in the specification
+	//It will move the repair truck to the correct spot
+	//The correct spot is determined by the plane's takeoff waiting area
 	public void animateRepairTruck(int i) {
 		if (i>22)
 		{
 			if (repairTruck[0] != null) {
 				if (repairTruck[0].remove_truck > 2) {
-					repairTruck[0].truckImage = SmartAirport.repairtruck_r;
+					repairTruck[0].truckImage = AirportImages.repairtruck_r;
 					repairTruck[0].x = repairTruck[0].x + 10;
 				}
 				if (repairTruck[0].y > 290) {
@@ -194,7 +204,7 @@ public class SecondaryAnimation {
 			}
 			if (repairTruck[1] != null) {
 				if (repairTruck[1].remove_truck > 2) {
-					repairTruck[1].truckImage = SmartAirport.repairtruck_r;
+					repairTruck[1].truckImage = AirportImages.repairtruck_r;
 					repairTruck[1].x = repairTruck[1].x + 10;
 				}
 				if (repairTruck[1].y > 400) {
