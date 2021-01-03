@@ -31,14 +31,17 @@ public class Airplane {
 	
 	public void setPlaneToSecondRunway() {
 		this.EnterLandingOrTakeoof = true;
-		this.y += 60;
+		this.y += 62;
 	}
 	
 	public void movingPlaneAndShadow(int num) {
 		this.x += num;
 		this.x_shadow += num;
 	}
-	
+	public void setShadowUnderPlane() {
+		this.x_shadow = this.x;
+		this.y_shadow = this.y;
+	}
 
 	
 }

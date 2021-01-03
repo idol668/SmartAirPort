@@ -49,11 +49,11 @@ public class SmartAirport extends JPanel {
 	private Image shadowcargo_180;
 	private Image repairman;
 	static Image repairtruck_up;
-	private Image repairtruck_r;
+	static Image repairtruck_r;
 	static Image rescueteam_up;
-	private Image ambuImage_up;
 	static Image rescueteam_r;
 	private Image rescueteam_down;
+	private Image ambuImage_up;
 	private Image ambuImage_r;
 	boolean[] aircraftForLanding = new boolean[2];
 	boolean[] aircraftForTakeoff = new boolean[2];
@@ -276,27 +276,9 @@ public class SmartAirport extends JPanel {
 	}
 
 	public void animateEmergencyLanding() {
-		int landingLine = 0;
 		for (int i = 0; i < 2; i++) {
 			if (emergencyLanding[i] && landingPlaneExists[i] != null) {
-				if (landingAllowed[2 * i] == true && landingAllowed[2 * i + 1] == true) {
-					Random rand = new Random();
-					if (rand.nextBoolean() == true) {
-						landingPlaneExists[i].setPlaneToSecondRunway();
-						landingLine = i * 2 + 1;
-					} else {
-						landingPlaneExists[i].setPlaneToFirstRunway();
-						landingLine = i * 2;
-					}
-				} else if (landingAllowed[2 * i] == true && !slipperyRunway[2 * i]) {
-					landingPlaneExists[i].setPlaneToFirstRunway();
-					landingLine = i * 2;
-				} else if (landingAllowed[2 * i + 1] == true && !slipperyRunway[2 * i + 1]) {
-					landingPlaneExists[i].setPlaneToSecondRunway();
-					landingLine = i * 2 + 1;
-				}
-				landingPlaneExists[i].x_shadow = landingPlaneExists[i].x;
-				landingPlaneExists[i].y_shadow = landingPlaneExists[i].y;
+				SecondaryAnimation.setLandingPlaneInPositionLine(i,landingAllowed[2 * i], landingAllowed[2 * i + 1], landingPlaneExists[i]);
 				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof
 						&& rescueTeams[i] != null) {
 
@@ -318,7 +300,7 @@ public class SmartAirport extends JPanel {
 					landingPlaneExists[i].EnterLandingOrTakeoof = false;
 					
 					for (int j = 0; j < 50; j++) {
-						SecondaryAnimation.movingRescueTeamToLandingLine(landingLine, j, rescueTeams[i]);
+						SecondaryAnimation.movingRescueTeamToLandingLine(landingPlaneExists[i].line, j, rescueTeams[i]);
 						repaint();
 						try {
 							Thread.sleep(100);
@@ -328,7 +310,7 @@ public class SmartAirport extends JPanel {
 					}
 					for (int j = 0; j < 40; j++) {
 						landingPlaneExists[i].movingPlaneAndShadow(10);
-						if (landingLine == 2 || landingLine == 3) {
+						if (landingPlaneExists[i].line == 2 || landingPlaneExists[i].line == 3) {
 							if (j < 2) {
 								rescueTeams[i].x += 1;
 							}
@@ -360,36 +342,18 @@ public class SmartAirport extends JPanel {
 			}
 			rescueTeams[i] = null;
 		}
-		
 	}
 
 	public void animateLandingAndTakeoff() {
 		SecondaryAnimation secondarySimulator = new SecondaryAnimation(cleaningSensors, cleaningCars, stillCleaning,
-				slipperyRunway, repairTruck, mechanicalProblem, repairtruck_r);
+				slipperyRunway, repairTruck, mechanicalProblem);
 		Airplane[] planes = new Airplane[2];
 		int[] runwaysTakeOff = new int[2];
 		for (int i = 0; i < 2; i++) {
 			if (landingPlaneExists[i] != null && !emergencyLanding[i]) {
-				if (landingAllowed[2 * i] == true && landingAllowed[2 * i + 1] == true) {
-					landingPlaneExists[i].EnterLandingOrTakeoof = true;
-					Random rand = new Random();
-					if (rand.nextBoolean() == true) {
-						landingPlaneExists[i].y = landingPlaneExists[i].y + 65;
-					} else {
-						landingPlaneExists[i].y = landingPlaneExists[i].y - 40;
-					}
-				} else if (landingAllowed[2 * i] == true && !secondarySimulator.slipperyRunway[2 * i]) {
-					landingPlaneExists[i].EnterLandingOrTakeoof = true;
-					landingPlaneExists[i].y = landingPlaneExists[i].y - 40;
-
-				} else if (landingAllowed[2 * i + 1] == true && !secondarySimulator.slipperyRunway[2 * i + 1]) {
-					landingPlaneExists[i].EnterLandingOrTakeoof = true;
-					landingPlaneExists[i].y = landingPlaneExists[i].y + 65;
-				}
-				landingPlaneExists[i].x_shadow = landingPlaneExists[i].x;
-				landingPlaneExists[i].y_shadow = landingPlaneExists[i].y;
+				SecondaryAnimation.setLandingPlaneInPositionLine(i,landingAllowed[2 * i], landingAllowed[2 * i + 1], landingPlaneExists[i]);
 			}
-			if (takeoffPlaneExists[i] != null && secondarySimulator.mechanicalProblem[i] == false) {
+			if (takeoffPlaneExists[i] != null && mechanicalProblem[i] == false) {
 
 				if (takeoffAllowed[2 * i] == true && takeoffAllowed[2 * i + 1] == true) {
 					takeoffPlaneExists[i].EnterLandingOrTakeoof = true;
@@ -401,19 +365,19 @@ public class SmartAirport extends JPanel {
 						planes[i] = takeoffPlaneExists[i];
 						runwaysTakeOff[i] = 2 * i;
 					}
-				} else if (takeoffAllowed[2 * i] == true && !secondarySimulator.slipperyRunway[2 * i]) {
+				} else if (takeoffAllowed[2 * i] == true && !slipperyRunway[2 * i]) {
 					takeoffPlaneExists[i].EnterLandingOrTakeoof = true;
 					planes[i] = takeoffPlaneExists[i];
 					runwaysTakeOff[i] = 2 * i;
 
-				} else if (takeoffAllowed[2 * i + 1] == true && !secondarySimulator.slipperyRunway[2 * i + 1]) {
+				} else if (takeoffAllowed[2 * i + 1] == true && !slipperyRunway[2 * i + 1]) {
 					planes[i] = takeoffPlaneExists[i];
 					takeoffPlaneExists[i].EnterLandingOrTakeoof = true;
 					runwaysTakeOff[i] = 2 * i + 1;
 				} else {
 					takeoffPlaneExists[i].EnterLandingOrTakeoof = false;
 				}
-			} else if (takeoffPlaneExists[i] != null && secondarySimulator.mechanicalProblem[i] == true) {
+			} else if (takeoffPlaneExists[i] != null && mechanicalProblem[i] == true) {
 				takeoffPlaneExists[i].EnterLandingOrTakeoof = false;
 			}
 
@@ -427,16 +391,15 @@ public class SmartAirport extends JPanel {
 			if (takeoffPlaneExists[i] != null && takeoffPlaneExists[i].EnterLandingOrTakeoof) {
 				planeOrTruckMooving = true;
 			}
-			if (repairTruck[i] != null && secondarySimulator.mechanicalProblem[i] == true) {
+			if (repairTruck[i] != null && mechanicalProblem[i] == true) {
 				planeOrTruckMooving = true;
 			}
-			if (cleaningCars[2 * i] != null && secondarySimulator.slipperyRunway[2 * i] == true) {
+			if (cleaningCars[2 * i] != null && slipperyRunway[2 * i] == true) {
 				planeOrTruckMooving = true;
 			}
-			if (cleaningCars[2 * i + 1] != null && secondarySimulator.slipperyRunway[2 * i + 1] == true) {
+			if (cleaningCars[2 * i + 1] != null && slipperyRunway[2 * i + 1] == true) {
 				planeOrTruckMooving = true;
 			}
-
 		}
 
 		if (!planeOrTruckMooving) {
@@ -453,9 +416,7 @@ public class SmartAirport extends JPanel {
 						landingPlaneExists[i].x += 20;
 						if (j>15 && j<21){
 							landingPlaneExists[i].y -=1; 
-
-						}
-						
+						}	
 					}
 
 					else if (j == 21) {

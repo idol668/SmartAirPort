@@ -1,31 +1,50 @@
 package SmartAirportSprint3;
 
-import java.awt.Image;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class SecondaryAnimation {
 	
 	/*--------------- This class will deal with the animation and drawing functions of our features such as : Slippery runway and Mechanical Problem--------------------*/
 	
-	boolean[] cleaningSensors;
-	CleaningTruck [] cleaningCars;
-	boolean[] stillCleaning;
-	boolean[] slipperyRunway;
-	RepairTruck[] repairTruck;
-	boolean[] mechanicalProblem;
-	private Image repairtruck_r;
+	static boolean[] cleaningSensors;
+	static CleaningTruck [] cleaningCars;
+	static boolean[] stillCleaning;
+	static boolean[] slipperyRunway;
+	static RepairTruck[] repairTruck;
+	static boolean[] mechanicalProblem;
 	
-	public SecondaryAnimation (boolean[] cleanSensors,CleaningTruck [] cleanCars,boolean[] stillCleaning,boolean[] slipperyRunway,RepairTruck[] repairTruck,boolean[] mechanicalProblem,Image repairtruck_r)
+	public SecondaryAnimation (boolean[] cleanSensors,CleaningTruck [] cleanCars,boolean[] stillCleaning,boolean[] slipperyRunway,RepairTruck[] repairTruck,boolean[] mechanicalProblem)
 	{
-		this.cleaningSensors=cleanSensors;
-		this.cleaningCars=cleanCars;
-		this.stillCleaning=stillCleaning;
-		this.slipperyRunway=slipperyRunway;
-		this.repairTruck=repairTruck;
-		this.mechanicalProblem=mechanicalProblem;
-		this.repairtruck_r=repairtruck_r;
+		SecondaryAnimation.cleaningSensors=cleanSensors;
+		SecondaryAnimation.cleaningCars=cleanCars;
+		SecondaryAnimation.stillCleaning=stillCleaning;
+		SecondaryAnimation.repairTruck=repairTruck;
+		SecondaryAnimation.mechanicalProblem=mechanicalProblem;
+		SecondaryAnimation.slipperyRunway=slipperyRunway;
 
 	}
+	
+	public static void setLandingPlaneInPositionLine(int line,boolean landingAllowedFirstLine, boolean landingAllowedSecondLine, Airplane landingPlane) {
+		if (landingAllowedFirstLine && landingAllowedSecondLine) {
+			Random rand = new Random();
+			if (rand.nextBoolean() == true) {
+				landingPlane.setPlaneToSecondRunway();
+				landingPlane.line = 2*line +1;
+			} else {
+				landingPlane.setPlaneToFirstRunway();
+				landingPlane.line = 2*line;
+			}
+		} else if (landingAllowedFirstLine && !slipperyRunway[2 * line]) {
+			landingPlane.setPlaneToFirstRunway();
+			landingPlane.line = 2*line;
+		} else if (landingAllowedSecondLine && !slipperyRunway[2 * line + 1]) {
+			landingPlane.setPlaneToSecondRunway();
+			landingPlane.line =  2*line +1;
+		}
+		landingPlane.setShadowUnderPlane();
+	}
+	
 	public static void movingRescueTeamToLandingLine(int landingLine, int loopStep, RescueTeam rescueTeam) {
 		switch (landingLine) {
 			case 0:
@@ -162,7 +181,7 @@ public class SecondaryAnimation {
 		{
 			if (repairTruck[0] != null) {
 				if (repairTruck[0].remove_truck > 2) {
-					repairTruck[0].truckImage = repairtruck_r;
+					repairTruck[0].truckImage = SmartAirport.repairtruck_r;
 					repairTruck[0].x = repairTruck[0].x + 10;
 				}
 				if (repairTruck[0].y > 290) {
@@ -175,7 +194,7 @@ public class SecondaryAnimation {
 			}
 			if (repairTruck[1] != null) {
 				if (repairTruck[1].remove_truck > 2) {
-					repairTruck[1].truckImage = repairtruck_r;
+					repairTruck[1].truckImage = SmartAirport.repairtruck_r;
 					repairTruck[1].x = repairTruck[1].x + 10;
 				}
 				if (repairTruck[1].y > 400) {
@@ -187,7 +206,6 @@ public class SecondaryAnimation {
 				}
 			}
 		}
-		
 	}
 		
 	
