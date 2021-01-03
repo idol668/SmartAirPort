@@ -83,8 +83,8 @@ public class AirportImages {
 		shadow_commerical_270 = ImageIO.read(new File("img/shadow_commerical_270_t.png"));
 		shadow_private_90 = ImageIO.read(new File("img/shadow_private_90.png"));
 		shadow_private_270 = ImageIO.read(new File("img/shadow_private_270.png"));
-		shadow_commerical_90 = ImageIO.read(new File("img/shadow_commerical_90.png"));
-		shadow_commerical_270 = ImageIO.read(new File("img/shadow_commerical_270.png"));
+		shadow_commerical_90 = ImageIO.read(new File("img/shadow_commerical_90_t.png"));
+		shadow_commerical_270 = ImageIO.read(new File("img/shadow_commerical_270_t.png"));
 
 		// Additional Images for takeoff
 		cargoplane_90 = ImageIO.read(new File("img/cargoplane_90.png"));
