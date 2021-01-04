@@ -403,7 +403,7 @@ public class AuxiliaryMethods {
 		for (int i = 0; i < 2; i++) {
 			key = String.format("repairTruck[%d]", i);
 			if (sysValues.get(key).equals("true")) {
-				SmartAirport.repairTruck[i] = new RepairTruck(730, 520, i, AirportImages.repairtruck_up);
+				SmartAirport.repairTruck[i] = new RepairTruck(720, 600, i, AirportImages.repairtruck_up);
 			} else {
 				SmartAirport.repairTruck[i] = null;
 			}

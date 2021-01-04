@@ -478,11 +478,6 @@ public class SmartAirport extends JPanel {
 		g.drawImage(rescue.flashlight, 600, 610, this);
 	}
 
-
-	private void drawAmbulance(Graphics g, Ambulance ambu) {
-		g.drawImage(ambu.ambuImage, ambu.x, ambu.y, this);
-	}
-	//This function draws the repair team(truck and mechanic) 
 	private void drawTruck(Graphics g, RepairTruck truck) {
 		if (truck.line == 0) {
 			g.drawImage(AirportImages.repairman, truck.man_x + 40, truck.man_y + 40, this);

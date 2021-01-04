@@ -208,8 +208,8 @@ public class SecondaryAnimation {
 					repairTruck[1].x = repairTruck[1].x + 10;
 				}
 				if (repairTruck[1].y > 400) {
-					repairTruck[1].y = repairTruck[1].y - 7;
-					repairTruck[1].man_y = repairTruck[1].man_y - 6;
+					repairTruck[1].y = repairTruck[1].y - 10;
+					repairTruck[1].man_y = repairTruck[1].man_y - 10;
 				} else {
 					repairTruck[1].man_x = repairTruck[1].man_x - 10;
 					repairTruck[1].remove_truck += 1;
