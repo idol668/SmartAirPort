@@ -26,53 +26,48 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
-import SmartAirport.AuxiliaryMethods;
 import tau.smlab.syntech.controller.jit.BasicJitController;
 import tau.smlab.syntech.controller.executor.ControllerExecutor;
 
 public class SmartAirport extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	static ControllerExecutor executor;
-	
-	//****************************************************//
-	//***          Initialize variables                ***//
-	//****************************************************//
-	
-	// Landing & take off
-	static boolean[] aircraftForLanding = new boolean[2];
-	static boolean[] aircraftForTakeoff = new boolean[2];
+	boolean[] aircraftForLanding = new boolean[2];
+	boolean[] aircraftForTakeoff = new boolean[2];
+	static boolean[] cleaningSensors = new boolean[4];
+	static CleaningTruck[] cleaningCars = new CleaningTruck[4];
+	static boolean[] stillCleaning = new boolean[4];
+	int takeOffIteartion;
+
 	static boolean[] takeoffAllowed = new boolean[4];
 	static boolean[] landingAllowed = new boolean[4];
+
 	static Airplane[] takeoffPlaneExists = new Airplane[2];
 	static Airplane[] landingPlaneExists = new Airplane[2];
 
-	// Emergency Landing
+	static ControllerExecutor executor;
 	static boolean[] emergencyLanding = new boolean[2];
-	static RescueTeam[] rescueTeams = new RescueTeam[2];
-	
-	// Mechanical Problem
-	static boolean[] mechanicalProblem = new boolean[2];
-	static RepairTruck[] repairTruck = new RepairTruck[2];
-	
-	// Slippery Runway
 	static boolean[] slipperyRunway = new boolean[4];
-	static boolean[] cleaningSensors = new boolean[4];
-	static boolean[] stillCleaning = new boolean[4];
-	static CleaningTruck[] cleaningCars = new CleaningTruck[4];
+	static boolean[] mechanicalProblem = new boolean[2];
 
-	// Panel variables
+	static RepairTruck[] repairTruck = new RepairTruck[2];
+
+	static RescueTeam[] rescueTeams = new RescueTeam[2];
+	static Ambulance[] ambulances = new Ambulance[2];
+
+	static Map<String, String> envMoves = new HashMap<>();
+
 	static boolean inScenario = false;
 	static boolean inManualScenario = false;
 	static boolean startScenario = false;
 	static boolean wait = false;
 	static String scenario = "none";
 	static int scenarioCounter = -1;
-	static Map<String, String> envMoves = new HashMap<>();
-	static JTextArea outputArea = new JTextArea("Here will be the output for scenarios and events \n", 0, 20);
-	
+
 	static boolean run = true;
 	static boolean finished = false;
+
+	static JTextArea outputArea = new JTextArea("Here will be the output for scenarios and events \n", 0, 20);
 
 	public SmartAirport() throws IOException {
 		AirportImages.initialFields();
@@ -135,11 +130,22 @@ public class SmartAirport extends JPanel {
 					Map<String, String> sysValues = executor.getCurrOutputs();
 					AuxiliaryMethods.getSysInputs(executor);
 					
-					// Create cleaning cars according to cleaning sensor
-					for(int runwayline=0; runwayline<4; runwayline++) {
-						AuxiliaryMethods.createCleaningCars(runwayline ,cleaningSensors[runwayline]);
+					// Create new CleaningCars
+					if (cleaningSensors[0]) {
+						cleaningCars[0] = new CleaningTruck(10, 155, 180, 450, 175);
 					}
-					
+
+					if (cleaningSensors[1]) {
+						cleaningCars[1] = new CleaningTruck(10, 255, 180, 450, 275);
+					}
+
+					if (cleaningSensors[2]) {
+						cleaningCars[2] = new CleaningTruck(10, 455, 180, 450, 475);
+					}
+
+					if (cleaningSensors[3]) {
+						cleaningCars[3] = new CleaningTruck(10, 555, 180, 450, 575);
+					}
 					System.out.println("System Values:"+sysValues.toString());
 					System.out.println("Env Values:"+envValues.toString());
 					repaint();
@@ -177,31 +183,17 @@ public class SmartAirport extends JPanel {
 	}
 
 	public void animateEmergencyLanding() {
-		int rescue_team_speed = 12;
-		int plane_landing_speed = 15;
-		int plane_driving_speed = 12;
-		int plane_landing_spot = 390;
-		int plane_arrived_to_the_ground = 340;
-		int rescue_team_out_of_sight_y_pos = 660;
-		int plane_out_of_sight_x_pos = 750;
-		
 		for (int i = 0; i < 2; i++) {
 			if (emergencyLanding[i] && landingPlaneExists[i] != null) {
 				SecondaryAnimation.animateGetPlaneToLandingSpot(i,landingAllowed[2 * i], landingAllowed[2 * i + 1], landingPlaneExists[i]);
-				landingPlaneExists[i].EnterLandingOrTakeoof = false;
-				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof && rescueTeams[i] != null) {
-					// plane landing and emergency flash light is on.
-					boolean planeWaitingForRescueTeam = false;
-					while(!planeWaitingForRescueTeam) {
+				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof
+						&& rescueTeams[i] != null) {
+
+					for (int j = 0; j < 22; j++) {
+						landingPlaneExists[i].movingPlaneAndShadow(15);
 						rescueTeams[i].TurnFlashLight();
-						if(landingPlaneExists[i].x < plane_landing_spot) {
-							landingPlaneExists[i].movingPlaneAndShadow(plane_landing_speed);
-							if(landingPlaneExists[i].x > plane_arrived_to_the_ground) {
-								landingPlaneExists[i].ground = true;
-							}
-						}
-						else {
-							planeWaitingForRescueTeam = true;
+						if (j == 9) {
+							landingPlaneExists[i].ground = true;
 						}
 						repaint();
 
@@ -211,23 +203,11 @@ public class SmartAirport extends JPanel {
 							e.printStackTrace();
 						}
 					}
-					// keep the flash light on
-					if(rescueTeams[i].flashlight == null) {
-						rescueTeams[i].TurnFlashLight();
-					}
-
-					// rescue team moves to the plane position
-					// The plane position is determined by the runway used by the plane while performing the emergency landing
-					boolean rescueTeamArrivedToThePlane = false;
-					int planePosition = AuxiliaryMethods.planePositionByRunwayNumber(landingPlaneExists[i].line);
-					while(!rescueTeamArrivedToThePlane) {
-						if(rescueTeams[i].y > planePosition) {
-							rescueTeams[i].y -= rescue_team_speed;
-						}
-						else {
-							rescueTeamArrivedToThePlane = true;
-							rescueTeams[i].rescueteamImage = AirportImages.rescueteam_r;
-						}
+					landingPlaneExists[i].movingPlaneAndShadow(4);
+					landingPlaneExists[i].EnterLandingOrTakeoof = false;
+					
+					for (int j = 0; j < 50; j++) {
+						SecondaryAnimation.movingRescueTeamToLandingLine(landingPlaneExists[i].line, j, rescueTeams[i]);
 						repaint();
 						try {
 							Thread.sleep(100);
@@ -235,37 +215,26 @@ public class SmartAirport extends JPanel {
 							e.printStackTrace();
 						}
 					}
-					
-					// the rescue team arrived to the plane and handle the situation
-					try {
-						TimeUnit.SECONDS.sleep(1);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					repaint();
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					
-					// rescue team return back to the control tower and plane drive to the arrival spot.
-					rescueTeams[i].rescueteamImage = AirportImages.rescueteam_down;
-					while(rescueTeams[i] != null || landingPlaneExists[i]!=null) {
-						if(landingPlaneExists[i]!=null) {
-							if(landingPlaneExists[i].x < plane_out_of_sight_x_pos) {
-								landingPlaneExists[i].movingPlaneAndShadow(plane_driving_speed);
+					for (int j = 0; j < 40; j++) {
+						landingPlaneExists[i].movingPlaneAndShadow(10);
+						if (landingPlaneExists[i].line == 2 || landingPlaneExists[i].line == 3) {
+							if (j < 2) {
+								rescueTeams[i].x += 1;
 							}
-							else {
-								landingPlaneExists[i] = null;
+							if (rescueTeams[i] != null) {
+								rescueTeams[i].rescueteamImage = AirportImages.rescueteam_down;
 							}
-						}
-						if(rescueTeams[i]!=null) {
-							if(rescueTeams[i].y < rescue_team_out_of_sight_y_pos) {
-								rescueTeams[i].y += rescue_team_speed;
+
+							if (rescueTeams[i] != null && rescueTeams[i].y < 660) {
+								rescueTeams[i].y += 12;
 							}
-							else {
+							if (rescueTeams[i] != null && rescueTeams[i].y >= 660) {
 								rescueTeams[i] = null;
+							}
+						} else {
+							if (rescueTeams[i] != null) {
+								rescueTeams[i].rescueteamImage = AirportImages.rescueteam_down;
+								rescueTeams[i].y += 13;
 							}
 						}
 						repaint();
@@ -345,6 +314,7 @@ public class SmartAirport extends JPanel {
 		}
 		animateGetToTakeOffSpot(runwaysTakeOff, planes);
 		for (int j = 0; j < 50; j++) {
+			takeOffIteartion = j;
 			for (int i = 0; i < 2; i++) {
 
 				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof && j >= 9) {
@@ -658,6 +628,12 @@ public class SmartAirport extends JPanel {
 		}
 		if (rescueTeams[1] != null) {
 			drawRescueTeam(g, rescueTeams[1]);
+		}
+		if (ambulances[0] != null) {
+			drawAmbulance(g, ambulances[0]);
+		}
+		if (ambulances[1] != null) {
+			drawAmbulance(g, ambulances[1]);
 		}
 	}
 
