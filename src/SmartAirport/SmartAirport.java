@@ -146,76 +146,7 @@ public class SmartAirport extends JPanel {
 		animationThread.start();
 		repaint();
 	}
-
-	public void animateEmergencyLanding() {
-		for (int i = 0; i < 2; i++) {
-			if (emergencyLanding[i] && landingPlaneExists[i] != null) {
-				SecondaryAnimation.animateGetPlaneToLandingSpot(i,landingAllowed[2 * i], landingAllowed[2 * i + 1], landingPlaneExists[i]);
-				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof
-						&& rescueTeams[i] != null) {
-
-					for (int j = 0; j < 22; j++) {
-						landingPlaneExists[i].movingPlaneAndShadow(15);
-						rescueTeams[i].TurnFlashLight();
-						if (j == 9) {
-							landingPlaneExists[i].ground = true;
-						}
-						repaint();
-
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-					landingPlaneExists[i].movingPlaneAndShadow(4);
-					landingPlaneExists[i].EnterLandingOrTakeoof = false;
-					
-					for (int j = 0; j < 50; j++) {
-						SecondaryAnimation.movingRescueTeamToLandingLine(landingPlaneExists[i].line, j, rescueTeams[i]);
-						repaint();
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-					for (int j = 0; j < 40; j++) {
-						landingPlaneExists[i].movingPlaneAndShadow(10);
-						if (landingPlaneExists[i].line == 2 || landingPlaneExists[i].line == 3) {
-							if (j < 2) {
-								rescueTeams[i].x += 1;
-							}
-							if (rescueTeams[i] != null) {
-								rescueTeams[i].rescueteamImage = AirportImages.rescueteam_down;
-							}
-
-							if (rescueTeams[i] != null && rescueTeams[i].y < 660) {
-								rescueTeams[i].y += 12;
-							}
-							if (rescueTeams[i] != null && rescueTeams[i].y >= 660) {
-								rescueTeams[i] = null;
-							}
-						} else {
-							if (rescueTeams[i] != null) {
-								rescueTeams[i].rescueteamImage = AirportImages.rescueteam_down;
-								rescueTeams[i].y += 13;
-							}
-						}
-						repaint();
-
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-			rescueTeams[i] = null;
-		}
-	}
-
+	
 	public void animateLandingAndTakeoff() {
 		SecondaryAnimation secondarySimulator = new SecondaryAnimation(cleaningSensors, cleaningCars, stillCleaning,
 				slipperyRunway, repairTruck, mechanicalProblem);
@@ -386,6 +317,125 @@ public class SmartAirport extends JPanel {
 			}
 		}
 	}
+	
+	// Animate Emergency Landing Step 1: the plane landing in the runway and emergency flash light is on.
+	public void animateEmergencyLandingLandingStage(int i) {
+		int plane_landing_speed         = 15;
+		int plane_arrived_to_the_ground = 340;
+		int plane_landing_spot          = 390;
+		boolean planeWaitingForRescueTeam = false;
+		
+		while(!planeWaitingForRescueTeam) {
+			rescueTeams[i].TurnFlashLight();
+			if(landingPlaneExists[i].x < plane_landing_spot) {
+				landingPlaneExists[i].movingPlaneAndShadow(plane_landing_speed);
+				if(landingPlaneExists[i].x > plane_arrived_to_the_ground) {
+					landingPlaneExists[i].ground = true;
+				}
+			}
+			else {
+				planeWaitingForRescueTeam = true;
+			}
+			repaint();
+
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	// Animate Emergency Landing Step 2: rescue team arrives to the plane position
+	// The plane position is determined by the runway used by the plane while performing the emergency landing.
+	public void animateEmergencyLandingRescueTeamArrivesStage(int i) {
+		int rescue_team_speed         = 12;
+		boolean is_rescueteam_arrives = false;
+		int planePosition = AuxiliaryMethods.planePositionByRunwayNumber(landingPlaneExists[i].line);
+		while(!is_rescueteam_arrives) {
+			if(rescueTeams[i].y > planePosition) {
+				rescueTeams[i].y -= rescue_team_speed;
+			}
+			else {
+				is_rescueteam_arrives = true;
+				rescueTeams[i].rescueteamImage = AirportImages.rescueteam_r;
+			}
+			repaint();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	// Animate Emergency Landing Step 3: rescue team returns back to the control tower and plane drive to the arrival spot.
+	public void animateEmergencyLandingOverStage(int i) {
+		int rescue_team_speed              = 12;
+		int plane_driving_speed            = 12;
+		int rescue_team_out_of_sight_y_pos = 660;
+		int plane_out_of_sight_x_pos       = 800;
+		boolean landingPlaneOutOfSight     = false;
+		rescueTeams[i].rescueteamImage = AirportImages.rescueteam_down;		
+		while(rescueTeams[i] != null || !landingPlaneOutOfSight) {
+			if(landingPlaneExists[i]!=null) {
+				if(landingPlaneExists[i].x < plane_out_of_sight_x_pos) {
+					landingPlaneExists[i].movingPlaneAndShadow(plane_driving_speed);
+				}
+				else {
+					landingPlaneOutOfSight = true;
+				}
+			}
+			if(rescueTeams[i]!=null) {
+				if(rescueTeams[i].y < rescue_team_out_of_sight_y_pos) {
+					rescueTeams[i].y += rescue_team_speed;
+				}
+				else {
+					rescueTeams[i] = null;
+				}
+			}
+			repaint();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void animateEmergencyLanding() {
+		for (int i = 0; i < 2; i++) {
+			if (emergencyLanding[i] && landingPlaneExists[i] != null) {
+				SecondaryAnimation.animateGetPlaneToLandingSpot(i,landingAllowed[2 * i], landingAllowed[2 * i + 1], landingPlaneExists[i]);
+				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof && rescueTeams[i] != null) {
+					animateEmergencyLandingLandingStage(i);
+					landingPlaneExists[i].EnterLandingOrTakeoof = false;
+					
+					// keep the flash light on
+					if(rescueTeams[i].flashlight == null) {
+						rescueTeams[i].TurnFlashLight();
+					}
+					animateEmergencyLandingRescueTeamArrivesStage(i);
+					try {
+						TimeUnit.SECONDS.sleep(1);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					repaint();
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					
+					animateEmergencyLandingOverStage(i);
+				}
+			}
+			rescueTeams[i] = null;
+		}
+	}
+
+
 
 	private void drawRescueTeam(Graphics g, RescueTeam rescue) 
 	{
