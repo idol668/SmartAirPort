@@ -58,17 +58,17 @@ public class AirportImages {
 	// This function sets all the images to their respective values
 	public static void initialFields() throws IOException {
 		//airport = ImageIO.read(new File("img/airport.png"));
-		airport = ImageIO.read(new File("img/airport_v5.png"));
+		airport = ImageIO.read(new File("img/airport_v4_white.png"));
 		commercialplane_0 = ImageIO.read(new File("img/commercialplane_0.png"));
-		privateplane_0 = ImageIO.read(new File("img/privateplane_0.png"));
+		privateplane_0 = ImageIO.read(new File("img/privateplane_blue_0.png"));
 		cargoplane_0 = ImageIO.read(new File("img/cargoplane_0.png"));
 		commercialplane_180 = ImageIO.read(new File("img/commercialplane_180.png"));
-		privateplane_180 = ImageIO.read(new File("img/privateplane_180.png"));
+		privateplane_180 = ImageIO.read(new File("img/privateplane_blue_180.png"));
 		cargoplane_180 = ImageIO.read(new File("img/cargoplane_180.png"));
 		shadowcargo_0 = ImageIO.read(new File("img/shadowcargo_0_t.png"));
-		shadow_private_0 = ImageIO.read(new File("img/shadow_private_0.png"));
+		shadow_private_0 = ImageIO.read(new File("img/shadow_privateplane_blue_0.png"));
 		shadow_commerical_0 = ImageIO.read(new File("img/shadow_commerical_0_t.png"));
-		shadow_private_180 = ImageIO.read(new File("img/shadow_private_180.png"));
+		shadow_private_180 = ImageIO.read(new File("img/shadow_privateplane_blue_180.png"));
 		shadow_commerical_180 = ImageIO.read(new File("img/shadow_commerical_180_t.png"));
 		shadowcargo_180 = ImageIO.read(new File("img/shadowcargo_180_t.png"));
 		repairman = ImageIO.read(new File("img/man1.png"));
@@ -82,16 +82,16 @@ public class AirportImages {
 		shadowcargo_270 = ImageIO.read(new File("img/shadowcargo_270_t.png"));
 		shadow_commerical_90 = ImageIO.read(new File("img/shadow_commerical_90_t.png"));
 		shadow_commerical_270 = ImageIO.read(new File("img/shadow_commerical_270_t.png"));
-		shadow_private_90 = ImageIO.read(new File("img/shadow_private_90.png"));
-		shadow_private_270 = ImageIO.read(new File("img/shadow_private_270.png"));
+		shadow_private_90 = ImageIO.read(new File("img/shadow_privateplane_blue_90.png"));
+		shadow_private_270 = ImageIO.read(new File("img/shadow_privateplane_blue_270.png"));
 		shadow_commerical_90 = ImageIO.read(new File("img/shadow_commerical_90_t.png"));
 		shadow_commerical_270 = ImageIO.read(new File("img/shadow_commerical_270_t.png"));
 
 		// Additional Images for takeoff
 		cargoplane_90 = ImageIO.read(new File("img/cargoplane_90.png"));
 		cargoplane_270 = ImageIO.read(new File("img/cargoplane_270.png"));
-		privateplane_90 = ImageIO.read(new File("img/privateplane_90.png"));
-		privateplane_270 = ImageIO.read(new File("img/privateplane_270.png"));
+		privateplane_90 = ImageIO.read(new File("img/privateplane_blue_90.png"));
+		privateplane_270 = ImageIO.read(new File("img/privateplane_blue_270.png"));
 		commercialplane_90 = ImageIO.read(new File("img/commercialplane_90.png"));
 		commercialplane_270 = ImageIO.read(new File("img/commercialplane_270.png"));
 
