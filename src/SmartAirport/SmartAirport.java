@@ -421,7 +421,8 @@ public class SmartAirport extends JPanel {
 			}
 		}
 	}
-
+	
+	// Animate Emergency Landing : union all stages of the animation.
 	public void animateEmergencyLanding() {
 		for (int i = 0; i < 2; i++) {
 			if (emergencyLanding[i] && landingPlaneExists[i] != null) {

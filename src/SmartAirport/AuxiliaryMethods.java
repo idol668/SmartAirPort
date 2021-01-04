@@ -272,19 +272,18 @@ public class AuxiliaryMethods {
 	public static void updatePanelInputs(Map<String, String> inputs, Map<String, String> sysValues) {
 		if (SmartAirport.inManualScenario) {
 			for (int i = 0; i < 2; i++) {
-				String Direction = ((i == 0) ? "north" : "south");
+				String Position = ((i == 0) ? "first" : "second");
 				if (SmartAirport.envMoves.get(String.format("takeoffAircrafts[%d]", i)) != null) {
-					String planeType = SmartAirport.envMoves.get(String.format("takeoffAircrafts[%d]", i));
+					String planeType = SmartAirport.envMoves.get(getTakeOffString(i));
 					//if already there is aircraft in this position
 					if (SmartAirport.takeoffPlaneExists[i] != null && SmartAirport.takeoffPlaneExists[i].type.equals(planeType)) {
 						continue;
 					}
 					//if there is no aircraft in the position OR the aircraft have no mechanical problem and already took off
 					if (SmartAirport.takeoffPlaneExists[i] == null || (!SmartAirport.mechanicalProblem[i] && (SmartAirport.takeoffAllowed[2 * i] || SmartAirport.takeoffAllowed[2 * i + 1]))) {
-						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + Direction + " "
-								+ planeType.toLowerCase() + " takeoff aircraft\n");
-						inputs.put((String.format("takeoffAircrafts[%d]", i)), planeType);
-						SmartAirport.envMoves.remove(String.format("takeoffAircrafts[%d]", i));
+						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + planeType.toLowerCase() + " takeoff aircraft in "+ Position + " position\n");
+						inputs.put(getTakeOffString(i), planeType);
+						SmartAirport.envMoves.remove(getTakeOffString(i));
 					}
 				}
 				if (SmartAirport.envMoves.get(getLandingString(i)) != null) {
@@ -295,8 +294,7 @@ public class AuxiliaryMethods {
 					}
 					//if there is no aircraft in the position OR the aircraft already landed
 					if (SmartAirport.landingPlaneExists[i] == null || (SmartAirport.landingAllowed[2 * i] || SmartAirport.landingAllowed[2 * i + 1])) {
-						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + Direction + " "
-								+ planeType.toLowerCase() + " land aircraft\n");
+						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + planeType.toLowerCase() + " landing aircraft in "+ Position + " position\n");
 						inputs.put(getLandingString(i), planeType);
 						SmartAirport.envMoves.remove(getLandingString(i));
 					}

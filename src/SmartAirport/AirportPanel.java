@@ -13,83 +13,93 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
+//****************************************************************************************
+//***            This class will contain methods related to the panel                  ***
+//****************************************************************************************
+
 public class AirportPanel {
 
-	static Boolean AddlandingNorth = false;
-	static Boolean AddlandingSouth = false;
-	static Boolean AddtakeoffNorth = false;
-	static Boolean AddtakeoffSouth = false;
+	static Boolean AddlandingFirstPosition = false;
+	static Boolean AddlandingSecondPosition = false;
+	static Boolean AddtakeoffFirstPosition = false;
+	static Boolean AddtakeoffSecondPosition = false;
 
 	public AirportPanel() throws IOException {
-
 	}
 
+	// The function execute when the user requests to add aircrafts.
 	public static void performAircraftsAddition(SmartAirport smartairport, String planesType) {
 		if (SmartAirport.inScenario || SmartAirport.inManualScenario || planesType.equals("-----"))
 			return;
 		SmartAirport.inManualScenario = true;
 		SmartAirport.outputArea.setText("Adding Aircrafts:\n");
-		if (AddlandingNorth == true) {
-			SmartAirport.envMoves.put("landingAircrafts[0]", planesType.toUpperCase());
+		if (AddlandingFirstPosition == true) {
+			SmartAirport.envMoves.put(AuxiliaryMethods.getLandingString(0), planesType.toUpperCase());
 		}
-		if (AddlandingSouth == true) {
-			SmartAirport.envMoves.put("landingAircrafts[1]", planesType.toUpperCase());
+		if (AddlandingSecondPosition == true) {
+			SmartAirport.envMoves.put(AuxiliaryMethods.getLandingString(1), planesType.toUpperCase());
 		}
-		if (AddtakeoffNorth == true) {
-			SmartAirport.envMoves.put("takeoffAircrafts[0]", planesType.toUpperCase());
+		if (AddtakeoffFirstPosition == true) {
+			SmartAirport.envMoves.put(AuxiliaryMethods.getTakeOffString(0), planesType.toUpperCase());
 		}
-		if (AddtakeoffSouth == true) {
-			SmartAirport.envMoves.put("takeoffAircrafts[1]", planesType.toUpperCase());
+		if (AddtakeoffSecondPosition == true) {
+			SmartAirport.envMoves.put(AuxiliaryMethods.getTakeOffString(1), planesType.toUpperCase());
 		}
 	}
 
+	// The function execute when the user requests to add mechanical problem to the smart airport.
 	public static void performMechanicalProblem(SmartAirport smartairport, String aircraft) {
 		if (SmartAirport.inScenario || SmartAirport.inManualScenario || aircraft.equals("-----"))
 			return;
 		SmartAirport.inManualScenario = true;
 		SmartAirport.outputArea.setText("Perform Mechnical problem:\n");
 		if (aircraft.equals("Takeoff North")) {
-			SmartAirport.envMoves.put("mechanicalProblem[0]", String.valueOf(true));
+			SmartAirport.envMoves.put(AuxiliaryMethods.getMechanicalProblemString(0), String.valueOf(true));
 		} else {
-			SmartAirport.envMoves.put("mechanicalProblem[1]", String.valueOf(true));
+			SmartAirport.envMoves.put(AuxiliaryMethods.getMechanicalProblemString(1), String.valueOf(true));
 		}
 	}
-
+	
+	// The function execute when the user requests to add a dirty runway to the smart airport.
 	public static void performSlipperyRunway(SmartAirport smartairport, String runway) {
 		if (SmartAirport.inScenario || SmartAirport.inManualScenario || runway.equals("-----"))
 			return;
 		SmartAirport.inManualScenario = true;
 		SmartAirport.outputArea.setText("perform Dirty runway:\n");
 		if (runway.equals("First Runway")) {
-			SmartAirport.envMoves.put("slipperyRunway[0]", String.valueOf(true));
+			SmartAirport.envMoves.put(AuxiliaryMethods.getSlipperyString(0), String.valueOf(true));
 		} else if (runway.equals("Second Runway")) {
-			SmartAirport.envMoves.put("slipperyRunway[1]", String.valueOf(true));
+			SmartAirport.envMoves.put(AuxiliaryMethods.getSlipperyString(1), String.valueOf(true));
 		} else if (runway.equals("Third Runway")) {
-			SmartAirport.envMoves.put("slipperyRunway[2]", String.valueOf(true));
+			SmartAirport.envMoves.put(AuxiliaryMethods.getSlipperyString(2), String.valueOf(true));
 		} else {
-			SmartAirport.envMoves.put("slipperyRunway[3]", String.valueOf(true));
+			SmartAirport.envMoves.put(AuxiliaryMethods.getSlipperyString(3), String.valueOf(true));
 		}
 	}
-
+	
+	// The function execute when the user requests to add an emergency landing to the smart airport.
 	public static void performEmergencyLanding(SmartAirport smartairport, String aircraft) {
 		if (SmartAirport.inScenario || SmartAirport.inManualScenario || aircraft.equals("-----"))
 			return;
 		SmartAirport.inManualScenario = true;
 		SmartAirport.outputArea.setText("Perform Emergency Landing:\n");
 		if (aircraft.equals("Landing North")) {
-			SmartAirport.envMoves.put("emergencyLanding[0]", String.valueOf(true));
+			SmartAirport.envMoves.put(AuxiliaryMethods.getEmergencyLandingString(0), String.valueOf(true));
 		} else {
-			SmartAirport.envMoves.put("emergencyLanding[1]", String.valueOf(true));
+			SmartAirport.envMoves.put(AuxiliaryMethods.getEmergencyLandingString(1), String.valueOf(true));
 		}
 	}
-
+	
+	// This function create the header of the panel.
 	public static JPanel createHeadLinePanel() {
 		JPanel headPanel = new JPanel();
 		JLabel headLineLabel = new JLabel("<html><span style='font-size:20px'>Smart Airport Simulator</span></html>");
 		headPanel.add(headLineLabel);
 		return headPanel;
 	}
-
+	
+	// The function created the part in the panel where planes can be added by the user.
+	// The user can choose plane type (cargo, commercial or private), landing or taking off aircraft and the location planes.
 	public static JPanel createEventsPanel(SmartAirport smartAirport) {
 		JPanel eventsPanel = new JPanel(new BorderLayout());
 		JPanel headLinePanel = new JPanel();
@@ -101,58 +111,56 @@ public class AirportPanel {
 		JLabel headLineLabel = new JLabel("<html><span style='font-size:14px'>Add landings & takeoffs</span></html>");
 		headLinePanel.add(headLineLabel);
 
-		JToggleButton landingNorthToggleButton = new JToggleButton("Landing North");
-		JToggleButton landingSouthToggleButton = new JToggleButton("Landing South");
-		JToggleButton takeoffNorthToggleButton = new JToggleButton("Takeoff North");
-		JToggleButton takeoffSouthToggleButton = new JToggleButton("Takeoff South");
+		JToggleButton landingFirstPosToggleButton = new JToggleButton("Landing Position 1");
+		JToggleButton landingSecPosToggleButton = new JToggleButton("Landing Position 2");
+		JToggleButton takeoffFirstPosToggleButton = new JToggleButton("Takeoff Position 1");
+		JToggleButton takeoffSecPosToggleButton = new JToggleButton("Takeoff Position 2");
 		JPanel manualAddbuttonPanel = new JPanel();
 
 		String[] planesType = { "-----", "Cargo", "Private", "Commercial" };
 		JComboBox<String> planesTypeCombo = new JComboBox<>(planesType);
 
-		landingNorthToggleButton.addItemListener(new ItemListener() {
+		landingFirstPosToggleButton.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent itemEvent) {
 				int state = itemEvent.getStateChange();
 
 				if (state == ItemEvent.SELECTED) {
-					AddlandingNorth = true;
+					AddlandingFirstPosition = true;
 				} else {
-					AddlandingNorth = false;
+					AddlandingFirstPosition = false;
 				}
 			}
 		});
-		landingSouthToggleButton.addItemListener(new ItemListener() {
+		landingSecPosToggleButton.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent itemEvent) {
 				int state = itemEvent.getStateChange();
 
 				if (state == ItemEvent.SELECTED) {
-					AddlandingSouth = true;
+					AddlandingSecondPosition = true;
 				} else {
-					AddlandingSouth = false;
-				}
-			}
-		});
-
-		takeoffNorthToggleButton.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent itemEvent) {
-				int state = itemEvent.getStateChange();
-
-				if (state == ItemEvent.SELECTED) {
-					AddtakeoffNorth = true;
-				} else {
-					AddtakeoffNorth = false;
+					AddlandingSecondPosition = false;
 				}
 			}
 		});
 
-		takeoffSouthToggleButton.addItemListener(new ItemListener() {
+		takeoffFirstPosToggleButton.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent itemEvent) {
 				int state = itemEvent.getStateChange();
-
 				if (state == ItemEvent.SELECTED) {
-					AddtakeoffSouth = true;
+					AddtakeoffFirstPosition = true;
 				} else {
-					AddtakeoffSouth = false;
+					AddtakeoffFirstPosition = false;
+				}
+			}
+		});
+
+		takeoffSecPosToggleButton.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent itemEvent) {
+				int state = itemEvent.getStateChange();
+				if (state == ItemEvent.SELECTED) {
+					AddtakeoffSecondPosition = true;
+				} else {
+					AddtakeoffSecondPosition = false;
 				}
 			}
 		});
@@ -167,11 +175,11 @@ public class AirportPanel {
 		manualAddbuttonPanel.add(planesTypeCombo, BorderLayout.NORTH);
 		manualAddbuttonPanel.add(manualAddButton, BorderLayout.SOUTH);
 
-		eventsPanelToggelsLanding.add(landingNorthToggleButton, BorderLayout.NORTH);
-		eventsPanelToggelsLanding.add(landingSouthToggleButton, BorderLayout.SOUTH);
+		eventsPanelToggelsLanding.add(landingFirstPosToggleButton, BorderLayout.NORTH);
+		eventsPanelToggelsLanding.add(landingSecPosToggleButton, BorderLayout.SOUTH);
 
-		eventsPanelToggelsTakeoff.add(takeoffNorthToggleButton, BorderLayout.NORTH);
-		eventsPanelToggelsTakeoff.add(takeoffSouthToggleButton, BorderLayout.SOUTH);
+		eventsPanelToggelsTakeoff.add(takeoffFirstPosToggleButton, BorderLayout.NORTH);
+		eventsPanelToggelsTakeoff.add(takeoffSecPosToggleButton, BorderLayout.SOUTH);
 
 		eventsPanelToggels.add(eventsPanelToggelsLanding, BorderLayout.WEST);
 		eventsPanelToggels.add(eventsPanelToggelsTakeoff, BorderLayout.EAST);
