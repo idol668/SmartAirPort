@@ -32,43 +32,47 @@ import tau.smlab.syntech.controller.executor.ControllerExecutor;
 public class SmartAirport extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	boolean[] aircraftForLanding = new boolean[2];
-	boolean[] aircraftForTakeoff = new boolean[2];
-	static boolean[] cleaningSensors = new boolean[4];
-	static CleaningTruck[] cleaningCars = new CleaningTruck[4];
-	static boolean[] stillCleaning = new boolean[4];
-	int takeOffIteartion;
-
+	static ControllerExecutor executor;
+	
+	//****************************************************//
+	//***          Initialize variables                ***//
+	//****************************************************//
+	
+	// Landing & take off
+	static boolean[] aircraftForLanding = new boolean[2];
+	static boolean[] aircraftForTakeoff = new boolean[2];
 	static boolean[] takeoffAllowed = new boolean[4];
 	static boolean[] landingAllowed = new boolean[4];
-
 	static Airplane[] takeoffPlaneExists = new Airplane[2];
 	static Airplane[] landingPlaneExists = new Airplane[2];
 
-	static ControllerExecutor executor;
+	// Emergency Landing
 	static boolean[] emergencyLanding = new boolean[2];
-	static boolean[] slipperyRunway = new boolean[4];
-	static boolean[] mechanicalProblem = new boolean[2];
-
-	static RepairTruck[] repairTruck = new RepairTruck[2];
-
 	static RescueTeam[] rescueTeams = new RescueTeam[2];
-	static Ambulance[] ambulances = new Ambulance[2];
+	
+	// Mechanical Problem
+	static boolean[] mechanicalProblem = new boolean[2];
+	static RepairTruck[] repairTruck = new RepairTruck[2];
+	
+	// Slippery Runway
+	static boolean[] slipperyRunway = new boolean[4];
+	static boolean[] cleaningSensors = new boolean[4];
+	static boolean[] stillCleaning = new boolean[4];
+	static CleaningTruck[] cleaningCars = new CleaningTruck[4];
 
-	static Map<String, String> envMoves = new HashMap<>();
-
+	// Panel variables
 	static boolean inScenario = false;
 	static boolean inManualScenario = false;
 	static boolean startScenario = false;
 	static boolean wait = false;
 	static String scenario = "none";
 	static int scenarioCounter = -1;
-
+	static Map<String, String> envMoves = new HashMap<>();
+	static JTextArea outputArea = new JTextArea("Here will be the output for scenarios and events \n", 0, 20);
+	
 	static boolean run = true;
 	static boolean finished = false;
-
-	static JTextArea outputArea = new JTextArea("Here will be the output for scenarios and events \n", 0, 20);
-
+	
 	public SmartAirport() throws IOException {
 		AirportImages.initialFields();
 		initScene();
@@ -314,7 +318,6 @@ public class SmartAirport extends JPanel {
 		}
 		animateGetToTakeOffSpot(runwaysTakeOff, planes);
 		for (int j = 0; j < 50; j++) {
-			takeOffIteartion = j;
 			for (int i = 0; i < 2; i++) {
 
 				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof && j >= 9) {
@@ -628,12 +631,6 @@ public class SmartAirport extends JPanel {
 		}
 		if (rescueTeams[1] != null) {
 			drawRescueTeam(g, rescueTeams[1]);
-		}
-		if (ambulances[0] != null) {
-			drawAmbulance(g, ambulances[0]);
-		}
-		if (ambulances[1] != null) {
-			drawAmbulance(g, ambulances[1]);
 		}
 	}
 
