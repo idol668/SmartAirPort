@@ -100,56 +100,17 @@ public class SmartAirport extends JPanel {
 
 					Map<String, String> envValues = executor.getCurrInputs();
 					AuxiliaryMethods.getEnvInputs(executor);
-					if (!envValues.get("takeoffAircrafts[0]").equals("NONE")) {
-						Airplane plane = AuxiliaryMethods.putPlanesInWaitingArea("takeoff", 0,
-								executor.getCurrInputs().get("takeoffAircrafts[0]"));
-						takeoffPlaneExists[0] = plane;
-					} else {
-						takeoffPlaneExists[0] = null;
-					}
-
-					if (!envValues.get("takeoffAircrafts[1]").equals("NONE")) {
-						Airplane plane = AuxiliaryMethods.putPlanesInWaitingArea("takeoff", 1,
-								executor.getCurrInputs().get("takeoffAircrafts[1]"));
-						takeoffPlaneExists[1] = plane;
-					} else {
-						takeoffPlaneExists[1] = null;
-					}
-
-					if (!envValues.get("landingAircrafts[0]").equals("NONE")) {
-						Airplane plane = AuxiliaryMethods.putPlanesInWaitingArea("landing", 0,
-								executor.getCurrInputs().get("landingAircrafts[0]"));
-						landingPlaneExists[0] = plane;
-					} else {
-						landingPlaneExists[0] = null;
-					}
-					if (!envValues.get("landingAircrafts[1]").equals("NONE")) {
-						Airplane plane = AuxiliaryMethods.putPlanesInWaitingArea("landing", 1,
-								executor.getCurrInputs().get("landingAircrafts[1]"));
-						landingPlaneExists[1] = plane;
-					} else {
-						landingPlaneExists[1] = null;
-					}
+					// Creating planes according To environment variables
+					AuxiliaryMethods.creatingPlanesAccordingToExecutor(envValues);
 
 					Map<String, String> sysValues = executor.getCurrOutputs();
 					AuxiliaryMethods.getSysInputs(executor);
 					
-					// Create new CleaningCars
-					if (cleaningSensors[0]) {
-						cleaningCars[0] = new CleaningTruck(10, 155, 180, 450, 175);
+					// Create cleaning cars according to cleaning sensor
+					for(int runwayline=0; runwayline<4; runwayline++) {
+						AuxiliaryMethods.createCleaningCars(runwayline ,cleaningSensors[runwayline]);
 					}
-
-					if (cleaningSensors[1]) {
-						cleaningCars[1] = new CleaningTruck(10, 255, 180, 450, 275);
-					}
-
-					if (cleaningSensors[2]) {
-						cleaningCars[2] = new CleaningTruck(10, 455, 180, 450, 475);
-					}
-
-					if (cleaningSensors[3]) {
-						cleaningCars[3] = new CleaningTruck(10, 555, 180, 450, 575);
-					}
+					
 					System.out.println("System Values:"+sysValues.toString());
 					System.out.println("Env Values:"+envValues.toString());
 					repaint();

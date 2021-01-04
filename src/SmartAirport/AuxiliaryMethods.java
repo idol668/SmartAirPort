@@ -17,6 +17,117 @@ public class AuxiliaryMethods {
 
 	public AuxiliaryMethods() throws IOException {
 	}
+	
+	/*
+	 * This function creating planes in the smart airport according To environment variables.
+	 */
+	public static void creatingPlanesAccordingToExecutor(Map<String, String> envValues) {
+		String takeoff_in_first_line  = getTakeOffString(0);
+		String takeoff_in_second_line = getTakeOffString(1);
+		String landing_in_first_line  = getLandingString(0);
+		String landing_in_second_line = getLandingString(1);
+				
+		if(isAircraftExist(envValues,takeoff_in_first_line)) {
+			Airplane plane = putPlanesInWaitingArea("takeoff", 0, envValues.get(takeoff_in_first_line));
+			SmartAirport.takeoffPlaneExists[0] = plane;
+		}else {
+			SmartAirport.takeoffPlaneExists[0] = null;
+		}
+
+		if (isAircraftExist(envValues, takeoff_in_second_line)) {
+			Airplane plane = putPlanesInWaitingArea("takeoff", 1, envValues.get(takeoff_in_second_line));
+			SmartAirport.takeoffPlaneExists[1] = plane;
+		} else {
+			SmartAirport.takeoffPlaneExists[1] = null;
+		}
+
+		if (isAircraftExist(envValues, landing_in_first_line)) {
+			Airplane plane = putPlanesInWaitingArea("landing", 0, envValues.get(landing_in_first_line));
+			SmartAirport.landingPlaneExists[0] = plane;
+		} else {
+			SmartAirport.landingPlaneExists[0] = null;
+		}
+		if (isAircraftExist(envValues, landing_in_second_line)) {
+			Airplane plane = putPlanesInWaitingArea("landing", 1,envValues.get(landing_in_second_line));
+			SmartAirport.landingPlaneExists[1] = plane;
+		} else {
+			SmartAirport.landingPlaneExists[1] = null;
+		}
+	}
+	
+	/*
+	 * This function returns if an aircraft exist in the environment variables
+	 */
+	public static boolean isAircraftExist(Map<String, String> envValues, String aircraftStr) {
+		return !envValues.get(aircraftStr).equals("NONE");
+	}
+	
+	/*
+	 * This function returns take off aircraft string according to runway number
+	 */
+	public static String getTakeOffString(int i) {
+		return (String.format("takeoffAircrafts[%d]", i));
+	}
+	
+	/*
+	 * This function returns landing aircraft string according to runway number
+	 */
+	public static String getLandingString(int i) {
+		return (String.format("landingAircrafts[%d]", i));
+	}
+	
+	/*
+	 * This function returns take off aircraft allowed string according to runway number
+	 */
+	public static String getTakeOffAllowedString(int i) {
+		return (String.format("takeoffAllowed[%d]", i));
+	}
+	
+	/*
+	 * This function returns landing aircraft allowed string according to runway number
+	 */
+	public static String getLandingAllowedString(int i) {
+		return (String.format("landingAllowed[%d]", i));
+	}
+	/*
+	 * This function returns mechanical problem string according to runway number
+	 */
+	public static String getMechanicalProblemString(int i) {
+		return (String.format("mechanicalProblem[%d]", i));
+	}
+	/*
+	 * This function returns repair truck string according to runway number
+	 */
+	public static String getRepairTruckString(int i) {
+		return (String.format("repairTruck[%d]", i));
+	}
+	/*
+	 * This function returns rescue team string according to runway number
+	 */
+	public static String getRescueTeamString(int i) {
+		return (String.format("rescueTeam[%d]", i));
+	}
+	
+	/*
+	 * This function returns emergency landing aircraft string according to runway number
+	 */
+	public static String getEmergencyLandingString(int i) {
+		return (String.format("emergencyLanding[%d]", i));
+	}
+	
+	/*
+	 * This function returns slippery runway string according to runway number
+	 */
+	public static String getSlipperyString(int i) {
+		return (String.format("slipperyRunway[%d]", i));
+	}
+	
+	/*
+	 * This function returns clean truck string according to runway number
+	 */
+	public static String getCleanTruckString(int i) {
+		return (String.format("cleanTruck[%d]", i));
+	}
 
 	/*
 	 *  This function sets the planes in their respective waiting area using by changing its x and y values
@@ -421,25 +532,6 @@ public class AuxiliaryMethods {
 			SmartAirport.startScenario = false;
 			SmartAirport.scenario = "none";
 		}
-	}
-	
-	public static String getTakeOffString(int i) {
-		return (String.format("takeoffAircrafts[%d]", i));
-	}
-	public static String getLandingString(int i) {
-		return (String.format("landingAircrafts[%d]", i));
-	}
-	public static String getMechanicalProblemString(int i) {
-		return (String.format("mechanicalProblem[%d]", i));
-	}
-	public static String getRescueTeamString(int i) {
-		return (String.format("rescueTeam[%d]", i));
-	}
-	public static String getEmergencyLandingString(int i) {
-		return (String.format("emergencyLanding[%d]", i));
-	}
-	public static String getSlipperyString(int i) {
-		return (String.format("slipperyRunway[%d]", i));
 	}
 	
 	// This function is used in order to get the environment inputs from the controller
