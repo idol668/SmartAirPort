@@ -29,13 +29,6 @@ import javax.swing.WindowConstants;
 import tau.smlab.syntech.controller.jit.BasicJitController;
 import tau.smlab.syntech.controller.executor.ControllerExecutor;
 
-
-//*********************************************************************************************
-//***              This is our main class and deals with the most important functionality:  ***
-//***              Landing and take offs and emergency landing                              ***
-//***   Also you can find the drawing function that are used by the thread animation here   ***
-//*********************************************************************************************
-
 public class SmartAirport extends JPanel {
 
 	private static final long serialVersionUID = 1L;
@@ -80,10 +73,8 @@ public class SmartAirport extends JPanel {
 	static boolean run = true;
 	static boolean finished = false;
 	
-	// This is where everything happens- the thread animation is activated here
-	// We use the thread to draw and simulate the airtport condition using the controller system and environment inputs 
 	public SmartAirport() throws IOException {
-		AirportImages.initialFields(); // initialize the images we gonna use in the airport
+		AirportImages.initialFields();
 		initScene();
 
 		Thread animationThread = new Thread(new Runnable() {
@@ -132,13 +123,13 @@ public class SmartAirport extends JPanel {
 							e.printStackTrace();
 						}
 					}
-					ScenarioFunctions.handleEndOfScenario();
+					AuxiliaryMethods.handleEndOfScenario();
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
-					// Here we update the inputs of the system and environment in the controller and the panel
+
 					AuxiliaryMethods.updateInputs(inputs, sysValues);
 					AuxiliaryMethods.updatePanelInputs(inputs, sysValues);
 					try {
@@ -155,12 +146,7 @@ public class SmartAirport extends JPanel {
 		animationThread.start();
 		repaint();
 	}
-
-	//*********************************************************************************************
-	//***            Take off ,Landing and Emergency landing functions                          ***
-	//*********************************************************************************************
-	// One of our main functions - this function deals with the animation of the take offs and landing that occur in the airport
-	// Also we call here some of our secondary animation functions here like the slippery runway and mechanical problem
+	
 	public void animateLandingAndTakeoff() {
 		SecondaryAnimation secondarySimulator = new SecondaryAnimation(cleaningSensors, cleaningCars, stillCleaning,
 				slipperyRunway, repairTruck, mechanicalProblem);
@@ -168,11 +154,8 @@ public class SmartAirport extends JPanel {
 		int[] runwaysTakeOff = new int[2];
 		for (int i = 0; i < 2; i++) {
 			if (landingPlaneExists[i] != null && !emergencyLanding[i]) {
-				//here we move our planes from the landing waiting area to the correct runway they gonna use in their landings
 				SecondaryAnimation.animateGetPlaneToLandingSpot(i,landingAllowed[2 * i], landingAllowed[2 * i + 1], landingPlaneExists[i]);
 			}
-			//Here we set the correct runway for the take off
-			//Note: in case of two possible runways we randomly choose one
 			if (takeoffPlaneExists[i] != null && mechanicalProblem[i] == false) {
 
 				if (takeoffAllowed[2 * i] == true && takeoffAllowed[2 * i + 1] == true) {
@@ -225,7 +208,6 @@ public class SmartAirport extends JPanel {
 		if (!planeOrTruckMooving) {
 			return;
 		}
-		// This function moves the planes from the take off waiting area to the correct take off lane
 		animateGetToTakeOffSpot(runwaysTakeOff, planes);
 		for (int j = 0; j < 50; j++) {
 			for (int i = 0; i < 2; i++) {
@@ -289,8 +271,8 @@ public class SmartAirport extends JPanel {
 					if (j>29)
 					{
 						if (takeoffPlaneExists[i].y > 500 && takeoffPlaneExists[i].y < 650) {
-							takeoffPlaneExists[i].y_shadow += 3;
-							takeoffPlaneExists[i].y+=3; 
+							takeoffPlaneExists[i].y_shadow += 2;
+							takeoffPlaneExists[i].y+=2; 
 
 						}
 						if (takeoffPlaneExists[i].y > 230 && takeoffPlaneExists[i].y < 330) {
@@ -315,7 +297,6 @@ public class SmartAirport extends JPanel {
 					
 				}
 			}
-			//Here we deal with the mechanical problem and the slippery runway issue
 			secondarySimulator.animatedCleanTruck(j);
 			secondarySimulator.animateRepairTruck(j);
 			repaint();
@@ -454,16 +435,15 @@ public class SmartAirport extends JPanel {
 		}
 	}
 
-	//*********************************************************************************************
-	//***                              Drawing Functions                                        ***
-	//*********************************************************************************************
-	// This function draws the rescue team and the flashlights that are used during the  emergency landing
-	private void drawRescueTeam(Graphics g, RescueTeam rescue) {
+
+
+	private void drawRescueTeam(Graphics g, RescueTeam rescue) 
+	{
 		g.drawImage(rescue.rescueteamImage, rescue.x, rescue.y, this);
 		g.drawImage(rescue.flashlight, 175, 135, this);
 		g.drawImage(rescue.flashlight, 175, 205, this);
 		g.drawImage(rescue.flashlight, 175, 225, this);
-		g.drawImage(rescue.flashlight, 175, 305, this);
+		g.drawImage(rescue.flashlight, 175, 300, this);
 		g.drawImage(rescue.flashlight, 175, 435, this);
 		g.drawImage(rescue.flashlight, 175, 510, this);
 		g.drawImage(rescue.flashlight, 175, 535, this);
@@ -471,18 +451,20 @@ public class SmartAirport extends JPanel {
 		g.drawImage(rescue.flashlight, 600, 135, this);
 		g.drawImage(rescue.flashlight, 600, 205, this);
 		g.drawImage(rescue.flashlight, 600, 225, this);
-		g.drawImage(rescue.flashlight, 600, 305, this);
+		g.drawImage(rescue.flashlight, 600, 300, this);
 		g.drawImage(rescue.flashlight, 600, 435, this);
 		g.drawImage(rescue.flashlight, 600, 510, this);
 		g.drawImage(rescue.flashlight, 600, 535, this);
 		g.drawImage(rescue.flashlight, 600, 610, this);
-	}
 
+
+
+	}
 
 	private void drawAmbulance(Graphics g, Ambulance ambu) {
 		g.drawImage(ambu.ambuImage, ambu.x, ambu.y, this);
 	}
-	//This function draws the repair team(truck and mechanic) 
+
 	private void drawTruck(Graphics g, RepairTruck truck) {
 		if (truck.line == 0) {
 			g.drawImage(AirportImages.repairman, truck.man_x + 40, truck.man_y + 40, this);
@@ -491,7 +473,7 @@ public class SmartAirport extends JPanel {
 		}
 		g.drawImage(truck.truckImage, truck.x, truck.y, this);
 	}
-	// This function draws all our planes and their shadows depending on their type and angles
+
 	private void drawPlane(Graphics g, Airplane plane) {
 		if (plane.degree == 0) {
 			if (plane.ground == false) {
@@ -620,43 +602,7 @@ public class SmartAirport extends JPanel {
 		}
 		return;
 	}
-	
-	// This function draws the oil on the lane when we are in slippery runway sitatuion 
-		private void drawOil(Graphics g, int i) {
-			if (i == 0) {
-				g.drawImage(AirportImages.oilAndDirt, 320, 175, this);
-			}
 
-			if (i == 1) {
-				g.drawImage(AirportImages.oilAndDirt, 320, 275, this);
-			}
-
-			if (i == 2) {
-				g.drawImage(AirportImages.oilAndDirt, 320, 475, this);// 1
-			}
-
-			if (i == 3) {
-				g.drawImage(AirportImages.oilAndDirt, 320, 575, this);// 1
-			}
-		}
-	//This function draws the cleaning team that handles the slippery runway situation 
-		private void drawCleaningTruck(Graphics g, CleaningTruck cleanCar) {
-			if (cleanCar.degree == 0) {
-				g.drawImage(AirportImages.cleaningCar_0, cleanCar.x, cleanCar.y, this);
-			}
-
-			if (cleanCar.degree == 180) {
-				g.drawImage(AirportImages.cleaningCar_180, cleanCar.x, cleanCar.y, this);
-			}
-			if (cleanCar.degree == 90) {
-				g.drawImage(AirportImages.cleaningCar_90, cleanCar.x, cleanCar.y, this);
-			}
-			if (cleanCar.degree == 270) {
-				g.drawImage(AirportImages.cleaningCar_270, cleanCar.x, cleanCar.y, this);
-			}
-		}
-	
-//This method calls for all the paint methods in the simulator
 	public  void   paintComponent(Graphics g) {
 		super.paintComponent(g);
 
@@ -698,7 +644,7 @@ public class SmartAirport extends JPanel {
 			drawRescueTeam(g, rescueTeams[1]);
 		}
 	}
-//Stimulates the controller in the beginning of the run by getting the planes values 
+
 	private void initScene() {
 		Random rand = new Random();
 
@@ -713,7 +659,7 @@ public class SmartAirport extends JPanel {
 		}
 	};
 
-// This functions creates all the Basic elements in the panel which is used in the simulator 
+
 	public static JPanel createControlPanel(SmartAirport smartAirport) {
 		JPanel controlPanel = new JPanel(new BorderLayout());
 		JPanel controlPanelHeadAndEvents = new JPanel(new BorderLayout());
@@ -770,15 +716,49 @@ public class SmartAirport extends JPanel {
 		SmartAirport.setVisible(true);
 	}
 
+	private void drawOil(Graphics g, int i) {
+		if (i == 0) {
+			g.drawImage(AirportImages.oilAndDirt, 320, 175, this);
+		}
+
+		if (i == 1) {
+			g.drawImage(AirportImages.oilAndDirt, 320, 275, this);
+		}
+
+		if (i == 2) {
+			g.drawImage(AirportImages.oilAndDirt, 320, 475, this);// 1
+		}
+
+		if (i == 3) {
+			g.drawImage(AirportImages.oilAndDirt, 320, 575, this);// 1
+		}
+	}
+
+	private void drawCleaningTruck(Graphics g, CleaningTruck cleanCar) {
+		if (cleanCar.degree == 0) {
+			g.drawImage(AirportImages.cleaningCar_0, cleanCar.x, cleanCar.y, this);
+		}
+
+		if (cleanCar.degree == 180) {
+			g.drawImage(AirportImages.cleaningCar_180, cleanCar.x, cleanCar.y, this);
+		}
+		if (cleanCar.degree == 90) {
+			g.drawImage(AirportImages.cleaningCar_90, cleanCar.x, cleanCar.y, this);
+		}
+		if (cleanCar.degree == 270) {
+			g.drawImage(AirportImages.cleaningCar_270, cleanCar.x, cleanCar.y, this);
+		}
+	}
+
 	public void setStartScenario() {
 		startScenario = true;
 
 	}
 
-	//This function is used to et the planes that are waiting in the take off waiting area to their correct lane 
 	public void animateGetToTakeOffSpot(int[] runway, Airplane[] planes) {
 		Map<Airplane, Boolean> gotToTakeOffSpot = new HashMap<Airplane, Boolean>();
 		Map<Airplane, Integer> runwayToPlane = new HashMap<Airplane, Integer>();
+
 		for (int i = 0; i < planes.length; i++) {
 			if (planes[i] != null) {
 				gotToTakeOffSpot.put(planes[i], false);
