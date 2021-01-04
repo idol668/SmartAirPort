@@ -188,14 +188,14 @@ public class AuxiliaryMethods {
 							|| SmartAirport.mechanicalProblem[i])) {
 				inputs.put(getTakeOffString(i), SmartAirport.takeoffPlaneExists[i].type);
 			} else {
-				setInput(inputs, getTakeOffString(i), SmartAirport.scenario);
+				ScenarioFunctions.setInput(inputs, getTakeOffString(i), SmartAirport.scenario);
 			}
 
 			if (SmartAirport.landingPlaneExists[i] != null && !SmartAirport.landingAllowed[2 * i]
 					&& !SmartAirport.landingAllowed[2 * i + 1]) {
 				inputs.put(getLandingString(i), SmartAirport.landingPlaneExists[i].type);
 			} else {
-				setInput(inputs, getLandingString(i), SmartAirport.scenario);
+				ScenarioFunctions.setInput(inputs, getLandingString(i), SmartAirport.scenario);
 			}
 			// mechanical Problem - we update the mechanical issue in the plane according to if a repair truck arrived and fixed the issue or not
 			if (SmartAirport.takeoffPlaneExists[i] != null && SmartAirport.mechanicalProblem[i]
@@ -206,7 +206,7 @@ public class AuxiliaryMethods {
 				inputs.put(getMechanicalProblemString(i), String.valueOf(false));
 
 			} else {
-				setInput(inputs, getMechanicalProblemString(i), SmartAirport.scenario);
+				ScenarioFunctions.setInput(inputs, getMechanicalProblemString(i), SmartAirport.scenario);
 			}
 		}
 		// slippery runway - we update the controller according to the road condition- is it still slippery or cleaned by the cleaning truck
@@ -216,7 +216,7 @@ public class AuxiliaryMethods {
 			} else if (SmartAirport.cleaningSensors[i]) {
 				inputs.put(getSlipperyString(i), String.valueOf(false));
 			} else {
-				setInput(inputs, getSlipperyString(i), SmartAirport.scenario);
+				ScenarioFunctions.setInput(inputs, getSlipperyString(i), SmartAirport.scenario);
 			}
 		}
 		// emergency Landing
@@ -236,7 +236,7 @@ public class AuxiliaryMethods {
 				} else if (SmartAirport.emergencyLanding[1] && !rescueArrived1) {
 					inputs.put("emergencyLanding[1]", String.valueOf(true));
 				} else {
-					setInput(inputs, "emergencyLanding[1]", SmartAirport.scenario);
+					ScenarioFunctions.setInput(inputs, "emergencyLanding[1]", SmartAirport.scenario);
 				}
 			} else if (isntLanding1) {
 				inputs.put("emergencyLanding[1]", String.valueOf(false));
@@ -245,7 +245,7 @@ public class AuxiliaryMethods {
 				} else if (SmartAirport.emergencyLanding[0] && !rescueArrived0) {
 					inputs.put("emergencyLanding[0]", String.valueOf(true));
 				} else {
-					setInput(inputs, "emergencyLanding[0]", SmartAirport.scenario);
+					ScenarioFunctions.setInput(inputs, "emergencyLanding[0]", SmartAirport.scenario);
 				}
 			}
 		} else {
@@ -260,7 +260,7 @@ public class AuxiliaryMethods {
 				inputs.put("emergencyLanding[0]", String.valueOf(false));
 				inputs.put("emergencyLanding[1]", String.valueOf(true));
 			} else {
-				setEmergencyLandingInputs(inputs, SmartAirport.scenario);
+				ScenarioFunctions.setEmergencyLandingInputs(inputs, SmartAirport.scenario);
 			}
 		}
 		if (SmartAirport.scenarioCounter > -1) {
@@ -339,164 +339,6 @@ public class AuxiliaryMethods {
 		}
 	}
 	
-	/*
-	 * This function is used to describe the state of our simulator
-	 * If the simulator is on manual or automatic state we will give it the value none
-	 * Else if we chose a scenario, we will update the state of our simulator to the right scenario value
-	 */
-	private static void setInput(Map<String, String> inputs, String envVar, String scenario) {
-		switch (scenario) {
-		case "none":
-			getInputNoneScenario(inputs, envVar);
-			break;
-		case "rush hour":
-			getInputRushHourScenario(inputs, envVar);
-			break;
-		case "slippery slope":
-			getInputSlipperySlopeScenario(inputs, envVar);
-			break;
-		case "being a mechanic is hard":
-			getInputBeingAMechanicIsHardScenario(inputs, envVar);
-			break;
-		case "scared of flying":
-			getInputScaredOfFlyingScenario(inputs, envVar);
-			break;
-		}
-
-	}
-
-	/*
-	 *  This function sets the emergency landing input in each scenario
-	 *  In case we are in none (automatic mode)- we would like to stimulate the simulator in the first state and get values
-	 *  for the emergency landing 
-	 */
-	private static void setEmergencyLandingInputs(Map<String, String> inputs, String scenario) {
-		switch (scenario) {
-		case "rush hour":
-		case "slippery slope":
-		case "being a mechanic is hard":
-			inputs.put("emergencyLanding[0]", String.valueOf(false));
-			inputs.put("emergencyLanding[1]", String.valueOf(false));
-			break;
-		case "scared of flying":
-			double emegencyChance = new Random().nextDouble();
-			if (emegencyChance <= 0.5) {
-				inputs.put("emergencyLanding[0]", String.valueOf(true));
-				inputs.put("emergencyLanding[1]", String.valueOf(false));
-			} else {
-				inputs.put("emergencyLanding[0]", String.valueOf(false));
-				inputs.put("emergencyLanding[1]", String.valueOf(true));
-			}
-			break;
-		case "none":
-			double emegencyChanceNone = new Random().nextDouble();
-			if (emegencyChanceNone <= 0.1) {
-				inputs.put("emergencyLanding[0]", String.valueOf(true));
-				inputs.put("emergencyLanding[1]", String.valueOf(false));
-			} else if (emegencyChanceNone <= 0.2) {
-				inputs.put("emergencyLanding[0]", String.valueOf(false));
-				inputs.put("emergencyLanding[1]", String.valueOf(true));
-			} else {
-				inputs.put("emergencyLanding[0]", String.valueOf(false));
-				inputs.put("emergencyLanding[1]", String.valueOf(false));
-			}
-			break;
-		}
-	}
-	
-	// This function is used when we are not in a scenario and in the first state in our simulator
-	// When we are in automatic state, we would like to stimulate the controller by giving the first environment values
-	private static void getInputNoneScenario(Map<String, String> inputs, String envVar) {
-		if (envVar.startsWith("takeoffAircrafts")) {
-			inputs.put(envVar, acquireRandomPlane(false));
-		} else if (envVar.startsWith("landingAircrafts")) {
-			inputs.put(envVar, acquireRandomPlane(false));
-		} else if (envVar.startsWith("mechanicalProblem")) {
-			inputs.put(envVar, String.valueOf(new Random().nextDouble() < 0.15));
-		} else if (envVar.startsWith("slipperyRunway")) {
-			inputs.put(envVar, String.valueOf(new Random().nextDouble() < 0.1));
-		} else if (envVar.startsWith("emergencyLanding")) {
-			inputs.put(envVar, String.valueOf(new Random().nextDouble() < 0.1));
-		}
-	}
-
-	// This function is used to get the inputs on the being scared of flying scenario
-	private static void getInputScaredOfFlyingScenario(Map<String, String> inputs, String envVar) {
-		if (envVar.startsWith("takeoffAircrafts")) {
-			inputs.put(envVar, acquireRandomPlane(false));
-		} else if (envVar.startsWith("landingAircrafts")) {
-			inputs.put(envVar, acquireRandomPlane(true));
-		} else if (envVar.startsWith("mechanicalProblem")) {
-			inputs.put(envVar, String.valueOf(false));
-		} else if (envVar.startsWith("slipperyRunway")) {
-			inputs.put(envVar, String.valueOf(false));
-		} else if (envVar.startsWith("emergencyLanding")) {
-			Random rd = new Random();
-			double chance = rd.nextDouble();
-			if (chance <= 0.9) {
-				inputs.put(envVar, String.valueOf(true));
-			} else {
-				inputs.put(envVar, String.valueOf(false));
-			}
-		}
-	}
-
-	// This function is used to get the inputs on the being mechanic is hard scenario
-	private static void getInputBeingAMechanicIsHardScenario(Map<String, String> inputs, String envVar) {
-		if (envVar.startsWith("takeoffAircrafts")) {
-			inputs.put(envVar, acquireRandomPlane(true));
-		} else if (envVar.startsWith("landingAircrafts")) {
-			inputs.put(envVar, acquireRandomPlane(false));
-		} else if (envVar.startsWith("mechanicalProblem")) {
-			Random rd = new Random();
-			double chance = rd.nextDouble();
-			if (chance <= 0.9) {
-				inputs.put(envVar, String.valueOf(true));
-			} else {
-				inputs.put(envVar, String.valueOf(false));
-			}
-		} else if (envVar.startsWith("slipperyRunway")) {
-			inputs.put(envVar, String.valueOf(false));
-		} else if (envVar.startsWith("emergencyLanding")) {
-			inputs.put(envVar, String.valueOf(false));
-		}
-	}
-
-	// This function is used to get the inputs on the slippery slope scenario 
-	private static void getInputSlipperySlopeScenario(Map<String, String> inputs, String envVar) {
-		if (envVar.startsWith("takeoffAircrafts")) {
-			inputs.put(envVar, acquireRandomPlane(false));
-		} else if (envVar.startsWith("landingAircrafts")) {
-			inputs.put(envVar, acquireRandomPlane(false));
-		} else if (envVar.startsWith("mechanicalProblem")) {
-			inputs.put(envVar, String.valueOf(false));
-		} else if (envVar.startsWith("slipperyRunway")) {
-			Random rd = new Random();
-			double chance = rd.nextDouble();
-			if (chance <= 0.9) {
-				inputs.put(envVar, String.valueOf(true));
-			} else {
-				inputs.put(envVar, String.valueOf(false));
-			}
-		} else if (envVar.startsWith("emergencyLanding")) {
-			inputs.put(envVar, String.valueOf(false));
-		}
-	}
-
-	// This function is used to get the inputs in the rush hour scenario 
-	private static void getInputRushHourScenario(Map<String, String> inputs, String envVar) {
-		if (envVar.startsWith("takeoffAircrafts")) {
-			inputs.put(envVar, acquireRandomPlane(true));
-		} else if (envVar.startsWith("landingAircrafts")) {
-			inputs.put(envVar, acquireRandomPlane(true));
-		} else if (envVar.startsWith("mechanicalProblem")) {
-			inputs.put(envVar, String.valueOf(false));
-		} else if (envVar.startsWith("slipperyRunway")) {
-			inputs.put(envVar, String.valueOf(false));
-		} else if (envVar.startsWith("emergencyLanding")) {
-			inputs.put(envVar, String.valueOf(false));
-		}
-	}
 
 	// This function is used to for the initial run in our simulator and in some of the scenarios 
 	// This function gets a random plane type 
@@ -521,18 +363,6 @@ public class AuxiliaryMethods {
 		return planeType;
 	}
 
-	public static void handleEndOfScenario() {
-		boolean scenarioOver = (SmartAirport.inScenario && SmartAirport.scenarioCounter == 0)
-				|| (SmartAirport.inManualScenario
-						&& (SmartAirport.envMoves.isEmpty() || SmartAirport.envMoves == null));
-		if (scenarioOver) {
-			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "Done\n");
-			SmartAirport.inScenario = false;
-			SmartAirport.inManualScenario = false;
-			SmartAirport.startScenario = false;
-			SmartAirport.scenario = "none";
-		}
-	}
 	
 	// This function is used in order to get the environment inputs from the controller
 	// This inputs are used to correctly draw the state of the airport
