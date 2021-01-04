@@ -19,9 +19,9 @@ import javax.swing.JToggleButton;
 
 public class AirportPanel {
 
-	static Boolean AddlandingFirstPosition = false;
+	static Boolean AddlandingFirstPosition  = false;
 	static Boolean AddlandingSecondPosition = false;
-	static Boolean AddtakeoffFirstPosition = false;
+	static Boolean AddtakeoffFirstPosition  = false;
 	static Boolean AddtakeoffSecondPosition = false;
 
 	public AirportPanel() throws IOException {

@@ -377,9 +377,7 @@ public class AuxiliaryMethods {
 		}
 		for (int i = 0; i < 2; i++) {
 			SmartAirport.mechanicalProblem[i] = envValues.get(getMechanicalProblemString(i)).equals("true") ? true : false;
-			SmartAirport.emergencyLanding[i] = envValues.get(getEmergencyLandingString(i)).equals("true") ? true : false;
-
-			
+			SmartAirport.emergencyLanding[i] = envValues.get(getEmergencyLandingString(i)).equals("true") ? true : false;		
 		}
 	}
 	
@@ -414,6 +412,9 @@ public class AuxiliaryMethods {
 		}
 	}
 	
+	/*
+	 * This function determines the plane position according to the chosen runway.
+	 */
 	public static int planePositionByRunwayNumber(int runwayLine) {
 		int planePosition;
 		switch (runwayLine) {
