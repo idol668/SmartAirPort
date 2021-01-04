@@ -53,7 +53,7 @@ public class AirportPanel {
 			return;
 		SmartAirport.inManualScenario = true;
 		SmartAirport.outputArea.setText("Perform Mechnical problem:\n");
-		if (aircraft.equals("Takeoff North")) {
+		if (aircraft.equals("Takeoff Position 1")) {
 			SmartAirport.envMoves.put(AuxiliaryMethods.getMechanicalProblemString(0), String.valueOf(true));
 		} else {
 			SmartAirport.envMoves.put(AuxiliaryMethods.getMechanicalProblemString(1), String.valueOf(true));
@@ -65,7 +65,7 @@ public class AirportPanel {
 		if (SmartAirport.inScenario || SmartAirport.inManualScenario || runway.equals("-----"))
 			return;
 		SmartAirport.inManualScenario = true;
-		SmartAirport.outputArea.setText("perform Dirty runway:\n");
+		SmartAirport.outputArea.setText("Perform Dirty Runway:\n");
 		if (runway.equals("First Runway")) {
 			SmartAirport.envMoves.put(AuxiliaryMethods.getSlipperyString(0), String.valueOf(true));
 		} else if (runway.equals("Second Runway")) {
@@ -83,7 +83,7 @@ public class AirportPanel {
 			return;
 		SmartAirport.inManualScenario = true;
 		SmartAirport.outputArea.setText("Perform Emergency Landing:\n");
-		if (aircraft.equals("Landing North")) {
+		if (aircraft.equals("Landing Position 1")) {
 			SmartAirport.envMoves.put(AuxiliaryMethods.getEmergencyLandingString(0), String.valueOf(true));
 		} else {
 			SmartAirport.envMoves.put(AuxiliaryMethods.getEmergencyLandingString(1), String.valueOf(true));
@@ -98,7 +98,7 @@ public class AirportPanel {
 		return headPanel;
 	}
 	
-	// The function created the part in the panel where planes can be added by the user.
+	// The function creates the part in the panel where planes can be added by the user.
 	// The user can choose plane type (cargo, commercial or private), landing or taking off aircraft and the location planes.
 	public static JPanel createEventsPanel(SmartAirport smartAirport) {
 		JPanel eventsPanel = new JPanel(new BorderLayout());
@@ -108,13 +108,13 @@ public class AirportPanel {
 		JPanel eventsPanelToggels = new JPanel();
 		JPanel eventsPanelToggelsAndLabel = new JPanel(new BorderLayout());
 
-		JLabel headLineLabel = new JLabel("<html><span style='font-size:14px'>Add landings & takeoffs</span></html>");
+		JLabel headLineLabel = new JLabel("<html><span style='font-size:14px'>Add Landings & Takeoffs</span></html>");
 		headLinePanel.add(headLineLabel);
 
 		JToggleButton landingFirstPosToggleButton = new JToggleButton("Landing Position 1");
-		JToggleButton landingSecPosToggleButton = new JToggleButton("Landing Position 2");
+		JToggleButton landingSecPosToggleButton   = new JToggleButton("Landing Position 2");
 		JToggleButton takeoffFirstPosToggleButton = new JToggleButton("Takeoff Position 1");
-		JToggleButton takeoffSecPosToggleButton = new JToggleButton("Takeoff Position 2");
+		JToggleButton takeoffSecPosToggleButton   = new JToggleButton("Takeoff Position 2");
 		JPanel manualAddbuttonPanel = new JPanel();
 
 		String[] planesType = { "-----", "Cargo", "Private", "Commercial" };
@@ -123,7 +123,6 @@ public class AirportPanel {
 		landingFirstPosToggleButton.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent itemEvent) {
 				int state = itemEvent.getStateChange();
-
 				if (state == ItemEvent.SELECTED) {
 					AddlandingFirstPosition = true;
 				} else {
@@ -191,7 +190,8 @@ public class AirportPanel {
 		eventsPanel.add(eventsPanelToggelsAndLabel, BorderLayout.NORTH);
 		return eventsPanel;
 	}
-
+	
+	// The function creates the part in the panel where the runway can be dirty by the user.
 	static JPanel createDirtyRunwayPanel(SmartAirport smartAirport) {
 		JPanel dirtyRunwayLinePanel = new JPanel();
 		JPanel dirtyRunwayComboAndButton = new JPanel();
@@ -221,8 +221,8 @@ public class AirportPanel {
 		return eventsPaneldirtyRunway;
 	}
 
+	//The function creates the part in the panel where emergency landing can be execute by the user.
 	static JPanel createEmergencyLandingPanel(SmartAirport smartAirport) {
-
 		JPanel emergencyHeadLine = new JPanel();
 		JPanel emergencyComboAndButton = new JPanel();
 		JPanel eventsPanelemergency = new JPanel(new BorderLayout());
@@ -231,7 +231,7 @@ public class AirportPanel {
 				"<html><span style='font-size:14px'>Emergency Landing</span></html>");
 		emergencyHeadLine.add(emergencyHeadLineLabel);
 
-		String[] planes = { "-----", "Landing North", "Landing South" };
+		String[] planes = { "-----", "Landing Position 1", "Landing Position 2" };
 		JComboBox<String> emergencyCombo = new JComboBox<>(planes);
 
 		JButton emergencyButton = new JButton("Go");
@@ -253,6 +253,7 @@ public class AirportPanel {
 		return eventsPanelemergency;
 	}
 
+	//The function creates the part in the panel where mechanical problem can be execute by the user.
 	static JPanel createMechanicalProblemPanel(SmartAirport smartAirport) {
 
 		JPanel MechanicalProblemHeadLine = new JPanel();
@@ -264,7 +265,7 @@ public class AirportPanel {
 				"<html><span style='font-size:14px'>Mechanical Problem</span></html>");
 		MechanicalProblemHeadLine.add(MechanicalProblemHeadLineLabel);
 
-		String[] planes = { "-----", "Takeoff North", "Takeoff South" };
+		String[] planes = { "-----", "Takeoff Position 1", "Takeoff Position 2" };
 		JComboBox<String> MechanicalProblemCombo = new JComboBox<>(planes);
 
 		JButton MechanicalProblemButton = new JButton("Go");
@@ -279,15 +280,13 @@ public class AirportPanel {
 
 		MechanicalProblemComboAndButton.add(MechanicalProblemCombo, BorderLayout.WEST);
 		MechanicalProblemComboAndButton.add(MechanicalProblemButton, BorderLayout.EAST);
-
 		eventsPanelMechanicalProblem.add(MechanicalProblemHeadLine, BorderLayout.NORTH);
 		eventsPanelMechanicalProblem.add(MechanicalProblemComboAndButton, BorderLayout.CENTER);
-
 		return eventsPanelMechanicalProblem;
 	}
-
+	
+	//The function creates the part in the panel where the user can choose to run scenario demo. 
 	static JPanel createScenariosPanel(SmartAirport smartAirport) {
-
 		JPanel scenariosHeadLine = new JPanel();
 		JPanel scenariosComboAndButton = new JPanel();
 
@@ -317,7 +316,8 @@ public class AirportPanel {
 
 		return eventsPanelScenarios;
 	}
-
+	
+	// This function checks which scenario is selected by the user and defines it at the smart airport.
 	protected static void setScenario(SmartAirport smartAirport, String name) {
 		if (SmartAirport.inScenario || SmartAirport.inManualScenario)
 			return;
@@ -328,7 +328,6 @@ public class AirportPanel {
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-
 		switch (name) {
 		case "rush hour":
 			setScenarioAndCounter("rush hour", 6);
@@ -343,12 +342,11 @@ public class AirportPanel {
 			setScenarioAndCounter("scared of flying", 4);
 			break;
 		}
-
 		SmartAirport.inScenario = true;
 		SmartAirport.wait = false;
-
 	}
-
+	
+	// The function set the scenario in smart airport.
 	private static void setScenarioAndCounter(String scenrioName, int scenarioNumOfSteps) {
 		SmartAirport.scenario = scenrioName;
 		SmartAirport.scenarioCounter = scenarioNumOfSteps;
