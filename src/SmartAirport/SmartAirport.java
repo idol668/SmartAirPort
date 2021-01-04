@@ -217,13 +217,15 @@ public class SmartAirport extends JPanel {
 		}
 		// This function moves the planes from the take off waiting area to the correct take off lane
 		animateGetToTakeOffSpot(runwaysTakeOff, planes);
-		for (int j = 0; j < 50; j++) {
+		for (int j = 0; j < 55; j++) {
+			int landinShadowgPlaneSpeed =18;
+			int landinPlaneSpeed =20;
 			for (int i = 0; i < 2; i++) {
 
 				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof && j >= 9) {
 					if (j < 21) {
-						landingPlaneExists[i].x_shadow += 18;
-						landingPlaneExists[i].x += 20;
+						landingPlaneExists[i].x_shadow += landinShadowgPlaneSpeed;
+						landingPlaneExists[i].x += landinPlaneSpeed;
 						if (j>15 && j<21){
 							landingPlaneExists[i].y -=1; 
 						}	
@@ -233,8 +235,9 @@ public class SmartAirport extends JPanel {
 						landingPlaneExists[i].ground = true;
 					} else {
 						if (j < 34) {
-							landingPlaneExists[i].x += 20;
-							landingPlaneExists[i].x_shadow += 22;
+							landinShadowgPlaneSpeed=22;
+							landingPlaneExists[i].x += landinPlaneSpeed;
+							landingPlaneExists[i].x_shadow += landinShadowgPlaneSpeed;
 						} else {
 							if (j > 33 && j < 40) {
 								if (landingPlaneExists[i].y > 165 && landingPlaneExists[i].y < 400) {
@@ -243,7 +246,8 @@ public class SmartAirport extends JPanel {
 								if (landingPlaneExists[i].y > 400 && landingPlaneExists[i].y < 500) {
 									landingPlaneExists[i].y += 2;
 								}
-								landingPlaneExists[i].x += 15;
+								landinPlaneSpeed=15;
+								landingPlaneExists[i].x += landinPlaneSpeed;
 							} else {
 								if (landingPlaneExists[i].y > 165 && landingPlaneExists[i].y < 400) {
 									landingPlaneExists[i].y -= 1;
@@ -251,8 +255,8 @@ public class SmartAirport extends JPanel {
 								if (landingPlaneExists[i].y > 400 && landingPlaneExists[i].y < 500) {
 									landingPlaneExists[i].y += 1;
 								}
-								
-								landingPlaneExists[i].x += 10;
+								landinPlaneSpeed=10;
+								landingPlaneExists[i].x += landinPlaneSpeed;
 							}
 
 							landingPlaneExists[i].x_shadow = landingPlaneExists[i].x;
