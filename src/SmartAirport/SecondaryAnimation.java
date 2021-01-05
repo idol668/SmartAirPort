@@ -37,15 +37,23 @@ public class SecondaryAnimation {
 			if (rand.nextBoolean() == true) {
 				landingPlane.setPlaneToSecondRunway();
 				landingPlane.line = 2*line +1;
+				SmartAirport.planesLanding[line]=landingPlane;
+				SmartAirport.runwaysLanding[line]=2*line +1;
 			} else {
 				landingPlane.setPlaneToFirstRunway();
+				SmartAirport.planesLanding[line]=landingPlane;
+				SmartAirport.runwaysLanding[line]=2*line;
 				landingPlane.line = 2*line;
 			}
 		} else if (landingAllowedFirstLine && !slipperyRunway[2 * line]) {
 			landingPlane.setPlaneToFirstRunway();
+			SmartAirport.planesLanding[line]=landingPlane;
+			SmartAirport.runwaysLanding[line]=2*line;
 			landingPlane.line = 2*line;
 		} else if (landingAllowedSecondLine && !slipperyRunway[2 * line + 1]) {
 			landingPlane.setPlaneToSecondRunway();
+			SmartAirport.planesLanding[line]=landingPlane;
+			SmartAirport.runwaysLanding[line]=2*line+1;
 			landingPlane.line =  2*line +1;
 		}
 		landingPlane.setShadowUnderPlane();

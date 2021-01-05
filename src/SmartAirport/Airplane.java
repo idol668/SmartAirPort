@@ -47,12 +47,12 @@ public class Airplane {
 	
 	public void setPlaneToFirstRunway() {
 		this.EnterLandingOrTakeoof = true;
-		this.y -= 40;
+		//this.y -= 40;
 	}
 	
 	public void setPlaneToSecondRunway() {
 		this.EnterLandingOrTakeoof = true;
-		this.y += 62;
+		//this.y += 62;
 	}
 	
 	// moves the x value of the plane and its shadow while doing some kind of movement 

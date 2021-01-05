@@ -43,6 +43,8 @@ public class SmartAirport extends JPanel {
 	static boolean[] landingAllowed = new boolean[4];
 	static Airplane[] takeoffPlaneExists = new Airplane[2];
 	static Airplane[] landingPlaneExists = new Airplane[2];
+	static int[] runwaysLanding = new int[2];
+	static Airplane[] planesLanding = new Airplane[2];
 
 	// Emergency Landing
 	static boolean[] emergencyLanding = new boolean[2];
@@ -156,8 +158,10 @@ public class SmartAirport extends JPanel {
 	public void animateLandingAndTakeoff() {
 		SecondaryAnimation secondarySimulator = new SecondaryAnimation(cleaningSensors, cleaningCars, stillCleaning,
 				slipperyRunway, repairTruck, mechanicalProblem);
-		Airplane[] planes = new Airplane[2];
+		Airplane[] planesTakeoff = new Airplane[2];
 		int[] runwaysTakeOff = new int[2];
+		runwaysLanding = new int[2];
+		planesLanding = new Airplane[2];
 		for (int i = 0; i < 2; i++) {
 			if (landingPlaneExists[i] != null && !emergencyLanding[i]) {
 				//here we move our planes from the landing waiting area to the correct runway they gonna use in their landings
@@ -171,19 +175,19 @@ public class SmartAirport extends JPanel {
 					takeoffPlaneExists[i].EnterLandingOrTakeoof = true;
 					Random rand = new Random();
 					if (rand.nextBoolean() == true) {
-						planes[i] = takeoffPlaneExists[i];
+						planesTakeoff[i] = takeoffPlaneExists[i];
 						runwaysTakeOff[i] = 2 * i + 1;
 					} else {
-						planes[i] = takeoffPlaneExists[i];
+						planesTakeoff[i] = takeoffPlaneExists[i];
 						runwaysTakeOff[i] = 2 * i;
 					}
 				} else if (takeoffAllowed[2 * i] == true && !slipperyRunway[2 * i]) {
 					takeoffPlaneExists[i].EnterLandingOrTakeoof = true;
-					planes[i] = takeoffPlaneExists[i];
+					planesTakeoff[i] = takeoffPlaneExists[i];
 					runwaysTakeOff[i] = 2 * i;
 
 				} else if (takeoffAllowed[2 * i + 1] == true && !slipperyRunway[2 * i + 1]) {
-					planes[i] = takeoffPlaneExists[i];
+					planesTakeoff[i] = takeoffPlaneExists[i];
 					takeoffPlaneExists[i].EnterLandingOrTakeoof = true;
 					runwaysTakeOff[i] = 2 * i + 1;
 				} else {
@@ -218,7 +222,8 @@ public class SmartAirport extends JPanel {
 			return;
 		}
 		// This function moves the planes from the take off waiting area to the correct take off lane
-		animateGetToTakeOffSpot(runwaysTakeOff, planes);
+		animateGetToTakeOffSpot(runwaysTakeOff, planesTakeoff);
+		animateGetToLandingSpot(runwaysLanding, planesLanding); 
 		for (int j = 0; j < 55; j++) {
 			int takeOffPlaneSpeed=20;
 			int takeOffPlaneSpeedY=1;
@@ -452,10 +457,13 @@ public class SmartAirport extends JPanel {
 	
 	// Animate Emergency Landing : union all stages of the animation.
 	public void animateEmergencyLanding() {
+		runwaysLanding = new int[2];
+		planesLanding = new Airplane[2];
 		for (int i = 0; i < 2; i++) {
 			if (emergencyLanding[i] && landingPlaneExists[i] != null) {
 				SecondaryAnimation.animateGetPlaneToLandingSpot(i,landingAllowed[2 * i], landingAllowed[2 * i + 1], landingPlaneExists[i]);
 				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof && rescueTeams[i] != null) {
+					animateGetToLandingSpot(runwaysLanding,planesLanding);
 					animateEmergencyLandingLandingStage(i);
 					landingPlaneExists[i].EnterLandingOrTakeoof = false;
 					
@@ -794,7 +802,6 @@ public class SmartAirport extends JPanel {
 	}
 
 	public static void main(String[] args) throws IOException {
-
 		JFrame SmartAirport = new JFrame("Airprot Simulator");
 		SmartAirport smartAirport = new SmartAirport();
 		SmartAirport.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -802,12 +809,9 @@ public class SmartAirport extends JPanel {
 		SmartAirport.setContentPane(createMainPanel(smartAirport));
 		SmartAirport.setVisible(true);
 	}
-
 	public void setStartScenario() {
 		startScenario = true;
-
 	}
-
 	//This function is used to et the planes that are waiting in the take off waiting area to their correct lane 
 	public void animateGetToTakeOffSpot(int[] runway, Airplane[] planes) {
 		Map<Airplane, Boolean> gotToTakeOffSpot = new HashMap<Airplane, Boolean>();
@@ -846,6 +850,57 @@ public class SmartAirport extends JPanel {
 				}
 				if (runwayPlane == 3) {
 					planeSpeedY=11;
+					plane.degree = 90;
+					plane.y += planeSpeedY;
+					plane.y_shadow += planeSpeedY;
+				}
+
+				repaint();
+
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	public void animateGetToLandingSpot(int[] runway, Airplane[] planes) {
+		Map<Airplane, Boolean> gotToTakeOffSpot = new HashMap<Airplane, Boolean>();
+		Map<Airplane, Integer> runwayToPlane = new HashMap<Airplane, Integer>();
+		for (int i = 0; i < planes.length; i++) {
+			if (planes[i] != null) {
+				gotToTakeOffSpot.put(planes[i], false);
+				runwayToPlane.put(planes[i], runway[i]);
+			}
+		}
+		int planeSpeedY=3;
+		for (Airplane plane : runwayToPlane.keySet()) {
+			for (int j = 0; j < 10; j++) {
+				int runwayPlane = runwayToPlane.get(plane);
+				if (j == 9) {
+					plane.degree = 180;
+					break;
+				}
+				if (runwayPlane == 0) {
+					plane.degree = 270;
+					plane.y -= planeSpeedY;
+					plane.y_shadow -= planeSpeedY;
+				}
+				if (runwayPlane == 1) {
+					planeSpeedY=7;
+					plane.degree = 90;
+					plane.y += planeSpeedY;
+					plane.y_shadow += planeSpeedY;
+				}
+				if (runwayPlane == 2) {
+					planeSpeedY=3;
+					plane.degree = 270;
+					plane.y -= planeSpeedY;
+					plane.y_shadow -= planeSpeedY;
+				}
+				if (runwayPlane == 3) {
+					planeSpeedY=6;
 					plane.degree = 90;
 					plane.y += planeSpeedY;
 					plane.y_shadow += planeSpeedY;
