@@ -378,17 +378,17 @@ public class AirportPanel {
 	// The function set the control board to appears in automatic control - the take off platform.
 	public static void setControlTowerBoardDepartures() {
 		if (!SmartAirport.inScenario && !SmartAirport.inManualScenario) {
-			SmartAirport.outputArea.setText("-------------Takeoff--Platform---------------\n");
-			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "Time     Gate        PlaneType      Color\n");
-			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "-----------------------------------------------------\n");
+			SmartAirport.outputArea.setText("---------------Takeoff--Platform-----------------\n");
+			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +"   "+ "Time     Gate        PlaneType      Color\n");
+			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "----------------------------------------------------------\n");
 		}
 	}
 	// The function set the control board to appears in automatic control - the landing platform.
 	public static void setControlTowerBoardArrivel() {
 		if (!SmartAirport.inScenario && !SmartAirport.inManualScenario) {
-			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "-------------Landing--Platform---------------\n");
-			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "Time     Gate        PlaneType      Color\n");
-			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "-----------------------------------------------------\n");
+			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "---------------Landing--Platform-----------------\n");
+			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +"   "+ "Time     Gate        PlaneType      Color\n");
+			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "----------------------------------------------------------\n");
 		}
 	}
 	// The function set the control board to appears in automatic control - add a plane details to the board.
@@ -405,7 +405,7 @@ public class AirportPanel {
 			}
 			String plane_type = String.format("%-15s",plane.type.toString().toLowerCase());
 			String color = String.format("%5s",plane.color);
-			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + curTime + gatestr + plane_type + color +"\n");
+			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +"   " + curTime + gatestr + plane_type + color +"\n");
 		}
 	}
 	
