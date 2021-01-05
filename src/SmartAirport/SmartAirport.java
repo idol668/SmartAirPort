@@ -114,6 +114,7 @@ public class SmartAirport extends JPanel {
 					System.out.println("System Values:"+sysValues.toString());
 					System.out.println("Env Values:"+envValues.toString());
 					repaint();
+					animateSetInWaitingTakeOffSpot();
 					animateEmergencyLanding();
 					animateLandingAndTakeoff();
 					while (wait) {
@@ -341,6 +342,26 @@ public class SmartAirport extends JPanel {
 			if (takeoffPlaneExists[i] != null && takeoffPlaneExists[i].EnterLandingOrTakeoof) {
 				takeoffPlaneExists[i] = null;
 			}
+		}
+	}
+	
+	// Animate enter of the take off planes
+	public void animateSetInWaitingTakeOffSpot() {
+		int planeSpeed=10;
+		int waitingTakeOffPosition= 650;
+		for (int j=0;j<2;j++) {
+			if(takeoffPlaneExists[j]!=null) {
+				while(takeoffPlaneExists[j].x > waitingTakeOffPosition){
+					takeoffPlaneExists[j].x-=planeSpeed;
+					takeoffPlaneExists[j].x_shadow-=planeSpeed;
+					repaint();
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}		
 		}
 	}
 	

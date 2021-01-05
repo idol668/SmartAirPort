@@ -144,7 +144,7 @@ public class AuxiliaryMethods {
 	 *  The waiting area is a spot in the airport where the planes are waiting to get their landing or take off permissions
 	 */
 	public static Airplane putPlanesInWaitingArea(String state, int spotInWaitingArea, String planeType) {
-		int takeoff_pos_x 		= 650; // the x value of the planes that are waiting for take off 
+		int takeoff_pos_x 		= 800; // the x value of the planes that are waiting for take off 
 		int landing_pos_x 		= 50;  // the x value of the planes that are waiting for landing 
 		int takeoff_pos_north_y = 300; // the y value of the planes that are waiting for takeoff in north
 		int takeoff_pos_south_y = 390; // the y value of the planes that are waiting for for takeoff in south 
@@ -159,9 +159,19 @@ public class AuxiliaryMethods {
 		// If its take off we will pass the correct x and y values, else we will pass the landing x and y value
 		if (state.equals("takeoff")) {
 			if (spotInWaitingArea == 0) {
-				plane = new Airplane(takeoff_pos_x, takeoff_pos_north_y, degree_0, planeType, 0, true);
+				if(SmartAirport.takeoffPlaneExists[0]== null) {
+					plane = new Airplane(takeoff_pos_x, takeoff_pos_north_y, degree_0, planeType, 0, true);
+				}
+				else {
+					plane = SmartAirport.takeoffPlaneExists[0];
+				}
 			} else {
-				plane = new Airplane(takeoff_pos_x, takeoff_pos_south_y, degree_0, planeType, 1, true);
+				if(SmartAirport.takeoffPlaneExists[1]== null) {
+					plane = new Airplane(takeoff_pos_x, takeoff_pos_south_y, degree_0, planeType, 1, true);
+				}
+				else {
+					plane = SmartAirport.takeoffPlaneExists[1];
+				}
 			}
 		}
 		if (state.equals("landing")) {
@@ -318,7 +328,7 @@ public class AuxiliaryMethods {
 					if (SmartAirport.repairTruck[i] != null) {
 						continue;
 					}
-					if (SmartAirport.takeoffPlaneExists[i]==null) {
+					if(SmartAirport.takeoffPlaneExists[i] == null) {
 						continue;
 					}
 					inputs.put(getMechanicalProblemString(i), "true");
