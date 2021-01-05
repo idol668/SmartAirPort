@@ -1,8 +1,14 @@
 package SmartAirport;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Map;
 import java.util.Random;
+import java.util.TimeZone;
 
 import tau.smlab.syntech.controller.executor.ControllerExecutor;
 
@@ -14,7 +20,6 @@ import tau.smlab.syntech.controller.executor.ControllerExecutor;
 public class AuxiliaryMethods {
 	static int degree_0 = 0;
 	static int degree_180 = 180;
-
 	public AuxiliaryMethods() throws IOException {
 	}
 	
@@ -26,10 +31,12 @@ public class AuxiliaryMethods {
 		String takeoff_in_second_line = getTakeOffString(1);
 		String landing_in_first_line  = getLandingString(0);
 		String landing_in_second_line = getLandingString(1);
-				
+		
+		AirportPanel.setControlTowerBoardDepartures();
 		if(isAircraftExist(envValues,takeoff_in_first_line)) {
 			Airplane plane = putPlanesInWaitingArea("takeoff", 0, envValues.get(takeoff_in_first_line));
 			SmartAirport.takeoffPlaneExists[0] = plane;
+			AirportPanel.addPlaneToControlTowerBoard(1, plane);
 		}else {
 			SmartAirport.takeoffPlaneExists[0] = null;
 		}
@@ -37,19 +44,22 @@ public class AuxiliaryMethods {
 		if (isAircraftExist(envValues, takeoff_in_second_line)) {
 			Airplane plane = putPlanesInWaitingArea("takeoff", 1, envValues.get(takeoff_in_second_line));
 			SmartAirport.takeoffPlaneExists[1] = plane;
+			AirportPanel.addPlaneToControlTowerBoard(2, plane);
 		} else {
 			SmartAirport.takeoffPlaneExists[1] = null;
 		}
-
+		AirportPanel.setControlTowerBoardArrivel();
 		if (isAircraftExist(envValues, landing_in_first_line)) {
 			Airplane plane = putPlanesInWaitingArea("landing", 0, envValues.get(landing_in_first_line));
 			SmartAirport.landingPlaneExists[0] = plane;
+			AirportPanel.addPlaneToControlTowerBoard(1, plane);
 		} else {
 			SmartAirport.landingPlaneExists[0] = null;
 		}
 		if (isAircraftExist(envValues, landing_in_second_line)) {
 			Airplane plane = putPlanesInWaitingArea("landing", 1,envValues.get(landing_in_second_line));
 			SmartAirport.landingPlaneExists[1] = plane;
+			AirportPanel.addPlaneToControlTowerBoard(2, plane);
 		} else {
 			SmartAirport.landingPlaneExists[1] = null;
 		}
@@ -182,7 +192,6 @@ public class AuxiliaryMethods {
 		// take off and landing planes - we update their state hence if they did perform take off or landing
 		// if they didn't perform the landing or takeoff we will tell the controller that they are still waiting for the permission 
 		for (int i = 0; i < SmartAirport.takeoffPlaneExists.length; i++) {
-
 			if (SmartAirport.takeoffPlaneExists[i] != null
 					&& ((!SmartAirport.takeoffAllowed[2 * i] && !SmartAirport.takeoffAllowed[2 * i + 1])
 							|| SmartAirport.mechanicalProblem[i])) {
@@ -281,7 +290,7 @@ public class AuxiliaryMethods {
 					}
 					//if there is no aircraft in the position OR the aircraft have no mechanical problem and already took off
 					if (SmartAirport.takeoffPlaneExists[i] == null || (!SmartAirport.mechanicalProblem[i] && (SmartAirport.takeoffAllowed[2 * i] || SmartAirport.takeoffAllowed[2 * i + 1]))) {
-						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + planeType.toLowerCase() + " takeoff aircraft in "+ Position + " position\n");
+						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + planeType.toLowerCase() + " takeoff aircraft in "+ Position + " platform\n");
 						inputs.put(getTakeOffString(i), planeType);
 						SmartAirport.envMoves.remove(getTakeOffString(i));
 					}
@@ -294,21 +303,24 @@ public class AuxiliaryMethods {
 					}
 					//if there is no aircraft in the position OR the aircraft already landed
 					if (SmartAirport.landingPlaneExists[i] == null || (SmartAirport.landingAllowed[2 * i] || SmartAirport.landingAllowed[2 * i + 1])) {
-						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + planeType.toLowerCase() + " landing aircraft in "+ Position + " position\n");
+						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + planeType.toLowerCase() + " landing aircraft in "+ Position + " platform\n");
 						inputs.put(getLandingString(i), planeType);
 						SmartAirport.envMoves.remove(getLandingString(i));
 					}
 				}
-
-				if (SmartAirport.envMoves.get(getMechanicalProblemString(i)) != null) {
+				String mechanicalProblemMove = SmartAirport.envMoves.get(getMechanicalProblemString(i));
+				if (mechanicalProblemMove != null) {
 					//if this aircraft already fixed
 					if (SmartAirport.repairTruck[i] != null) {
 						continue;
 					}
 					inputs.put(getMechanicalProblemString(i), "true");
+					SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +"- adding mechanical problem in the aircarf waiting\n in  "+mechanicalProblemMove.toLowerCase()+"\n");
 					SmartAirport.envMoves.remove(getMechanicalProblemString(i));
 				}
-				if (SmartAirport.envMoves.get(getEmergencyLandingString(i)) != null) {
+				
+				String EmergencyLandingMove = SmartAirport.envMoves.get(getEmergencyLandingString(i));
+				if ( EmergencyLandingMove != null) {
 					int j = ((i == 0) ? 1 : 0);
 					boolean rescueArrived = sysValues.get(getRescueTeamString(i)).equals("true");
 					boolean isAircaftLanding = !(inputs.get(getLandingString(i)).equals("NONE"));
@@ -320,17 +332,20 @@ public class AuxiliaryMethods {
 					if (isAircaftLanding && !(SmartAirport.emergencyLanding[i] && rescueArrived)) {
 						inputs.put(getEmergencyLandingString(i), String.valueOf(true));
 						inputs.put(getEmergencyLandingString(j), String.valueOf(false));
+						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +"- adding emergency from "+EmergencyLandingMove.toLowerCase()+"\n");
 						SmartAirport.envMoves.remove(getEmergencyLandingString(i));
 					}
 				}
 			}
 			for (int i = 0; i < 4; i++) {
-				if (SmartAirport.envMoves.get(getSlipperyString(i)) != null) {
+				String sllipryrunwayMove = SmartAirport.envMoves.get(getSlipperyString(i));
+				if ( sllipryrunwayMove != null) {
 					//if this runway already slippery OR just cleaned;
 					if(SmartAirport.slipperyRunway[i] || SmartAirport.cleaningSensors[i]) {
 						continue;
 					}
 					inputs.put(getSlipperyString(i), "true");
+					SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +"- adding a dirty runway in "+sllipryrunwayMove.toLowerCase()+"\n");
 					SmartAirport.envMoves.remove(getSlipperyString(i));
 				}
 			}

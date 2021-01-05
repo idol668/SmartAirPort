@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
@@ -65,7 +66,7 @@ public class SmartAirport extends JPanel {
 	static String scenario = "none";
 	static int scenarioCounter = -1;
 	static Map<String, String> envMoves = new HashMap<>();
-	static JTextArea outputArea = new JTextArea("Here will be the output for scenarios and events \n", 0, 20);
+	static JTextArea outputArea = new JTextArea("", 10, 27);
 	
 	static boolean run = true;
 	static boolean finished = false;
@@ -719,10 +720,13 @@ public class SmartAirport extends JPanel {
 		JPanel outputPanel = new JPanel();
 		JPanel outputLabelPanel = new JPanel();
 
-		JLabel outputLabel = new JLabel("<html><span style='font-size:14px'>Output</span></html>");
-
+		JLabel outputLabel = new JLabel("<html><span style='font-size:14px'>Control Tower Board</span></html>");
 		outputLabelPanel.add(outputLabel);
-		outputPanel.add(outputArea);
+		
+		JScrollPane scrollPane = new JScrollPane(outputArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		outputPanel.add(scrollPane);
+		AirportPanel.controlPanelDesign();
+		
 		outputPanelAndLabel.add(outputLabelPanel, BorderLayout.NORTH);
 		outputPanelAndLabel.add(outputPanel, BorderLayout.CENTER);
 

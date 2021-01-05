@@ -12,6 +12,7 @@ public class Airplane {
 	int y_shadow;
 	int degree;
 	String type;
+	String color;
 	boolean ground;
 	int line;
 	boolean EnterLandingOrTakeoof;
@@ -22,11 +23,26 @@ public class Airplane {
 		this.y = y;
 		this.degree = degree; // the position of the plane in the airport usually 0- take off and 180- for landing  
 		this.type = type;
+		this.color = colorByType(type);
 		this.line = line;
 		this.ground = ground;
 		this.x_shadow=x; // the x and y value of the plane shadow
 		this.y_shadow=y;
 		this.EnterLandingOrTakeoof =false; //when a plane is about to perform take off or landing the value will be true
+	}
+	
+	public String colorByType(String type) {
+		String color;
+		if(type.equals("CARGO")) {
+			color = "brown";
+		}
+		else if(type.equals("PRIVATE")) {
+			color = "blue";
+		}
+		else {
+			color = "white";
+		}
+		return color;
 	}
 	
 	public void setPlaneToFirstRunway() {
