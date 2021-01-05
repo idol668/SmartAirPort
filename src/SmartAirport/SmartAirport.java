@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
@@ -65,7 +66,7 @@ public class SmartAirport extends JPanel {
 	static String scenario = "none";
 	static int scenarioCounter = -1;
 	static Map<String, String> envMoves = new HashMap<>();
-	static JTextArea outputArea = new JTextArea("Here will be the output for scenarios and events \n", 0, 20);
+	static JTextArea outputArea = new JTextArea("", 10, 27);
 	
 	static boolean run = true;
 	static boolean finished = false;
@@ -218,7 +219,11 @@ public class SmartAirport extends JPanel {
 		// This function moves the planes from the take off waiting area to the correct take off lane
 		animateGetToTakeOffSpot(runwaysTakeOff, planes);
 		for (int j = 0; j < 55; j++) {
+			int takeOffPlaneSpeed=20;
+			int takeOffPlaneSpeedY=1;
+
 			int landinShadowgPlaneSpeed =18;
+			int planeSpeedY=1;
 			int landinPlaneSpeed =20;
 			for (int i = 0; i < 2; i++) {
 
@@ -227,7 +232,7 @@ public class SmartAirport extends JPanel {
 						landingPlaneExists[i].x_shadow += landinShadowgPlaneSpeed;
 						landingPlaneExists[i].x += landinPlaneSpeed;
 						if (j>15 && j<21){
-							landingPlaneExists[i].y -=1; 
+							landingPlaneExists[i].y -=planeSpeedY; 
 						}	
 					}
 
@@ -241,19 +246,22 @@ public class SmartAirport extends JPanel {
 						} else {
 							if (j > 33 && j < 40) {
 								if (landingPlaneExists[i].y > 165 && landingPlaneExists[i].y < 400) {
-									landingPlaneExists[i].y -= 1;
+									landingPlaneExists[i].y -= planeSpeedY;
 								}
 								if (landingPlaneExists[i].y > 400 && landingPlaneExists[i].y < 500) {
-									landingPlaneExists[i].y += 2;
+									planeSpeedY=2;
+									landingPlaneExists[i].y += planeSpeedY;
 								}
 								landinPlaneSpeed=15;
 								landingPlaneExists[i].x += landinPlaneSpeed;
 							} else {
 								if (landingPlaneExists[i].y > 165 && landingPlaneExists[i].y < 400) {
-									landingPlaneExists[i].y -= 1;
+									planeSpeedY=1;
+									landingPlaneExists[i].y -= planeSpeedY;
 								}
 								if (landingPlaneExists[i].y > 400 && landingPlaneExists[i].y < 500) {
-									landingPlaneExists[i].y += 1;
+									planeSpeedY=2;
+									landingPlaneExists[i].y += planeSpeedY;
 								}
 								landinPlaneSpeed=10;
 								landingPlaneExists[i].x += landinPlaneSpeed;
@@ -272,9 +280,9 @@ public class SmartAirport extends JPanel {
 				if (takeoffPlaneExists[i] != null && takeoffPlaneExists[i].EnterLandingOrTakeoof & j >= 20) {
 					if (j<29)
 					{
-						takeoffPlaneExists[i].x -= 20;
-						takeoffPlaneExists[i].x_shadow = (int) Math.round(takeoffPlaneExists[i].x_shadow - 20);
-						takeoffPlaneExists[i].y_shadow = (int) Math.round(takeoffPlaneExists[i].y_shadow - 1);
+						takeoffPlaneExists[i].x -= takeOffPlaneSpeed;
+						takeoffPlaneExists[i].x_shadow = (int) Math.round(takeoffPlaneExists[i].x_shadow - takeOffPlaneSpeed);
+						takeoffPlaneExists[i].y_shadow = (int) Math.round(takeoffPlaneExists[i].y_shadow - takeOffPlaneSpeedY);
 					}
 					
 					if (j == 29) {
@@ -283,28 +291,33 @@ public class SmartAirport extends JPanel {
 					if (j>29)
 					{
 						if (takeoffPlaneExists[i].y > 500 && takeoffPlaneExists[i].y < 650) {
-							takeoffPlaneExists[i].y_shadow += 3;
-							takeoffPlaneExists[i].y+=3; 
+							takeOffPlaneSpeedY=3;
+							takeoffPlaneExists[i].y_shadow += takeOffPlaneSpeedY;
+							takeoffPlaneExists[i].y+=takeOffPlaneSpeedY; 
 
 						}
 						if (takeoffPlaneExists[i].y > 230 && takeoffPlaneExists[i].y < 330) {
-							takeoffPlaneExists[i].y_shadow += 1;
-							takeoffPlaneExists[i].y+=1; 
+							takeOffPlaneSpeedY=1;
+							takeoffPlaneExists[i].y_shadow += takeOffPlaneSpeedY;
+							takeoffPlaneExists[i].y+=takeOffPlaneSpeedY; 
 							
 						}
 						if (takeoffPlaneExists[i].y > 400 && takeoffPlaneExists[i].y < 500) {
-							takeoffPlaneExists[i].y_shadow = (int) Math.round(takeoffPlaneExists[i].y_shadow -2);
-							takeoffPlaneExists[i].y= (int) Math.round(takeoffPlaneExists[i].y -2);
+							takeOffPlaneSpeedY=2;
+							takeoffPlaneExists[i].y_shadow = (int) Math.round(takeoffPlaneExists[i].y_shadow -takeOffPlaneSpeedY);
+							takeoffPlaneExists[i].y= (int) Math.round(takeoffPlaneExists[i].y -takeOffPlaneSpeedY);
 							
 						}
 						else
 						{
-							takeoffPlaneExists[i].y_shadow = (int) Math.round(takeoffPlaneExists[i].y_shadow -1);
-							takeoffPlaneExists[i].y= (int) Math.round(takeoffPlaneExists[i].y -1);
+							takeOffPlaneSpeedY=1;
+							takeoffPlaneExists[i].y_shadow = (int) Math.round(takeoffPlaneExists[i].y_shadow -takeOffPlaneSpeedY);
+							takeoffPlaneExists[i].y= (int) Math.round(takeoffPlaneExists[i].y -takeOffPlaneSpeedY);
 
 						}
-						takeoffPlaneExists[i].x -=23;
-						takeoffPlaneExists[i].x_shadow = (int) Math.round(takeoffPlaneExists[i].x_shadow - 23);
+						takeOffPlaneSpeed=23;
+						takeoffPlaneExists[i].x -=takeOffPlaneSpeed;
+						takeoffPlaneExists[i].x_shadow = (int) Math.round(takeoffPlaneExists[i].x_shadow - takeOffPlaneSpeed);
 					}
 					
 				}
@@ -613,20 +626,26 @@ public class SmartAirport extends JPanel {
 	
 	// This function draws the oil on the lane when we are in slippery runway sitatuion 
 		private void drawOil(Graphics g, int i) {
-			if (i == 0) {
-				g.drawImage(AirportImages.oilAndDirt, 320, 175, this);
+			int lane_number =0;
+			int oilY=175;
+			int oilX =320;
+			if (i == lane_number) {
+				g.drawImage(AirportImages.oilAndDirt, oilX, oilY, this);
 			}
-
-			if (i == 1) {
-				g.drawImage(AirportImages.oilAndDirt, 320, 275, this);
+			lane_number+=1;
+			oilY+=100;
+			if (i == lane_number) {
+				g.drawImage(AirportImages.oilAndDirt, oilX, oilY, this);
 			}
-
-			if (i == 2) {
-				g.drawImage(AirportImages.oilAndDirt, 320, 475, this);// 1
+			lane_number+=1;
+			oilY=475;
+			if (i == lane_number) {
+				g.drawImage(AirportImages.oilAndDirt, oilX, oilY, this);// 1
 			}
-
-			if (i == 3) {
-				g.drawImage(AirportImages.oilAndDirt, 320, 575, this);// 1
+			lane_number+=1;
+			oilY+=100;
+			if (i == lane_number) {
+				g.drawImage(AirportImages.oilAndDirt, oilX, oilY, this);// 1
 			}
 		}
 	//This function draws the cleaning team that handles the slippery runway situation 
@@ -719,10 +738,13 @@ public class SmartAirport extends JPanel {
 		JPanel outputPanel = new JPanel();
 		JPanel outputLabelPanel = new JPanel();
 
-		JLabel outputLabel = new JLabel("<html><span style='font-size:14px'>Output</span></html>");
-
+		JLabel outputLabel = new JLabel("<html><span style='font-size:14px'>Control Tower Board</span></html>");
 		outputLabelPanel.add(outputLabel);
-		outputPanel.add(outputArea);
+		
+		JScrollPane scrollPane = new JScrollPane(outputArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		outputPanel.add(scrollPane);
+		AirportPanel.controlPanelDesign();
+		
 		outputPanelAndLabel.add(outputLabelPanel, BorderLayout.NORTH);
 		outputPanelAndLabel.add(outputPanel, BorderLayout.CENTER);
 
@@ -775,6 +797,7 @@ public class SmartAirport extends JPanel {
 				runwayToPlane.put(planes[i], runway[i]);
 			}
 		}
+		int planeSpeedY=10;
 		for (Airplane plane : runwayToPlane.keySet()) {
 			for (int j = 0; j < 16; j++) {
 				int runwayPlane = runwayToPlane.get(plane);
@@ -785,23 +808,26 @@ public class SmartAirport extends JPanel {
 				}
 				if (runwayPlane == 0) {
 					plane.degree = 270;
-					plane.y -= 10;
-					plane.y_shadow -= 10;
+					plane.y -= planeSpeedY;
+					plane.y_shadow -= planeSpeedY;
 				}
 				if (runwayPlane == 1) {
+					planeSpeedY=4;
 					plane.degree = 270;
-					plane.y -= 4;
-					plane.y_shadow -= 4;
+					plane.y -= planeSpeedY;
+					plane.y_shadow -= planeSpeedY;
 				}
 				if (runwayPlane == 2) {
+					planeSpeedY=4;
 					plane.degree = 90;
-					plane.y += 4;
-					plane.y_shadow += 4;
+					plane.y += planeSpeedY;
+					plane.y_shadow += planeSpeedY;
 				}
 				if (runwayPlane == 3) {
+					planeSpeedY=11;
 					plane.degree = 90;
-					plane.y += 11;
-					plane.y_shadow += 11;
+					plane.y += planeSpeedY;
+					plane.y_shadow += planeSpeedY;
 				}
 
 				repaint();

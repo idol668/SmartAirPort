@@ -77,9 +77,16 @@ asm consistentAssertionMechProblem  {Int(0..(N-1)) i}:
 	G consistentAssertionStillNotRepaired(takeoffAircrafts[i],mechanicalProblem[i],repairTruck[i]);
 	
 // Asm 4 - If repair truck comes to fix a plane in the next state of the controller the mechanical problem disappear 
+// Also mechanical problem can't occur on a none object
 asm RepairedAircraft {Int(0..(N-1)) i}:
 	G (repairTruck[i] -> next(!mechanicalProblem[i]));
 	
+asm NoneObjectCantHaveMechProblem {Int(0..(N-1)) i}:
+	G next (!(mechanicalProblem[i] & takeoffAircrafts[i] = NONE ));
+	
+asm NoneObjectCantHaveMechProblemBegin {Int(0..(N-1)) i}:
+	 (!(mechanicalProblem[i] & takeoffAircrafts[i] = NONE ));
+		
 // Gar 3- The system shouldn't send repair team to a none object
 gar RepairTruckIfAircraftExited {Int(0..(N-1)) i}:
 	G (next(takeoffAircrafts[i] = NONE) -> next(!repairTruck[i]));
@@ -89,13 +96,15 @@ gar RepairTruckIfAircraftExistdBegining{Int(0..(N-1)) i}:
 	((takeoffAircrafts[i] = NONE) -> (!repairTruck[i]));
 	
 // Gar 4 - Repair team should be send only if mechanical problem exists, we used trigger to describe behavior that  should never happen
+/* Note : we decided not to use triggers to duplication of code, since triggers still can't use the
+ * Int (0..(doubleN-1)) i syntax, hence you can see the gar down below written in a different way 
 gar  trig [true]*([!mechanicalProblem[0] & repairTruck[0]]) |=> false;
-gar  trig [true]*([!mechanicalProblem[1] & repairTruck[1]]) |=> false;
+gar  trig [true]*([!mechanicalProblem[1] & repairTruck[1]]) |=> false;*/
 
 
 // Gar 4 - Repair team should be send only if mechanical problem exists,another version without triggers and with parametric approach 	
-//gar repairTruckOnlyIfBroken {Int(0..(N-1)) i}:
-	//G (next(!mechanicalProblem[i]) -> next(!repairTruck[i]));
+gar repairTruckOnlyIfBroken {Int(0..(N-1)) i}:
+	G (next(!mechanicalProblem[i]) -> next(!repairTruck[i]));
 
 // For the completeness of the controller we added this gar for the beginning state of the controller 
 gar repairTruckOnlyIfBrokenBegin {Int(0..(N-1)) i}:
@@ -129,15 +138,18 @@ asm consistentAssertionSlippery {Int (0..(doubleN-1)) i}:
 asm cleanRunway {Int (0..(doubleN-1)) i}:
 	G (cleanTruck[i]->next(!slipperyRunway[i]));
 	
-//// Gar  7 - Clean team won't be send to a not slippery runway, we used triggers to describe a behavior that shouldn't happen 
-gar  trig [true]*([!slipperyRunway[0] & cleanTruck[0]]) |=> false;
+//// Gar  7 - Clean team won't be send to a not slippery runway, we used triggers to describe a behavior that shouldn't happen
+/*
+ * Note : we decided not to use triggers to duplication of code, since triggers still can't use the
+ * Int (0..(doubleN-1)) i syntax, hence you can see the gar down below written in a different way
+gar N trig [true]*([!slipperyRunway[0] & cleanTruck[0]]) |=> false;
 gar  trig [true]*([!slipperyRunway[1] & cleanTruck[1]]) |=> false;
 gar  trig [true]*([!slipperyRunway[2] & cleanTruck[2]]) |=> false;
-gar  trig [true]*([!slipperyRunway[3] & cleanTruck[3]]) |=> false;
+gar  trig [true]*([!slipperyRunway[3] & cleanTruck[3]]) |=> false;*/ 
 
 // Gar  7 - Clean team won't be send to a not slippery runway- with a more parametric approach
-//gar cleanTruckOnlyIfSlippry {Int (0..(doubleN-1)) i}:
-	//G (next(!slipperyRunway[i]) -> next(!cleanTruck[i]));
+gar cleanTruckOnlyIfSlippry {Int (0..(doubleN-1)) i}:
+	G (next(!slipperyRunway[i]) -> next(!cleanTruck[i]));
 
 // For the completeness of the controller we added this gar for the beginning state of the controller 		
 gar cleanTruckOnlyIfSlippryBegin {Int (0..(doubleN-1)) i}:
