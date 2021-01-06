@@ -58,7 +58,7 @@ public class AirportImages {
 	// This function sets all the images to their respective values
 	public static void initialFields() throws IOException {
 		//airport = ImageIO.read(new File("img/airport.png"));
-		airport = ImageIO.read(new File("img/airport_v4_white.png"));
+		airport = ImageIO.read(new File("img/airport_v4_white_with_mda.png"));
 		commercialplane_0 = ImageIO.read(new File("img/commercialplane_0.png"));
 		privateplane_0 = ImageIO.read(new File("img/privateplane_blue_0.png"));
 		cargoplane_0 = ImageIO.read(new File("img/cargoplane_0.png"));

@@ -805,7 +805,7 @@ public class SmartAirport extends JPanel {
 		JFrame SmartAirport = new JFrame("Airprot Simulator");
 		SmartAirport smartAirport = new SmartAirport();
 		SmartAirport.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		SmartAirport.setSize(1150, 800);
+		SmartAirport.setSize(1150, 850);
 		SmartAirport.setContentPane(createMainPanel(smartAirport));
 		SmartAirport.setVisible(true);
 	}
