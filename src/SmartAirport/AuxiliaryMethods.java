@@ -138,6 +138,13 @@ public class AuxiliaryMethods {
 	public static String getCleanTruckString(int i) {
 		return (String.format("cleanTruck[%d]", i));
 	}
+	
+	/*
+	 * This function finds a key from the mapValues and returns the converted boolean value.
+	 */
+	public static boolean getBooleanValueFromMap(Map<String, String> mapValues, String key) {
+		return mapValues.get(key).equals("true") ? true : false;
+	}
 
 	/*
 	 *  This function sets the planes in their respective waiting area using by changing its x and y values
@@ -198,7 +205,6 @@ public class AuxiliaryMethods {
 	 * We update the environment values according to the guarantees we defined in the specification 
 	 */
 	public static void updateInputs(Map<String, String> inputs, Map<String, String> sysValues) {
-		
 		// take off and landing planes - we update their state hence if they did perform take off or landing
 		// if they didn't perform the landing or takeoff we will tell the controller that they are still waiting for the permission 
 		for (int i = 0; i < SmartAirport.takeoffPlaneExists.length; i++) {
@@ -227,7 +233,7 @@ public class AuxiliaryMethods {
 			} else {
 				if ((SmartAirport.takeoffPlaneExists[i]==null)) {
 					inputs.put(getMechanicalProblemString(i), String.valueOf(false));
-				}else {
+				} else {
 					ScenarioFunctions.setInput(inputs, getMechanicalProblemString(i), SmartAirport.scenario);
 				}
 			}
@@ -243,48 +249,54 @@ public class AuxiliaryMethods {
 			}
 		}
 		// emergency Landing
-		boolean rescueArrived0 = sysValues.get("rescueTeam[0]").equals("true");
-		boolean rescueArrived1 = sysValues.get("rescueTeam[1]").equals("true");
-		boolean isntLanding0 = inputs.get("landingAircrafts[0]").equals("NONE");
-		boolean isntLanding1 = inputs.get("landingAircrafts[1]").equals("NONE");
-
-		if (isntLanding0 || isntLanding1) {
-			if (isntLanding0 && isntLanding1) {
-				inputs.put("emergencyLanding[0]", String.valueOf(false));
-				inputs.put("emergencyLanding[1]", String.valueOf(false));
-			} else if (isntLanding0) {
-				inputs.put("emergencyLanding[0]", String.valueOf(false));
-				if ( (rescueArrived0 && SmartAirport.emergencyLanding[0])  || (rescueArrived1 && SmartAirport.emergencyLanding[1] )) {
-					inputs.put("emergencyLanding[1]", String.valueOf(false));
-				} else if (SmartAirport.emergencyLanding[1] && !rescueArrived1) {
-					inputs.put("emergencyLanding[1]", String.valueOf(true));
-				} else {
-					ScenarioFunctions.setInput(inputs, "emergencyLanding[1]", SmartAirport.scenario);
+		boolean[] rescueArrived = new boolean[2];
+		for(int i = 0; i < 2; i++) {
+			rescueArrived[i]= sysValues.get(getRescueTeamString(i)).equals("true");
+		}
+		boolean[] isnotLanding = new boolean[2];
+		for(int i = 0; i < 2; i++) {
+			isnotLanding[i]= inputs.get(getLandingString(i)).equals("NONE");
+		}
+		if (isnotLanding[0] || isnotLanding[1]) {
+			if (isnotLanding[0] && isnotLanding[1]) {
+				for(int i = 0; i < 2; i++) {
+					inputs.put(getEmergencyLandingString(i),String.valueOf(false));
 				}
-			} else if (isntLanding1) {
-				inputs.put("emergencyLanding[1]", String.valueOf(false));
-				if ( (rescueArrived0 && SmartAirport.emergencyLanding[0])  || (rescueArrived1 && SmartAirport.emergencyLanding[1] )) {
-					inputs.put("emergencyLanding[0]", String.valueOf(false));
-				} else if (SmartAirport.emergencyLanding[0] && !rescueArrived0) {
-					inputs.put("emergencyLanding[0]", String.valueOf(true));
-				} else {
-					ScenarioFunctions.setInput(inputs, "emergencyLanding[0]", SmartAirport.scenario);
+			} else { // Only on one of the platforms is there plane waiting to land.
+				for(int i = 0; i < 2; i++) {
+					if(isnotLanding[i]) {
+						inputs.put(getEmergencyLandingString(i), String.valueOf(false));
+						if ((rescueArrived[0] && SmartAirport.emergencyLanding[0])||(rescueArrived[1] && SmartAirport.emergencyLanding[1])) {
+							inputs.put(getEmergencyLandingString(1-i), String.valueOf(false));
+						}
+						// if there already have an emergency landing on this platform, and the rescue team not arrived yet
+						else if (SmartAirport.emergencyLanding[1-i] && !rescueArrived[1-i]) {
+							inputs.put(getEmergencyLandingString(1-i), String.valueOf(true));
+						}
+						else {
+							ScenarioFunctions.setInput(inputs, getEmergencyLandingString(1-i), SmartAirport.scenario);
+						}
+					}
 				}
 			}
 		} else {
-			if ((rescueArrived0 && SmartAirport.emergencyLanding[0])
-					|| (rescueArrived1 && SmartAirport.emergencyLanding[1])) {
-				inputs.put("emergencyLanding[0]", String.valueOf(false));
-				inputs.put("emergencyLanding[1]", String.valueOf(false));
-			} else if (SmartAirport.emergencyLanding[0] && !rescueArrived0) {
-				inputs.put("emergencyLanding[0]", String.valueOf(true));
-				inputs.put("emergencyLanding[1]", String.valueOf(false));
-			} else if (SmartAirport.emergencyLanding[1] && !rescueArrived1) {
-				inputs.put("emergencyLanding[0]", String.valueOf(false));
-				inputs.put("emergencyLanding[1]", String.valueOf(true));
-			} else {
-				ScenarioFunctions.setEmergencyLandingInputs(inputs, SmartAirport.scenario);
+			// if emergency landing happens on one of the platform and rescue team arrives
+			if ((rescueArrived[0] && SmartAirport.emergencyLanding[0]) || (rescueArrived[1] && SmartAirport.emergencyLanding[1])) {
+				for(int i = 0; i < 2; i++) {
+					inputs.put(getEmergencyLandingString(i),String.valueOf(false));
+				}
+			}// else if emergency landing happens on one of the platform and rescue team not arrives yet
+			else if((SmartAirport.emergencyLanding[0] && !rescueArrived[0]) || (SmartAirport.emergencyLanding[1] && !rescueArrived[1])){
+				for(int i = 0; i < 2; i++) {
+					if(SmartAirport.emergencyLanding[i] && !rescueArrived[i]) {
+						inputs.put(getEmergencyLandingString(i), String.valueOf(true));
+						inputs.put(getEmergencyLandingString(1-i), String.valueOf(false));
+					}
+				}
 			}
+			else {
+				ScenarioFunctions.setEmergencyLandingInputs(inputs, SmartAirport.scenario);
+			}		
 		}
 		if (SmartAirport.scenarioCounter > -1) {
 			SmartAirport.scenarioCounter--;
@@ -370,8 +382,10 @@ public class AuxiliaryMethods {
 	}
 	
 
-	// This function is used to for the initial run in our simulator and in some of the scenarios 
-	// This function gets a random plane type 
+	/*
+	 * Purpose : gets a random plane type.
+	 * This function uses for the initial run in our simulator
+	 */
 	public static String acquireRandomPlane(boolean onlyAirCraft) {
 		String planeType = "";
 		Random rd = new Random();
@@ -393,14 +407,14 @@ public class AuxiliaryMethods {
 		return planeType;
 	}
 
-	
-	// This function is used in order to get the environment inputs from the controller
-	// This inputs are used to correctly draw the state of the airport
-	public static void getEnvInputs(ControllerExecutor executor)
-	{
+	/*
+	 * This function is used in order to get the environment inputs from the controller
+	 * This inputs are used to correctly draw the state of the airport
+	 */
+	public static void getEnvInputs(ControllerExecutor executor){
 		Map<String, String> envValues = executor.getCurrInputs();
 		for (int i = 0; i < 4; i++) {
-			SmartAirport.slipperyRunway[i] = envValues.get( getSlipperyString(i)).equals("true") ? true : false;
+			SmartAirport.slipperyRunway[i] = getBooleanValueFromMap(envValues, getSlipperyString(i));
 			if (SmartAirport.slipperyRunway[i]) {
 				SmartAirport.stillCleaning[i] = true;
 			} else {
@@ -408,36 +422,34 @@ public class AuxiliaryMethods {
 			}
 		}
 		for (int i = 0; i < 2; i++) {
-			SmartAirport.mechanicalProblem[i] = envValues.get(getMechanicalProblemString(i)).equals("true") ? true : false;
-			SmartAirport.emergencyLanding[i] = envValues.get(getEmergencyLandingString(i)).equals("true") ? true : false;		
+			SmartAirport.mechanicalProblem[i] = getBooleanValueFromMap(envValues, getMechanicalProblemString(i));
+			SmartAirport.emergencyLanding[i] = getBooleanValueFromMap(envValues, getEmergencyLandingString(i));	
 		}
 	}
 	
-	// This function is used in order to get the system inputs from the controller
-	// This inputs are used to correctly draw the state of the airport
-	public static void getSysInputs(ControllerExecutor executor)
-	{
+	/*
+	 * This function is used in order to get the system inputs from the controller.
+	 * This inputs are used to correctly draw the state of the airport
+	 */
+	public static void getSysInputs(ControllerExecutor executor){
 		Map<String, String> sysValues = executor.getCurrOutputs();
-		String key = "";
 		for (int i = 0; i < 4; i++) {
-			key = String.format("takeoffAllowed[%d]", i);
-			SmartAirport.takeoffAllowed[i] = sysValues.get(key).equals("true") ? true : false;
-			key = String.format("landingAllowed[%d]", i);
-			SmartAirport.landingAllowed[i] = sysValues.get(key).equals("true") ? true : false;
-			key = String.format("cleanTruck[%d]", i);
-			SmartAirport.cleaningSensors[i] = sysValues.get(key).equals("true") ? true : false;
+			SmartAirport.takeoffAllowed[i]  = getBooleanValueFromMap(sysValues, getTakeOffAllowedString(i));
+			SmartAirport.landingAllowed[i]  = getBooleanValueFromMap(sysValues, getLandingAllowedString(i));
+			SmartAirport.cleaningSensors[i] = getBooleanValueFromMap(sysValues, getCleanTruckString(i));
 		}
-		
 		for (int i = 0; i < 2; i++) {
-			key = String.format("repairTruck[%d]", i);
-			if (sysValues.get(key).equals("true")) {
-				SmartAirport.repairTruck[i] = new RepairTruck(720, 600, i, AirportImages.repairtruck_up);
+			if (sysValues.get(getRepairTruckString(i)).equals("true")) {
+				int repairtruck_entrance_pos_x = 720;
+				int repairtruck_entrance_pos_y = 600;
+				SmartAirport.repairTruck[i] = new RepairTruck(repairtruck_entrance_pos_x, repairtruck_entrance_pos_y, i, AirportImages.repairtruck_up);
 			} else {
 				SmartAirport.repairTruck[i] = null;
 			}
-			key = String.format("rescueTeam[%d]", i);
-			if (sysValues.get(key).equals("true")) {
-				SmartAirport.rescueTeams[i] = new RescueTeam(320, 650, i, AirportImages.rescueteam_up, AirportImages.flashlight);
+			if (sysValues.get(getRescueTeamString(i)).equals("true")) {
+				int rescue_entrance_pos_x = 325;
+				int rescue_entrance_pos_y = 660;
+				SmartAirport.rescueTeams[i] = new RescueTeam(rescue_entrance_pos_x, rescue_entrance_pos_y, i, AirportImages.rescueteam_up, AirportImages.flashlight);
 			} else {
 				SmartAirport.rescueTeams[i] = null;
 			}
@@ -471,7 +483,7 @@ public class AuxiliaryMethods {
 	public static void createCleaningCars(int runwayLine, boolean isCleaningSensorsOn) {
 		if(isCleaningSensorsOn) {
 			// the x position of the cleaning truck and the oil is permanent in all runway lines
-			int cleantruck_x_pos = 10;
+			int cleantruck_x_pos = -55;
 			int oil_x_pos 		 = 450;
 			// the x position of the cleaning truck and the oil changed according to runway line
 			int cleantruck_y_pos;

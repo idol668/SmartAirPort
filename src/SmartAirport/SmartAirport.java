@@ -37,14 +37,14 @@ public class SmartAirport extends JPanel {
 	//****************************************************//
 	
 	// Landing & take off
-	static boolean[] aircraftForLanding = new boolean[2];
-	static boolean[] aircraftForTakeoff = new boolean[2];
-	static boolean[] takeoffAllowed = new boolean[4];
-	static boolean[] landingAllowed = new boolean[4];
+	static boolean[] aircraftForLanding  = new boolean[2];
+	static boolean[] aircraftForTakeoff  = new boolean[2];
+	static boolean[] takeoffAllowed      = new boolean[4];
+	static boolean[] landingAllowed      = new boolean[4];
 	static Airplane[] takeoffPlaneExists = new Airplane[2];
 	static Airplane[] landingPlaneExists = new Airplane[2];
-	static int[] runwaysLanding = new int[2];
-	static Airplane[] planesLanding = new Airplane[2];
+	static int[] runwaysLanding          = new int[2];
+	static Airplane[] planesLanding      = new Airplane[2];
 
 	// Emergency Landing
 	static boolean[] emergencyLanding = new boolean[2];
@@ -421,14 +421,25 @@ public class SmartAirport extends JPanel {
 		}
 	}
 	
-	// Animate Emergency Landing Step 3: rescue team returns back to the control tower and plane drive to the arrival spot.
+	// Animate Emergency Landing Step 3: rescue team returns back to the MDA building and plane drive to the arrival spot.
 	public void animateEmergencyLandingOverStage(int i) {
+		int rescue_team_turn               = 10;
 		int rescue_team_speed              = 12;
 		int plane_driving_speed            = 12;
 		int rescue_team_out_of_sight_y_pos = 660;
 		int plane_out_of_sight_x_pos       = 800;
 		boolean landingPlaneOutOfSight     = false;
-		rescueTeams[i].rescueteamImage = AirportImages.rescueteam_down;		
+		
+		//rescue team turn back to the MDA building.
+		rescueTeams[i].rescueteamImage = AirportImages.rescueteam_down;	
+		rescueTeams[i].x += rescue_team_turn;
+		repaint();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		while(rescueTeams[i] != null || !landingPlaneOutOfSight) {
 			if(landingPlaneExists[i]!=null) {
 				if(landingPlaneExists[i].x < plane_out_of_sight_x_pos) {

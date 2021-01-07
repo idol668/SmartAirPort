@@ -124,28 +124,23 @@ public class SecondaryAnimation {
 		for (int i = 0; i < 4; i++) {
 			if (slipperyRunway[i]) {
 				if (cleaningSensors[i]) {
-					if (timeToRemoveDirtOrTruck < 20) {
-						
+					if (timeToRemoveDirtOrTruck < 25) {						
 						cleaningCars[i].x = cleaningCars[i].x + cleaningCarSpeedX;
-
 					}
-					if (timeToRemoveDirtOrTruck > 20 & timeToRemoveDirtOrTruck < 27) {
+					if (timeToRemoveDirtOrTruck > 25 & timeToRemoveDirtOrTruck < 32) {
 						stillCleaning[i] = false;
 						cleaningCars[i].degree = 90;
 						cleaningCars[i].y = cleaningCars[i].y + cleaningCarSpeedY;
 					}
 
-					if (timeToRemoveDirtOrTruck > 27) {
+					if (timeToRemoveDirtOrTruck > 32) {
 						cleaningCars[i].degree = 0;
 						cleaningCars[i].x = cleaningCars[i].x - cleaningCarSpeedX;
 						if (timeToRemoveDirtOrTruck == 54) {
 							cleaningCars[i] = null;
 						}
-
 					}
-
 				}
-
 			}
 		}
 	}
