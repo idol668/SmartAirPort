@@ -119,21 +119,21 @@ public class SecondaryAnimation {
 
 	/*This Function will simulate the dirty runway functionality that was described in the specification */
 	public void animatedCleanTruck(int timeToRemoveDirtOrTruck) {
-		int cleaningCarSpeedX=15;
+		int cleaningCarSpeedX=17;
 		int cleaningCarSpeedY=2;
 		for (int i = 0; i < 4; i++) {
 			if (slipperyRunway[i]) {
 				if (cleaningSensors[i]) {
-					if (timeToRemoveDirtOrTruck < 25) {						
+					if (timeToRemoveDirtOrTruck < 23) {						
 						cleaningCars[i].x = cleaningCars[i].x + cleaningCarSpeedX;
 					}
-					if (timeToRemoveDirtOrTruck > 25 & timeToRemoveDirtOrTruck < 32) {
+					if (timeToRemoveDirtOrTruck > 23 & timeToRemoveDirtOrTruck < 30) {
 						stillCleaning[i] = false;
 						cleaningCars[i].degree = 90;
 						cleaningCars[i].y = cleaningCars[i].y + cleaningCarSpeedY;
 					}
 
-					if (timeToRemoveDirtOrTruck > 32) {
+					if (timeToRemoveDirtOrTruck > 30) {
 						cleaningCars[i].degree = 0;
 						cleaningCars[i].x = cleaningCars[i].x - cleaningCarSpeedX;
 						if (timeToRemoveDirtOrTruck == 54) {

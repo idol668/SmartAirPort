@@ -8,6 +8,7 @@ import java.util.Random;
 //****************************************************************************************
 
 public class ScenarioFunctions {
+	
 	/*
 	 * This function is used to describe the state of our simulator
 	 * If the simulator is on manual or automatic state we will give it the value none

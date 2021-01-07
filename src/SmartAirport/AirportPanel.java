@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 
 //****************************************************************************************
@@ -31,6 +32,49 @@ public class AirportPanel {
 	static Boolean AddtakeoffSecondPosition = false;
 
 	public AirportPanel() throws IOException {
+	}
+	
+	//This functions creates all the basic elements of the panel that is user in our simulator 
+	public static JPanel createControlPanel(SmartAirport smartAirport) {
+		JPanel controlPanel = new JPanel(new BorderLayout());
+		JPanel controlPanelHeadAndEvents = new JPanel(new BorderLayout());
+		JPanel controlPanelEvents = new JPanel(new BorderLayout());
+		JPanel controlPanelScenarionsAndOutput = new JPanel(new BorderLayout());
+		JPanel outputPanelAndLabel = new JPanel(new BorderLayout());
+		JPanel headPanel = AirportPanel.createHeadLinePanel();
+		JPanel eventsPanel = AirportPanel.createEventsPanel(smartAirport);
+		JPanel scenariosPanel = AirportPanel.createScenariosPanel(smartAirport);
+		JPanel dirtyRunway = AirportPanel.createDirtyRunwayPanel(smartAirport);
+		JPanel EmergencyPanel = AirportPanel.createEmergencyLandingPanel(smartAirport);
+		JPanel MechanicalPanel = AirportPanel.createMechanicalProblemPanel(smartAirport);
+		JPanel outputPanel = new JPanel();
+		JPanel outputLabelPanel = new JPanel();
+
+		JLabel outputLabel = new JLabel("<html><span style='font-size:14px'>Control Tower Board</span></html>");
+		outputLabelPanel.add(outputLabel);
+		
+		JScrollPane scrollPane = new JScrollPane(SmartAirport.outputArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		outputPanel.add(scrollPane);
+		AirportPanel.controlPanelDesign();
+		
+		outputPanelAndLabel.add(outputLabelPanel, BorderLayout.NORTH);
+		outputPanelAndLabel.add(outputPanel, BorderLayout.CENTER);
+
+		controlPanelEvents.add(EmergencyPanel, BorderLayout.NORTH);
+		controlPanelEvents.add(dirtyRunway, BorderLayout.CENTER);
+		controlPanelEvents.add(MechanicalPanel, BorderLayout.SOUTH);
+
+		controlPanelHeadAndEvents.add(headPanel, BorderLayout.NORTH);
+		controlPanelHeadAndEvents.add(eventsPanel, BorderLayout.CENTER);
+		controlPanelHeadAndEvents.add(controlPanelEvents, BorderLayout.SOUTH);
+
+		controlPanelScenarionsAndOutput.add(scenariosPanel, BorderLayout.NORTH);
+		controlPanelScenarionsAndOutput.add(outputPanelAndLabel, BorderLayout.CENTER);
+
+		controlPanel.add(controlPanelHeadAndEvents, BorderLayout.NORTH);
+		controlPanel.add(controlPanelScenarionsAndOutput, BorderLayout.CENTER);
+
+		return controlPanel;
 	}
 
 	// The function execute when the user requests to add aircrafts.
