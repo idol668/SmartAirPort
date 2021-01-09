@@ -1,6 +1,5 @@
 package SmartAirport;
 
-import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.io.IOException;
 import java.util.HashMap;
@@ -9,9 +8,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
@@ -118,7 +115,7 @@ public class SmartAirport extends JPanel {
 					System.out.println("System Values:"+sysValues.toString());
 					System.out.println("Env Values:"+envValues.toString());
 					repaint();
-					animateSetInWaitingTakeOffSpot();
+					animateGetInWaitingPlatform();
 					animateEmergencyLanding();
 					animateLandingAndTakeoff();
 					while (wait) {
@@ -353,7 +350,9 @@ public class SmartAirport extends JPanel {
 			}
 		}
 	}
-	//The Function Sets the planes runways for take off or landing
+	
+	
+	// The Function Sets the planes for take off or landing according to available runway.
 	public void setLandingAndTakeOffRunwaysStep1(SecondaryAnimation secondarySimulator,Airplane[] planesTakeoff,int[] runwaysTakeOff ) {
 		for (int i = 0; i < 2; i++) {
 			if (landingPlaneExists[i] != null && !emergencyLanding[i]) {
@@ -391,6 +390,7 @@ public class SmartAirport extends JPanel {
 			}
 		}
 	}
+	
 	//The function checks if there's any movement that going to occur in the airport 
 	public boolean checkIfMovementInAirportStep2 (boolean planeOrTruckMooving) {	
 		for (int i = 0; i < 2; i++) {
@@ -413,21 +413,45 @@ public class SmartAirport extends JPanel {
 		return planeOrTruckMooving;
 	}
 	
-	// Animate enter of the take off planes
-	public void animateSetInWaitingTakeOffSpot() {
-		int planeSpeed=10;
-		int waitingTakeOffPosition= 650;
+	// Animate the entrance of the take-off and landing planes to the waiting platform
+	public void animateGetInWaitingPlatform() {
+		int planeSpeedDriving = 10;
+		int planeSpeedFlying  = 15;
+		int waitingTakeOffPosition = 650;
+		int waitingLandingPosition = 50;
 		for (int j=0;j<2;j++) {
-			if(takeoffPlaneExists[j]!=null) {
-				while(takeoffPlaneExists[j].x > waitingTakeOffPosition){
-					takeoffPlaneExists[j].x-=planeSpeed;
-					takeoffPlaneExists[j].x_shadow-=planeSpeed;
-					repaint();
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+			boolean planeArrivedToTakeoffPlatform = false;
+			boolean planeArrivedToLandingPlatform = false;
+			while(!planeArrivedToTakeoffPlatform || !planeArrivedToLandingPlatform) {
+				if(takeoffPlaneExists[j]!=null) {
+					if(takeoffPlaneExists[j].x > waitingTakeOffPosition){
+						takeoffPlaneExists[j].x-=planeSpeedDriving;
+						takeoffPlaneExists[j].x_shadow-=planeSpeedDriving;
 					}
+					else {
+						planeArrivedToTakeoffPlatform = true;
+					}
+				}
+				else {
+					planeArrivedToTakeoffPlatform = true;
+				}
+				if(landingPlaneExists[j]!=null) {
+					if(landingPlaneExists[j].x < waitingLandingPosition) {
+						landingPlaneExists[j].x+=planeSpeedFlying;
+						landingPlaneExists[j].x_shadow+=planeSpeedFlying;
+					}
+					else {
+						planeArrivedToLandingPlatform = true;
+					}
+				}
+				else {
+					planeArrivedToLandingPlatform = true;
+				}
+				repaint();
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}		
 		}
@@ -510,6 +534,7 @@ public class SmartAirport extends JPanel {
 				}
 				else {
 					landingPlaneOutOfSight = true;
+					landingPlaneExists[i]=null;
 				}
 			}
 			if(rescueTeams[i]!=null) {
@@ -564,6 +589,109 @@ public class SmartAirport extends JPanel {
 			rescueTeams[i] = null;
 		}
 	}
+	//This function is used to set the planes that are waiting in the take off waiting area to their correct lane 
+		public void animateGetToTakeOffSpot(int[] runway, Airplane[] planes) {
+			Map<Airplane, Boolean> gotToTakeOffSpot = new HashMap<Airplane, Boolean>();
+			Map<Airplane, Integer> runwayToPlane = new HashMap<Airplane, Integer>();
+			for (int i = 0; i < planes.length; i++) {
+				if (planes[i] != null) {
+					gotToTakeOffSpot.put(planes[i], false);
+					runwayToPlane.put(planes[i], runway[i]);
+				}
+			}
+			for (Airplane plane : runwayToPlane.keySet()) {
+				for (int j = 0; j < 16; j++) {
+					int runwayPlane = runwayToPlane.get(plane);
+					int planeSpeedY;
+					if (j == 15) {
+						plane.degree = 0;
+						break;
+					}
+					if (runwayPlane == 0) {
+						planeSpeedY=10;
+						plane.degree = 270;
+						plane.y -= planeSpeedY;
+						plane.y_shadow -= planeSpeedY;
+					}
+					if (runwayPlane == 1) {
+						planeSpeedY=4;
+						plane.degree = 270;
+						plane.y -= planeSpeedY;
+						plane.y_shadow -= planeSpeedY;
+					}
+					if (runwayPlane == 2) {
+						planeSpeedY=4;
+						plane.degree = 90;
+						plane.y += planeSpeedY;
+						plane.y_shadow += planeSpeedY;
+					}
+					if (runwayPlane == 3) {
+						planeSpeedY=11;
+						plane.degree = 90;
+						plane.y += planeSpeedY;
+						plane.y_shadow += planeSpeedY;
+					}
+					repaint();
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		//This function sets the landing planes into there landing lane
+		public void animateGetToLandingSpot(int[] runway, Airplane[] planes) {
+			Map<Airplane, Boolean> gotToTakeOffSpot = new HashMap<Airplane, Boolean>();
+			Map<Airplane, Integer> runwayToPlane = new HashMap<Airplane, Integer>();
+			for (int i = 0; i < planes.length; i++) {
+				if (planes[i] != null) {
+					gotToTakeOffSpot.put(planes[i], false);
+					runwayToPlane.put(planes[i], runway[i]);
+				}
+			}
+			
+			for (Airplane plane : runwayToPlane.keySet()) {
+				for (int j = 0; j < 10; j++) {
+					int planeSpeedY;
+					int runwayPlane = runwayToPlane.get(plane);
+					if (j == 9) {
+						plane.degree = 180;
+						break;
+					}
+					if (runwayPlane == 0) {
+						planeSpeedY=2;
+						plane.degree = 270;
+						plane.y -= planeSpeedY;
+						plane.y_shadow -= planeSpeedY;
+					}
+					if (runwayPlane == 1) {
+						planeSpeedY=7;
+						plane.degree = 90;
+						plane.y += planeSpeedY;
+						plane.y_shadow += planeSpeedY;
+					}
+					if (runwayPlane == 2) {
+						planeSpeedY=3;
+						plane.degree = 270;
+						plane.y -= planeSpeedY;
+						plane.y_shadow -= planeSpeedY;
+					}
+					if (runwayPlane == 3) {
+						planeSpeedY=6;
+						plane.degree = 90;
+						plane.y += planeSpeedY;
+						plane.y_shadow += planeSpeedY;
+					}
+					repaint();
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 
 	//*********************************************************************************************
 	//***                              Drawing Functions                                        ***
@@ -775,26 +903,11 @@ public class SmartAirport extends JPanel {
 		super.paintComponent(g);
 
 		g.drawImage(AirportImages.airport, 0, 0, this);
-
-		if (repairTruck[0] != null) {
-			drawTruck(g, repairTruck[0]);
+		for (int i = 0; i < 2; i++) {
+			if (repairTruck[i] != null) {
+				drawTruck(g, repairTruck[i]);
+			}
 		}
-		if (repairTruck[1] != null) {
-			drawTruck(g, repairTruck[1]);
-		}
-		if (takeoffPlaneExists[0] != null) {
-			drawPlane(g, takeoffPlaneExists[0]);
-		}
-		if (takeoffPlaneExists[1] != null) {
-			drawPlane(g, takeoffPlaneExists[1]);
-		}
-		if (landingPlaneExists[0] != null) {
-			drawPlane(g, landingPlaneExists[0]);
-		}
-		if (landingPlaneExists[1] != null) {
-			drawPlane(g, landingPlaneExists[1]);
-		}
-
 		for (int i = 0; i < 4; i++) {
 			if (slipperyRunway[i] == true) {
 				if (stillCleaning[i]) {
@@ -805,14 +918,20 @@ public class SmartAirport extends JPanel {
 				}
 			}
 		}
-		if (rescueTeams[0] != null) {
-			drawRescueTeam(g, rescueTeams[0]);
-		}
-		if (rescueTeams[1] != null) {
-			drawRescueTeam(g, rescueTeams[1]);
+		for (int i = 0; i < 2; i++) {
+			if (rescueTeams[i] != null) {
+				drawRescueTeam(g, rescueTeams[i]);
+			}
+			if (takeoffPlaneExists[i] != null) {
+				drawPlane(g, takeoffPlaneExists[i]);
+			}
+			if (landingPlaneExists[i] != null) {
+				drawPlane(g, landingPlaneExists[i]);
+			}
 		}
 	}
-//Stimulates the controller in the beginning of the run by getting the planes values 
+	
+	//Stimulates the controller in the beginning of the run by getting the planes values 
 	private void initScene() {
 		Random rand = new Random();
 
@@ -845,106 +964,5 @@ public class SmartAirport extends JPanel {
 	}
 	public void setStartScenario() {
 		startScenario = true;
-	}
-	//This function is used to et the planes that are waiting in the take off waiting area to their correct lane 
-	public void animateGetToTakeOffSpot(int[] runway, Airplane[] planes) {
-		Map<Airplane, Boolean> gotToTakeOffSpot = new HashMap<Airplane, Boolean>();
-		Map<Airplane, Integer> runwayToPlane = new HashMap<Airplane, Integer>();
-		for (int i = 0; i < planes.length; i++) {
-			if (planes[i] != null) {
-				gotToTakeOffSpot.put(planes[i], false);
-				runwayToPlane.put(planes[i], runway[i]);
-			}
-		}
-		int planeSpeedY=10;
-		for (Airplane plane : runwayToPlane.keySet()) {
-			for (int j = 0; j < 16; j++) {
-				int runwayPlane = runwayToPlane.get(plane);
-
-				if (j == 15) {
-					plane.degree = 0;
-					break;
-				}
-				if (runwayPlane == 0) {
-					plane.degree = 270;
-					plane.y -= planeSpeedY;
-					plane.y_shadow -= planeSpeedY;
-				}
-				if (runwayPlane == 1) {
-					planeSpeedY=4;
-					plane.degree = 270;
-					plane.y -= planeSpeedY;
-					plane.y_shadow -= planeSpeedY;
-				}
-				if (runwayPlane == 2) {
-					planeSpeedY=4;
-					plane.degree = 90;
-					plane.y += planeSpeedY;
-					plane.y_shadow += planeSpeedY;
-				}
-				if (runwayPlane == 3) {
-					planeSpeedY=11;
-					plane.degree = 90;
-					plane.y += planeSpeedY;
-					plane.y_shadow += planeSpeedY;
-				}
-				repaint();
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-	//This function sets the landing planes into there landing lane
-	public void animateGetToLandingSpot(int[] runway, Airplane[] planes) {
-		Map<Airplane, Boolean> gotToTakeOffSpot = new HashMap<Airplane, Boolean>();
-		Map<Airplane, Integer> runwayToPlane = new HashMap<Airplane, Integer>();
-		for (int i = 0; i < planes.length; i++) {
-			if (planes[i] != null) {
-				gotToTakeOffSpot.put(planes[i], false);
-				runwayToPlane.put(planes[i], runway[i]);
-			}
-		}
-		int planeSpeedY=2;
-		for (Airplane plane : runwayToPlane.keySet()) {
-			for (int j = 0; j < 10; j++) {
-				int runwayPlane = runwayToPlane.get(plane);
-				if (j == 9) {
-					plane.degree = 180;
-					break;
-				}
-				if (runwayPlane == 0) {
-					plane.degree = 270;
-					plane.y -= planeSpeedY;
-					plane.y_shadow -= planeSpeedY;
-				}
-				if (runwayPlane == 1) {
-					planeSpeedY=7;
-					plane.degree = 90;
-					plane.y += planeSpeedY;
-					plane.y_shadow += planeSpeedY;
-				}
-				if (runwayPlane == 2) {
-					planeSpeedY=3;
-					plane.degree = 270;
-					plane.y -= planeSpeedY;
-					plane.y_shadow -= planeSpeedY;
-				}
-				if (runwayPlane == 3) {
-					planeSpeedY=6;
-					plane.degree = 90;
-					plane.y += planeSpeedY;
-					plane.y_shadow += planeSpeedY;
-				}
-				repaint();
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
 	}
 }

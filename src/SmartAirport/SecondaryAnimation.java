@@ -192,45 +192,33 @@ public class SecondaryAnimation {
 	//It will move the repair truck to the correct spot
 	//The correct spot is determined by the plane's takeoff waiting area
 	public void animateRepairTruck(int loopStep) {
-		int repairTruckSpeedX=10;
-		int repairTruckSpeedY=20;
-		int repairManSpeedY=19;
-		int repairManSpeedX =7;
-		
-		if (loopStep>26)
-		{
-			if (repairTruck[0] != null) {
-				if (repairTruck[0].remove_truck > 2) {
-					repairTruck[0].truckImage = AirportImages.repairtruck_r;
-					repairTruck[0].x = repairTruck[0].x + repairTruckSpeedX;
+		int repairTruckSpeedX = 10;
+		int repairTruckSpeedY = 20;
+		int repairManSpeedY   = 20;
+		int repairManSpeedX   = 7;
+		int plane_waiting_platform_1_y_pos = 290;
+		int plane_waiting_platform_2_y_pos = 400;
+		int plane_waiting_x_pos = 670;
+		int truck_step_to_leave = 2;
+		int[] planeWaitingPosition = {plane_waiting_platform_1_y_pos,plane_waiting_platform_2_y_pos};
+		if (loopStep>26){
+			for(int i=0; i<2;i++) {
+				if (repairTruck[i] != null) {
+					if(repairTruck[i].remove_truck_step > truck_step_to_leave) {
+						repairTruck[i].truckImage = AirportImages.repairtruck_r;
+						repairTruck[i].x+= repairTruckSpeedX;				
+					}
+					if (repairTruck[i].y > planeWaitingPosition[i]) {
+						repairTruck[i].y -= repairTruckSpeedY;
+						repairTruck[i].man_y -= repairManSpeedY;
+					}
+					else if(repairTruck[i].man_x > plane_waiting_x_pos) {
+						repairTruck[i].man_x -= repairManSpeedX;
+						repairTruck[i].remove_truck_step += 1;
+					}
 				}
-				if (repairTruck[0].y > 290) {
-					repairTruck[0].y = repairTruck[0].y - repairTruckSpeedY;
-					repairTruck[0].man_y = repairTruck[0].man_y - repairManSpeedY;
-				} else {
-					repairTruck[0].man_x = repairTruck[0].man_x - repairManSpeedX;
-					repairTruck[0].remove_truck += 1;
-				}
-			}
-			if (repairTruck[1] != null) {
-				if (repairTruck[1].remove_truck > 2) {
-					repairTruck[1].truckImage = AirportImages.repairtruck_r;
-					repairTruck[1].x = repairTruck[1].x + repairTruckSpeedX;
-				}
-				if (repairTruck[1].y > 400) {
-					repairTruckSpeedY=10;
-					repairManSpeedY=10;
-					repairManSpeedX=10;
-					repairTruck[1].y = repairTruck[1].y - repairTruckSpeedY;
-					repairTruck[1].man_y = repairTruck[1].man_y - repairManSpeedY;
-				} else {
-					repairTruck[1].man_x = repairTruck[1].man_x -repairManSpeedX;
-					repairTruck[1].remove_truck += 1;
-				}
-			}
+			}		
 		}
 	}
-		
-	
 	
 }

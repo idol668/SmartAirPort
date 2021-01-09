@@ -152,13 +152,13 @@ public class AuxiliaryMethods {
 	 */
 	public static Airplane putPlanesInWaitingArea(String state, int spotInWaitingArea, String planeType) {
 		int takeoff_pos_x 		= 800; // the x value of the planes that are waiting for take off 
-		int landing_pos_x 		= 50;  // the x value of the planes that are waiting for landing 
+		int landing_pos_x 		=-100;  // the x value of the planes that are waiting for landing 
 		int takeoff_pos_north_y = 300; // the y value of the planes that are waiting for takeoff in north
 		int takeoff_pos_south_y = 390; // the y value of the planes that are waiting for for takeoff in south 
 		int landing_pos_north_y = 165; // the y value of the planes that are waiting for landing in north
 		int landing_pos_south_y = 475; // the y value of the planes that are waiting for landing in south
 		int landing_pos_commercial_north_y = 185;
-		int landing_pos_commercial_south_y = 500;
+		int landing_pos_commercial_south_y = 485;
 
 		Airplane plane = null;
 		
@@ -183,17 +183,26 @@ public class AuxiliaryMethods {
 		}
 		if (state.equals("landing")) {
 			if (spotInWaitingArea == 0) {
-				if (planeType.equals("COMMERCIAL")) {
-					plane = new Airplane(landing_pos_x, landing_pos_commercial_north_y, degree_180, planeType, 0, false);
-				} else {
-					plane = new Airplane(landing_pos_x, landing_pos_north_y, degree_180, planeType, 0, false);
+				if(SmartAirport.landingPlaneExists[0]== null) {
+					if (planeType.equals("COMMERCIAL")) {
+						plane = new Airplane(landing_pos_x, landing_pos_commercial_north_y, degree_180, planeType, 0, false);
+					} else {
+						plane = new Airplane(landing_pos_x, landing_pos_north_y, degree_180, planeType, 0, false);
+					}
 				}
-
+				else {
+					plane = SmartAirport.landingPlaneExists[0];
+				}
 			} else {
-				if (planeType.equals("COMMERCIAL")) {
-					plane = new Airplane(landing_pos_x, landing_pos_commercial_south_y, degree_180, planeType, 1, false);
-				} else {
-					plane = new Airplane(landing_pos_x, landing_pos_south_y, degree_180, planeType, 1, false);
+				if(SmartAirport.landingPlaneExists[1]== null) {
+					if (planeType.equals("COMMERCIAL")) {
+						plane = new Airplane(landing_pos_x, landing_pos_commercial_south_y, degree_180, planeType, 1, false);
+					} else {
+						plane = new Airplane(landing_pos_x, landing_pos_south_y, degree_180, planeType, 1, false);
+					}
+				}
+				else {
+					plane = SmartAirport.landingPlaneExists[1];
 				}
 			}
 		}

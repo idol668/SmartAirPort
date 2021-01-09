@@ -11,7 +11,7 @@ public class RepairTruck {
 	int man_x;
 	int man_y;
 	int line;
-	int remove_truck = 0;
+	int remove_truck_step = 0;
 	Image truckImage;
 	
 	
