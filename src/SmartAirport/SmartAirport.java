@@ -376,11 +376,11 @@ public class SmartAirport extends JPanel implements Constants{
 	
 	// Animate Emergency Landing : union all stages of the animation.
 	public void animateEmergencyLanding() {
-		runwaysLanding = new int[2];
-		planesLanding = new Airplane[2];
-		for (int i = 0; i < 2; i++) {
+		runwaysLanding = new int[N];
+		planesLanding = new Airplane[N];
+		for (int i = 0; i < N; i++) {
 			if (emergencyLanding[i] && landingPlaneExists[i] != null) {
-				SecondaryAnimation.animateMovePlaneToRunway(i,true,landingAllowed[2 * i], landingAllowed[2 * i + 1], landingPlaneExists[i]);
+				SecondaryAnimation.animateMovePlaneToRunway(i,true,landingAllowed[N * i], landingAllowed[N * i + 1], landingPlaneExists[i]);
 				if (landingPlaneExists[i] != null && landingPlaneExists[i].EnterLandingOrTakeoof && rescueTeams[i] != null) {
 					animateGetToLandingSpot(runwaysLanding,planesLanding);
 					animateEmergencyLandingLandingStage(i);
@@ -413,7 +413,7 @@ public class SmartAirport extends JPanel implements Constants{
 		public void animateGetToTakeOffSpot(int[] runway, Airplane[] planes) {
 			Map<Airplane, Boolean> gotToTakeOffSpot = new HashMap<Airplane, Boolean>();
 			Map<Airplane, Integer> runwayToPlane = new HashMap<Airplane, Integer>();
-			for (int i = 0; i < planes.length; i++) {
+			for (int i = 0; i < N; i++) {
 				if (planes[i] != null) {
 					gotToTakeOffSpot.put(planes[i], false);
 					runwayToPlane.put(planes[i], runway[i]);
@@ -464,7 +464,7 @@ public class SmartAirport extends JPanel implements Constants{
 		public void animateGetToLandingSpot(int[] runway, Airplane[] planes) {
 			Map<Airplane, Boolean> gotToTakeOffSpot = new HashMap<Airplane, Boolean>();
 			Map<Airplane, Integer> runwayToPlane = new HashMap<Airplane, Integer>();
-			for (int i = 0; i < planes.length; i++) {
+			for (int i = 0; i < N; i++) {
 				if (planes[i] != null) {
 					gotToTakeOffSpot.put(planes[i], false);
 					runwayToPlane.put(planes[i], runway[i]);
@@ -519,8 +519,8 @@ public class SmartAirport extends JPanel implements Constants{
 	// This function draws the rescue team and the flashlights that are used during the  emergency landing
 	private void drawRescueTeam(Graphics g, RescueTeam rescue) {
 		g.drawImage(rescue.rescueteamImage, rescue.x, rescue.y, this);
-		int waitingArea1X =175;
-		int waitingArea2X=600;
+		int waitingArea1X = 175;
+		int waitingArea2X = 600;
 		g.drawImage(rescue.flashlight, waitingArea1X, 135, this);
 		g.drawImage(rescue.flashlight, waitingArea1X, 205, this);
 		g.drawImage(rescue.flashlight, waitingArea1X, 225, this);
@@ -723,12 +723,12 @@ public class SmartAirport extends JPanel implements Constants{
 		super.paintComponent(g);
 
 		g.drawImage(AirportImages.airport, 0, 0, this);
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < N; i++) {
 			if (repairTruck[i] != null) {
 				drawTruck(g, repairTruck[i]);
 			}
 		}
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 2*N; i++) {
 			if (slipperyRunway[i] == true) {
 				if (stillCleaning[i]) {
 					drawOil(g, i);
@@ -738,7 +738,7 @@ public class SmartAirport extends JPanel implements Constants{
 				}
 			}
 		}
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < N; i++) {
 			if (rescueTeams[i] != null) {
 				drawRescueTeam(g, rescueTeams[i]);
 			}
@@ -761,7 +761,7 @@ public class SmartAirport extends JPanel implements Constants{
 		for (int i = 0; i < aircraftForTakeoff.length; i++) {
 			aircraftForTakeoff[i] = rand.nextBoolean();
 		}
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 2*N; i++) {
 			takeoffAllowed[i] = false;
 		}
 	};
