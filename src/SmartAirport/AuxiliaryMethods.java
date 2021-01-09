@@ -1,14 +1,7 @@
 package SmartAirport;
-
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Map;
 import java.util.Random;
-import java.util.TimeZone;
 
 import tau.smlab.syntech.controller.executor.ControllerExecutor;
 
@@ -17,9 +10,7 @@ import tau.smlab.syntech.controller.executor.ControllerExecutor;
 //***              This methods are often used during our simulation                   ***
 //****************************************************************************************
 
-public class AuxiliaryMethods {
-	static int degree_0 = 0;
-	static int degree_180 = 180;
+public class AuxiliaryMethods implements Constants{
 	public AuxiliaryMethods() throws IOException {
 	}
 	
@@ -259,20 +250,20 @@ public class AuxiliaryMethods {
 		}
 		// emergency Landing
 		boolean[] rescueArrived = new boolean[2];
-		for(int i = 0; i < 2; i++) {
+		for(int i = 0; i < N; i++) {
 			rescueArrived[i]= sysValues.get(getRescueTeamString(i)).equals("true");
 		}
 		boolean[] isnotLanding = new boolean[2];
-		for(int i = 0; i < 2; i++) {
+		for(int i = 0; i < N; i++) {
 			isnotLanding[i]= inputs.get(getLandingString(i)).equals("NONE");
 		}
 		if (isnotLanding[0] || isnotLanding[1]) {
 			if (isnotLanding[0] && isnotLanding[1]) {
-				for(int i = 0; i < 2; i++) {
+				for(int i = 0; i < N; i++) {
 					inputs.put(getEmergencyLandingString(i),String.valueOf(false));
 				}
 			} else { // Only on one of the platforms is there plane waiting to land.
-				for(int i = 0; i < 2; i++) {
+				for(int i = 0; i < N; i++) {
 					if(isnotLanding[i]) {
 						inputs.put(getEmergencyLandingString(i), String.valueOf(false));
 						if ((rescueArrived[0] && SmartAirport.emergencyLanding[0])||(rescueArrived[1] && SmartAirport.emergencyLanding[1])) {
@@ -291,12 +282,12 @@ public class AuxiliaryMethods {
 		} else {
 			// if emergency landing happens on one of the platform and rescue team arrives
 			if ((rescueArrived[0] && SmartAirport.emergencyLanding[0]) || (rescueArrived[1] && SmartAirport.emergencyLanding[1])) {
-				for(int i = 0; i < 2; i++) {
+				for(int i = 0; i < N; i++) {
 					inputs.put(getEmergencyLandingString(i),String.valueOf(false));
 				}
 			}// else if emergency landing happens on one of the platform and rescue team not arrives yet
 			else if((SmartAirport.emergencyLanding[0] && !rescueArrived[0]) || (SmartAirport.emergencyLanding[1] && !rescueArrived[1])){
-				for(int i = 0; i < 2; i++) {
+				for(int i = 0; i < N; i++) {
 					if(SmartAirport.emergencyLanding[i] && !rescueArrived[i]) {
 						inputs.put(getEmergencyLandingString(i), String.valueOf(true));
 						inputs.put(getEmergencyLandingString(1-i), String.valueOf(false));
@@ -315,7 +306,7 @@ public class AuxiliaryMethods {
 	// This function updates the panel inputs - which is caused by an event when the user clicks on one of the buttons
 	public static void updatePanelInputs(Map<String, String> inputs, Map<String, String> sysValues) {
 		if (SmartAirport.inManualScenario) {
-			for (int i = 0; i < 2; i++) {
+			for (int i = 0; i < N; i++) {
 				String Position = ((i == 0) ? "first" : "second");
 				if (SmartAirport.envMoves.get(String.format("takeoffAircrafts[%d]", i)) != null) {
 					String planeType = SmartAirport.envMoves.get(getTakeOffString(i));
@@ -324,7 +315,7 @@ public class AuxiliaryMethods {
 						continue;
 					}
 					//if there is no aircraft in the position OR the aircraft have no mechanical problem and already took off
-					if (SmartAirport.takeoffPlaneExists[i] == null || (!SmartAirport.mechanicalProblem[i] && (SmartAirport.takeoffAllowed[2 * i] || SmartAirport.takeoffAllowed[2 * i + 1]))) {
+					if (SmartAirport.takeoffPlaneExists[i] == null || (!SmartAirport.mechanicalProblem[i] && (SmartAirport.takeoffAllowed[N * i] || SmartAirport.takeoffAllowed[N * i + 1]))) {
 						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + planeType.toLowerCase() + " takeoff aircraft in "+ Position + " platform\n");
 						inputs.put(getTakeOffString(i), planeType);
 						SmartAirport.envMoves.remove(getTakeOffString(i));
@@ -337,7 +328,7 @@ public class AuxiliaryMethods {
 						continue;
 					}
 					//if there is no aircraft in the position OR the aircraft already landed
-					if (SmartAirport.landingPlaneExists[i] == null || (SmartAirport.landingAllowed[2 * i] || SmartAirport.landingAllowed[2 * i + 1])) {
+					if (SmartAirport.landingPlaneExists[i] == null || (SmartAirport.landingAllowed[N * i] || SmartAirport.landingAllowed[N * i + 1])) {
 						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + planeType.toLowerCase() + " landing aircraft in "+ Position + " platform\n");
 						inputs.put(getLandingString(i), planeType);
 						SmartAirport.envMoves.remove(getLandingString(i));
@@ -422,7 +413,7 @@ public class AuxiliaryMethods {
 	 */
 	public static void getEnvInputs(ControllerExecutor executor){
 		Map<String, String> envValues = executor.getCurrInputs();
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 2*N; i++) {
 			SmartAirport.slipperyRunway[i] = getBooleanValueFromMap(envValues, getSlipperyString(i));
 			if (SmartAirport.slipperyRunway[i]) {
 				SmartAirport.stillCleaning[i] = true;
@@ -430,7 +421,7 @@ public class AuxiliaryMethods {
 				SmartAirport.stillCleaning[i] = false;
 			}
 		}
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < N; i++) {
 			SmartAirport.mechanicalProblem[i] = getBooleanValueFromMap(envValues, getMechanicalProblemString(i));
 			SmartAirport.emergencyLanding[i] = getBooleanValueFromMap(envValues, getEmergencyLandingString(i));	
 		}
@@ -442,12 +433,12 @@ public class AuxiliaryMethods {
 	 */
 	public static void getSysInputs(ControllerExecutor executor){
 		Map<String, String> sysValues = executor.getCurrOutputs();
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 2*N; i++) {
 			SmartAirport.takeoffAllowed[i]  = getBooleanValueFromMap(sysValues, getTakeOffAllowedString(i));
 			SmartAirport.landingAllowed[i]  = getBooleanValueFromMap(sysValues, getLandingAllowedString(i));
 			SmartAirport.cleaningSensors[i] = getBooleanValueFromMap(sysValues, getCleanTruckString(i));
 		}
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < N; i++) {
 			if (sysValues.get(getRepairTruckString(i)).equals("true")) {
 				int repairtruck_entrance_pos_x = 720;
 				int repairtruck_entrance_pos_y = 600;

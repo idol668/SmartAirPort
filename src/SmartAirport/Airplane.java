@@ -45,16 +45,6 @@ public class Airplane {
 		return color;
 	}
 	
-	public void setPlaneToFirstRunway() {
-		this.EnterLandingOrTakeoof = true;
-		//this.y -= 40;
-	}
-	
-	public void setPlaneToSecondRunway() {
-		this.EnterLandingOrTakeoof = true;
-		//this.y += 62;
-	}
-	
 	// moves the x value of the plane and its shadow while doing some kind of movement 
 	public void movingPlaneAndShadow(int num) {
 		this.x += num;

@@ -30,33 +30,36 @@ public class SecondaryAnimation {
 
 	}
 	
-	// This function moves the plane from its waiting landing area to the runway it is going to use while performing landing
-	public static void animateGetPlaneToLandingSpot(int line,boolean landingAllowedFirstLine, boolean landingAllowedSecondLine, Airplane landingPlane) {
-		if (landingAllowedFirstLine && landingAllowedSecondLine) {
-			Random rand = new Random();
-			if (rand.nextBoolean() == true) {
-				landingPlane.setPlaneToSecondRunway();
-				landingPlane.line = 2*line +1;
-				SmartAirport.planesLanding[line]=landingPlane;
-				SmartAirport.runwaysLanding[line]=2*line +1;
-			} else {
-				landingPlane.setPlaneToFirstRunway();
-				SmartAirport.planesLanding[line]=landingPlane;
-				SmartAirport.runwaysLanding[line]=2*line;
-				landingPlane.line = 2*line;
+	// This function moves the plane from its waiting landing area to the runway it is going to use while performing landing/takeoff
+	// Note: in case of two possible runways we randomly choose one
+	public static void animateMovePlaneToRunway(int line, boolean islanding, boolean UsingFirstLineAllowed, boolean UsingSecondLineAllowed, Airplane Plane) {
+		if((UsingFirstLineAllowed && !slipperyRunway[2 * line]) || (UsingSecondLineAllowed&& !slipperyRunway[2 * line + 1])) {
+			Plane.EnterLandingOrTakeoof = true;
+			if (UsingFirstLineAllowed && UsingSecondLineAllowed && !slipperyRunway[2 * line] && !slipperyRunway[2 * line + 1]) {
+				Random rand = new Random();
+				if (rand.nextBoolean() == true) {
+					Plane.line = 2*line+1;
+				} else {
+					Plane.line = 2*line;
+				}
+			} else if (UsingFirstLineAllowed && !slipperyRunway[2 * line]) {
+				Plane.line = 2*line;
+			} else if (UsingSecondLineAllowed && !slipperyRunway[2 * line + 1]) {
+				Plane.line = 2*line+1;
 			}
-		} else if (landingAllowedFirstLine && !slipperyRunway[2 * line]) {
-			landingPlane.setPlaneToFirstRunway();
-			SmartAirport.planesLanding[line]=landingPlane;
-			SmartAirport.runwaysLanding[line]=2*line;
-			landingPlane.line = 2*line;
-		} else if (landingAllowedSecondLine && !slipperyRunway[2 * line + 1]) {
-			landingPlane.setPlaneToSecondRunway();
-			SmartAirport.planesLanding[line]=landingPlane;
-			SmartAirport.runwaysLanding[line]=2*line+1;
-			landingPlane.line =  2*line +1;
+			
+			if(islanding==true) {
+				SmartAirport.planesLanding[line] = Plane;
+				SmartAirport.runwaysLanding[line]= Plane.line;
+			}
+			else {
+				SmartAirport.planesTakeoff[line] = Plane;
+				SmartAirport.runwaysTakeOff[line] = Plane.line;
+			}
+			
+		} else {
+			Plane.EnterLandingOrTakeoof = false;
 		}
-		landingPlane.setShadowUnderPlane();
 	}
 	
 	// This function moves the rescue team to the correct spot
@@ -148,7 +151,7 @@ public class SecondaryAnimation {
 	
 	
 	/*The Function will make the planes that are waiting to land to go in circles until they'll get the chance to land */
-	public void animatedWaitingForLanding(int iteration, Airplane aircraft)
+	public static void animatedWaitingForLanding(int iteration, Airplane aircraft)
 	{
 		int planeSpeedX=4;
 		int planeSpeedY=3;
@@ -218,6 +221,108 @@ public class SecondaryAnimation {
 					}
 				}
 			}		
+		}
+	}
+	
+	// This function will simulate the landing of an airplane.
+	// The airplane moves on the runway and changes its speed according to the position on the runway.
+	public static void animatePlaneLanding(int loopStep,Airplane plane) {
+		int landinPlaneSpeed = 20;
+		int landinShadowgPlaneSpeed = 18;
+		int planeSpeedY = 1;
+		int min_upper_runway_y = 165;
+		int max_upper_runway_y = 400;
+		int max_lower_runway_y = 500;
+		
+		if (plane != null && plane.EnterLandingOrTakeoof && loopStep >= 9) {
+			if (loopStep < 21) {
+				plane.x_shadow += landinShadowgPlaneSpeed;
+				plane.x += landinPlaneSpeed;
+				if (loopStep>15 && loopStep<21){
+					plane.y -=planeSpeedY; 
+				}	
+			}
+			else if (loopStep == 21) {
+				plane.ground = true;
+			} else {
+				if (loopStep < 34) {
+					landinShadowgPlaneSpeed=22;
+					plane.x += landinPlaneSpeed;
+					plane.x_shadow += landinShadowgPlaneSpeed;
+				} else {
+
+					if (loopStep > 33 && loopStep < 40) {
+						if (plane.y > min_upper_runway_y && plane.y < max_upper_runway_y) {
+							plane.y -= planeSpeedY;
+						}
+						if (plane.y > max_upper_runway_y && plane.y < max_lower_runway_y) {
+							planeSpeedY=2;
+							plane.y += planeSpeedY;
+						}
+						landinPlaneSpeed=15;
+						plane.x += landinPlaneSpeed;
+					} else {
+						if (plane.y > min_upper_runway_y && plane.y < max_upper_runway_y) {
+							planeSpeedY=1;
+							plane.y -= planeSpeedY;
+						}
+						if (plane.y > max_upper_runway_y && plane.y < max_lower_runway_y) {
+							planeSpeedY=2;
+							plane.y += planeSpeedY;
+						}
+						landinPlaneSpeed=10;
+						plane.x += landinPlaneSpeed;
+					}
+					plane.setShadowUnderPlane();
+				}
+			}
+		}
+		if (plane != null && !plane.EnterLandingOrTakeoof) {
+			animatedWaitingForLanding(loopStep, plane);
+		}
+	}
+	
+	// This function will simulate the take-off of an airplane.
+	// The airplane moves on the runway and changes its speed according to the position on the runway.
+	public static void animatePlaneTakingOff(int loopStep,Airplane plane) {
+		int takeOffPlaneSpeed = 20;
+		int takeOffPlaneSpeedY = 1;
+		
+		if (plane != null && plane.EnterLandingOrTakeoof & loopStep >= 20) {
+			if (loopStep<29){
+				plane.x -= takeOffPlaneSpeed;
+				plane.x_shadow = (int) Math.round(plane.x_shadow - takeOffPlaneSpeed);
+				plane.y_shadow = (int) Math.round(plane.y_shadow - takeOffPlaneSpeedY);
+			} else if (loopStep == 29) {
+				plane.ground = false;
+			} else {
+				if (plane.y > 500 && plane.y < 650) {
+					takeOffPlaneSpeedY=3;
+					plane.y_shadow += takeOffPlaneSpeedY;
+					plane.y+=takeOffPlaneSpeedY; 
+	
+				}
+				if (plane.y > 230 && plane.y < 330) {
+					takeOffPlaneSpeedY=1;
+					plane.y_shadow += takeOffPlaneSpeedY;
+					plane.y+=takeOffPlaneSpeedY; 
+					
+				}
+				if (plane.y > 400 && plane.y < 500) {
+					takeOffPlaneSpeedY=2;
+					plane.y_shadow = (int) Math.round(plane.y_shadow -takeOffPlaneSpeedY);
+					plane.y= (int) Math.round(plane.y -takeOffPlaneSpeedY);
+					
+				} else {
+					takeOffPlaneSpeedY=1;
+					plane.y_shadow = (int) Math.round(plane.y_shadow -takeOffPlaneSpeedY);
+					plane.y= (int) Math.round(plane.y -takeOffPlaneSpeedY);
+	
+				}
+				takeOffPlaneSpeed=23;
+				plane.x -=takeOffPlaneSpeed;
+				plane.x_shadow = (int) Math.round(plane.x_shadow - takeOffPlaneSpeed);
+			}
 		}
 	}
 	
