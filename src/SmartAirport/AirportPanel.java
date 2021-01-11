@@ -85,7 +85,7 @@ public class AirportPanel {
 		String planesType = userPlaneType.split(" ")[0].toUpperCase();
 		if(AddlandingFirstPosition || AddlandingSecondPosition ||  AddtakeoffFirstPosition || AddtakeoffSecondPosition) {
 			SmartAirport.inManualScenario = true;
-			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +"Adding Aircrafts:\n");
+			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +" Adding Aircrafts:\n");
 			if (AddlandingFirstPosition) {
 				SmartAirport.envMoves.put(AuxiliaryMethods.getLandingString(0), planesType);
 			}
@@ -101,7 +101,7 @@ public class AirportPanel {
 		}
 		else {
 			SmartAirport.outputArea.setText("Missing selection\n");
-			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "Please Choose Landing or Taking off\n");
+			SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + " Please Choose Landing or Taking off\n");
 		}
 	}
 
@@ -110,7 +110,7 @@ public class AirportPanel {
 		if (SmartAirport.inScenario || SmartAirport.inManualScenario || aircraft.equals("-----"))
 			return;
 		SmartAirport.inManualScenario = true;
-		SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +"Perform Mechnical problem:\n");
+		SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +" Perform Mechnical problem:\n");
 		if (aircraft.equals("Takeoff Platform 1")) {
 			SmartAirport.envMoves.put(AuxiliaryMethods.getMechanicalProblemString(0), aircraft);
 		} else {
@@ -123,7 +123,7 @@ public class AirportPanel {
 		if (SmartAirport.inScenario || SmartAirport.inManualScenario || runway.equals("-----"))
 			return;
 		SmartAirport.inManualScenario = true;
-		SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "Perform Dirty Runway:\n");
+		SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + " Perform Dirty Runway:\n");
 		if (runway.equals("First Runway")) {
 			SmartAirport.envMoves.put(AuxiliaryMethods.getSlipperyString(0), runway);
 		} else if (runway.equals("Second Runway")) {
@@ -140,7 +140,7 @@ public class AirportPanel {
 		if (SmartAirport.inScenario || SmartAirport.inManualScenario || aircraft.equals("-----"))
 			return;
 		SmartAirport.inManualScenario = true;
-		SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +"Perform Emergency Landing:\n");
+		SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +" Perform Emergency Landing:\n");
 		if (aircraft.equals("Landing Platform 1")) {
 			SmartAirport.envMoves.put(AuxiliaryMethods.getEmergencyLandingString(0), aircraft);
 		} else {

@@ -316,7 +316,7 @@ public class AuxiliaryMethods implements Constants{
 					}
 					//if there is no aircraft in the position OR the aircraft have no mechanical problem and already took off
 					if (SmartAirport.takeoffPlaneExists[i] == null || (!SmartAirport.mechanicalProblem[i] && (SmartAirport.takeoffAllowed[N * i] || SmartAirport.takeoffAllowed[N * i + 1]))) {
-						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + planeType.toLowerCase() + " takeoff aircraft in "+ Position + " platform\n");
+						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + " - adding " + planeType.toLowerCase() + " takeoff aircraft in "+ Position + " platform\n");
 						inputs.put(getTakeOffString(i), planeType);
 						SmartAirport.envMoves.remove(getTakeOffString(i));
 					}
@@ -329,7 +329,7 @@ public class AuxiliaryMethods implements Constants{
 					}
 					//if there is no aircraft in the position OR the aircraft already landed
 					if (SmartAirport.landingPlaneExists[i] == null || (SmartAirport.landingAllowed[N * i] || SmartAirport.landingAllowed[N * i + 1])) {
-						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + "- adding " + planeType.toLowerCase() + " landing aircraft in "+ Position + " platform\n");
+						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() + " - adding " + planeType.toLowerCase() + " landing aircraft in "+ Position + " platform\n");
 						inputs.put(getLandingString(i), planeType);
 						SmartAirport.envMoves.remove(getLandingString(i));
 					}
@@ -344,7 +344,8 @@ public class AuxiliaryMethods implements Constants{
 						continue;
 					}
 					inputs.put(getMechanicalProblemString(i), "true");
-					SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +"- adding mechanical problem in the aircarf waiting\n in  "+mechanicalProblemMove.toLowerCase()+"\n");
+					SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +" - The aircraft waiting in "+mechanicalProblemMove.toLowerCase()+"\n has a mechanical problem now!\n");
+					SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +" - In this stage or in the next stages, the system\n will send a repair truck\n");
 					SmartAirport.envMoves.remove(getMechanicalProblemString(i));
 				}
 				
@@ -361,7 +362,8 @@ public class AuxiliaryMethods implements Constants{
 					if (isAircaftLanding && !(SmartAirport.emergencyLanding[i] && rescueArrived)) {
 						inputs.put(getEmergencyLandingString(i), String.valueOf(true));
 						inputs.put(getEmergencyLandingString(j), String.valueOf(false));
-						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +"- adding emergency from "+EmergencyLandingMove.toLowerCase()+"\n");
+						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +" - The aircraft in "+EmergencyLandingMove.toLowerCase()+" is performing\n an emergency landing!!\n");
+						SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +" - The system will send a rescue team immediately!!\n");
 						SmartAirport.envMoves.remove(getEmergencyLandingString(i));
 					}
 				}
@@ -374,7 +376,8 @@ public class AuxiliaryMethods implements Constants{
 						continue;
 					}
 					inputs.put(getSlipperyString(i), "true");
-					SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +"- adding a dirty runway in "+sllipryrunwayMove.toLowerCase()+"\n");
+					SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +" - The "+sllipryrunwayMove.toLowerCase()+" is now dirty!\n");
+					SmartAirport.outputArea.setText(SmartAirport.outputArea.getText() +" - In this stage or in the next stages, the system\n will send a clean truck\n");
 					SmartAirport.envMoves.remove(getSlipperyString(i));
 				}
 			}
