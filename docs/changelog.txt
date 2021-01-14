@@ -1,8 +1,0 @@
-Changes from Sprint 2 to Sprint 3
----------------------------------
-1. Added the emergency landing feature to the specification and the UI.
-2. Added a responsive panel to the UI.
-3. Improve the simulation appreance( fine tunning).
-4. Added new classes and started organzing and splitting the code into different classes.
-
-Note : we added our "bad" attempts for the emergancy landinds specification in the specftra file and the issues we encountred .
